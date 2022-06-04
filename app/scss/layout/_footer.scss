@@ -1,0 +1,39 @@
+// ======================================
+//  Footer Styles
+// ======================================
+
+.footer{ background-color: $color_bg; color: $white; font-size: $font_size_small; }
+
+.footer p {
+    font-size: $font_size_small;
+    padding:20px 0px 0px 0px;
+    color: $white;
+  }
+
+  a.footerlinks {
+    color: $white;
+    text-decoration: none;
+    &.footerlinks:hover{
+      color: $white;
+      text-decoration: underline;  
+    }
+    &.footerlinks:visited{
+      color: $white;  
+    }
+    &.footerlinks:active{
+      color: $white;  
+    }
+  }
+  @media (min-width: $break_l) {
+    
+  }
+  @media (min-width: $break_m) {
+  
+  }  
+  @media (max-width: $break_s) {
+    .footer .text-left{ text-align: center !important; }
+    .footer .text-right{ text-align: center !important; }
+    .footer .text-left p { padding: 0px 0px 0px 0px; margin: 20px 0px 0px 0px; }
+    .footer .text-right p { padding: 0px 0px 0px 0px; margin: 0px 0px 20px 0px; }
+    .footer p { font-size: $font_size_small; }
+  }

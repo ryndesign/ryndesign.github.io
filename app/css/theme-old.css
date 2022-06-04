@@ -1,0 +1,257 @@
+@charset "UTF-8";
+/* CSS Document */
+
+/* INDEX______________________________________
+
+01. GENERAL STYLES
+02. NAVIGATION
+03. FOOTER
+04. TYPOGRAPHY
+05. HOME
+06. SUB PAGES
+07. MEDIA QUERIES
+
+____________________________________________*/
+
+
+/* -- 01. GENERAL STYLES ------------------------------------ */
+html,body {overflow-x: hidden;}
+img, a {border:0; outline: none;}
+body{ font-family: 'Open Sans', sans-serif; font-weight: normal; font-size:1.125em; line-height: 1.8; }
+
+/* unvisited link */
+a:link {
+    color: #000; text-decoration: underline; 
+}
+
+/* visited link */
+a:visited {
+    color: #333;
+}
+
+/* mouse over link */
+a:hover {
+    color: #333; 
+}
+
+/* selected link */
+a:active {
+    color: #333;
+}
+
+/* Tempalte Sections */	
+.header{ background-color: #999;; z-index: 25; }
+.main{ background-color: #FFF; min-height: 400px; }
+
+.fixed-top-pad{
+
+    /* Fix Nav Margin Height of Menu */     
+    margin-top:50px;   
+
+}
+
+.footer{ background-color: #333; color: #FFF; font-size: 0.875em; }
+
+/* -- 02. NAVIGATION ------------------------------------ */
+
+.navbar-default {
+    background-color: #f8f8f8;
+    border-color: #e7e7e7;
+
+    /* Default Margin */  
+    margin-top: 0px;
+}
+
+.navbar {
+    position: relative;
+    min-height: 50px;
+    margin-bottom: 20px;
+    border: 1px solid transparent!important;
+}
+ 
+/* Animated Hamburger Menu*/
+  #nav-icon{
+    top:15px;
+    right:15px;
+    width: 25px;
+    height: 19px;
+    position: relative;
+    margin: 0px auto;
+    -webkit-transform: rotate(0deg);
+    -moz-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
+    transform: rotate(0deg);
+    -webkit-transition: .5s ease-in-out;
+    -moz-transition: .5s ease-in-out;
+    -o-transition: .5s ease-in-out;
+    transition: .5s ease-in-out;
+    cursor: pointer;
+  }
+  
+  #nav-icon span {
+    display: block;
+    position: absolute;
+    height: 3px;
+    width: 100%;
+    background: #333;
+    border-radius: 0px;
+    opacity: 1;
+    left: 0;
+    -webkit-transform: rotate(0deg);
+    -moz-transform: rotate(0deg);
+    -o-transform: rotate(0deg);
+    transform: rotate(0deg);
+    -webkit-transition: .25s ease-in-out;
+    -moz-transition: .25s ease-in-out;
+    -o-transition: .25s ease-in-out;
+    transition: .25s ease-in-out;
+  } 
+  
+  #nav-icon span:nth-child(1) {
+    top: 0px;
+  }
+  
+  #nav-icon span:nth-child(2),#nav-icon span:nth-child(3) {
+    top: 8px;
+  }
+  
+  #nav-icon span:nth-child(4) {
+    top: 16px;
+  }
+  
+  #nav-icon.open span:nth-child(1) {
+    top: 8px;
+    width: 0%;
+    left: 50%;
+  }
+  
+  #nav-icon.open span:nth-child(2) {
+    -webkit-transform: rotate(45deg);
+    -moz-transform: rotate(45deg);
+    -o-transform: rotate(45deg);
+    transform: rotate(45deg);
+  }
+  
+  #nav-icon.open span:nth-child(3) {
+    -webkit-transform: rotate(-45deg);
+    -moz-transform: rotate(-45deg);
+    -o-transform: rotate(-45deg);
+    transform: rotate(-45deg);
+  }
+  
+  #nav-icon.open span:nth-child(4) {
+    top: 8px;
+    width: 0%;
+    left: 50%;
+  }
+  
+
+
+/* -- 03. FOOTER ------------------------------------ */
+
+.footer p{ padding:10px 0px 0px 0px; }
+
+/* unvisited link */
+a.footerlinks:link {
+    color: #FFF; text-decoration: none;
+}
+
+/* mouse over link */
+a.footerlinks:hover {
+	color: #FFF; text-decoration: underline;
+}
+
+/* visited link */
+a.footerlinks:visited {
+    color: #FFF; text-decoration: none;
+}
+
+/* selected link */
+a.footerlinks:active {
+    color: #FFF; text-decoration: none;
+}
+
+
+/* -- 04. TYPOGRAPHY ------------------------------------ */
+
+.h1, .h2, .h3, h1, h2, h3 {
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+.h1-title{ font-family: 'Open Sans', sans-serif; font-weight: 500; font-size:3.750em; }
+.h2-title{ font-family: 'Roboto Condensed', sans-serif; font-weight: 900; font-size:2.625em; line-height: 1.4  }
+
+
+
+/* -- 05. HOME ------------------------------------ */
+
+
+/* -- 06. SUB PAGES ------------------------------------ */
+
+
+/* -- 07. MEDIA QUERIES ------------------------------------ */
+
+@media (max-width: 480px) {
+
+}
+
+@media (max-width: 767px) {
+    
+    /* Fixed Nav Full Screen */
+    .navbar-default .navbar-collapse {
+        border-color: #e7e7e7;
+        max-height: 100vh!important;
+        transition: .2s cubic-bezier(0.18, 0.82, 0.85, 1.49) .2s;
+        
+    }    
+      
+    .navbar-collapse.in {
+        min-height:calc(100vh - 0px);
+    }    
+
+    .navbar-nav {
+        margin: 0px -15px!important;
+
+        /* Fixed Nav FadeInDown */
+        animation: fadeInDown 0.75s;
+        
+    }
+    
+    .navbar-toggle {
+        position: relative!important;
+        float: right!important;
+        padding: 0px!important;
+        margin-top: 0px!important;
+        margin-right: 0px!important;
+        margin-bottom: 0px!important;
+        background-color: transparent!important;
+        background-image: none!important;
+        border: 0px solid transparent!important;
+        border-radius: 0px!important;
+    }
+
+    .h1-title{ font-size:2.4em; line-height: 1.2; }
+    .h2-title{ font-size:2em; line-height: 1.2; }
+    
+    p { font-size:1.125em; line-height: 1.8; }
+
+	.footer .text-left{ text-align: center; }
+    .footer .text-right{ text-align: center; }
+    .footer .text-left p { padding: 0px 0px 0px 0px; margin: 20px 0px 0px 0px; }
+    .footer .text-right p { padding: 0px 0px 0px 0px; margin: 0px 0px 20px 0px; }
+    .footer p { font-size: 1.063em; }
+
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+
+}
+
+@media (min-width: 992px) and (max-width: 1199px) {
+
+}
+
+@media (min-width: 1200px) {
+
+}

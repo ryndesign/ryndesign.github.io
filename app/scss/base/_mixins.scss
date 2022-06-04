@@ -1,0 +1,320 @@
+//Scss Document
+
+// ======================================
+//  Mixins
+// ======================================
+
+// Buttons mixin Start
+@mixin button-main($color_main, $text) {
+    background-color: $color_main;
+    color: $text;
+		font-size: $font_size_regular;
+		border: 2px solid $color_main ;
+		border-radius: 5px;
+		padding: .35em .8em;
+		&:hover {
+			cursor: pointer;
+			background-color: lighten($color_main, 50%);
+			border: 2px solid $color_main ;
+			color: darken($text, 100%);
+			transition: all 0.3s ease;
+			text-decoration: underline;
+		}
+}
+
+@mixin button-sub($color, $text) {
+    background-color: $color;
+    color: $text;
+    font-size: $font_size_regular;
+		border: 2px solid $color;
+		border-radius: 5px;
+		padding: .35em .8em;
+		&:hover {
+			cursor: pointer;
+			color: darken($text, 90%);
+			background-color: lighten($color, 15%);
+			transition: all 0.3s ease;
+			text-decoration: underline;
+		}
+}
+
+// Buttons mixin End
+
+//Padding Mixin Start - this can be used for Margins as well. Just copy and past the code and change all instances of padding to margin
+
+@mixin padding($values...){
+	$full_padding_str: null;
+	$half_padding_str: null;
+	$quarter_padding_str: null;
+
+	@each $var in $values {
+		$new_full: #{$var}px;
+		$calc_half: calc(#{$var}px/2);
+		$calc_quarter: calc(#{$var}px/4);
+		$new_half: #{$calc_half};
+		$new_quarter: #{$calc_quarter};
+
+		$full_padding_str: #{$full_padding_str} #{$new_full};
+		$half_padding_str: #{$half_padding_str} #{$new_half};
+		$quarter_padding_str: #{$quarter_padding_str} #{$new_quarter};
+	}
+
+	padding: $full_padding_str;
+	@media (max-width: $break_l) {
+		padding: $half_padding_str;
+	}
+	@media (max-width: $break_s) {
+		padding: $quarter_padding_str;
+	}
+}
+
+// Example
+// .class{
+// 	@include padding(50, 25);
+// 	}
+
+//Padding Mixin End
+
+
+// Vertical Center Mixin Start
+
+@mixin vertical-center {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+  }
+
+//Example
+
+// .parent {
+// 	position: relative;
+//   }
+//   .child {
+// 	@include vertical-center;
+//   }
+
+// Vertical Center Mixin End
+
+
+//Banner image Placeholder start
+
+%bg-image {
+    width: 100%;
+    background-position: center center;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+//usage example
+
+// .image-one {
+//     @extend %bg-image;
+//     background-image:url(/img/image-one.jpg");
+// }
+
+//Banner image Placeholder end
+
+
+// Arrow with Four Optional Directions
+
+// Even if an arrow is not the most spectacular part of a web page, we frequently need to use it. 
+// And, it’s not that easy to create it with CSS, as you need to use a certain technique that can be hard to remember. 
+// This mixin helps you quickly create an arrow with CSS. 
+// You can choose from four directions (up, down, left, right) and set the size and color of the arrow.
+
+@mixin arrow($direction: down, $size: 5px, $color: #555) {
+	width: 0;
+	height: 0;
+	@if ($direction == left) {
+	   border-top: $size solid transparent;
+	   border-bottom: $size solid transparent; 
+	   border-right: $size solid $color;
+	}
+	@else if ($direction == right) {
+	   border-top: $size solid transparent;
+	   border-bottom: $size solid transparent; 
+	   border-left: $size solid $color;
+	}
+	@else if ($direction == down) {
+	   border-left: $size solid transparent;
+	   border-right: $size solid transparent;
+	   border-top: $size solid $color;
+	}
+	@else {
+	   border-left: $size solid transparent;
+	   border-right: $size solid transparent;
+	   border-bottom: $size solid $color;
+	}
+ }
+
+//  The arrow mixin takes three arguments: the direction, size, and color of the arrow. 
+//  However, as the mixin also comes with defaults for the arguments (down, 5px, #555), 
+//  you can also use it without specifying custom arguments.
+
+//  Example
+//  without arguments (default)
+// div { 
+// 	@include arrow(); 
+//  }
+ 
+//  with custom arguments
+//  div {
+// 	@include arrow(up, 10px, #efefef);
+//  }
+
+// Arrow with Four Optional Directions END
+
+
+// Centered mixin
+//This mixin is used for centering I do have an example above but will remove or move down to the bottom for archive
+//Usage is in the example below
+// More of the mixin here > https://css-tricks.com/snippets/sass/centering-mixin/
+@mixin centered($horizontal: true, $vertical: true) {
+	position: absolute;
+	@if ($horizontal and $vertical) {
+	  top: 50%;
+	  left: 50%;
+	  transform: translate(-50%, -50%);
+	} @else if ($horizontal) {
+	  left: 50%;
+	  transform: translate(-50%, 0);
+	} @else if ($vertical) {
+	  top: 50%;
+	  transform: translate(0, -50%);
+	}
+  }
+
+//Example 
+// .child {
+// 	background: white;
+// 	padding: 20px;
+  
+// 	&.both {
+// 	  @include center;
+// 	}
+  
+// 	&.horizontal {
+// 	  @include center(true, false);
+// 	}
+  
+// 	&.vertical {
+// 	  @include center(false, true);
+// 	}
+//   }
+
+// Centerer mixin END
+
+// Extended Centering mixin
+// More on this mixin here > https://codepen.io/ilokano/pen/mJxJPL
+
+  @mixin center($pos:both ) {
+	position: absolute;
+		@if ($pos==both) {
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		} @else if ($pos==top) {
+		left: 50%;
+		transform: translate(-50%, 0);
+		} @else if ($pos==left) {
+		top: 50%;
+		transform: translate(0, -50%);
+		} @else if ($pos==right) {
+		top: 50%;
+		right:0;
+		transform: translate(0, -50%);
+		} @else if ($pos==bottom) {
+		bottom: 0;
+		left:50%;
+		transform: translate(-50%, 0);
+		}
+  	}
+
+
+// Example 
+
+// .child {
+	// 	background: white;
+	// 	padding: 20px;
+		// 	&.both {
+		// 	  @include center(both);
+		// 	}
+		// 	&.top {
+		// 	  @include center(top);
+		// 	}	
+		// 	&.right {
+		// 	  @include center(right);
+		// 	}	
+		// 	&.bottom {
+		// 	  @include center(bottom);
+		// 	}	
+		// 	&.left {
+		// 	  @include center(left);
+		// 	}	
+	//  }
+// Extended Centering mixin END
+
+
+// Mixin for basic CSS triangles
+// Usage below
+// @include triangle(size, colour, direction);
+
+@mixin triangle($size, $color, $direction) {
+    height: 0;
+    width: 0;
+
+    $width: nth($size, 1);
+    $height: nth($size, length($size));
+
+    $width: $width / 2;
+    $height: if(length($size) > 1, $height, $height/2);
+
+    @if $direction == up {
+        border-bottom: $height solid $color;
+        border-left: $width solid transparent;
+        border-right: $width solid transparent;
+
+    } @else if $direction == right {
+        border-left: $height solid $color;
+        border-bottom: $width solid transparent;
+        border-top: $width solid transparent;
+
+    } @else if $direction == down {
+        border-top: $height solid $color;
+        border-left: $width solid transparent;
+        border-right: $width solid transparent;
+
+    } @else if $direction == left {
+        border-right: $height solid $color;
+        border-bottom: $width solid transparent;
+        border-top: $width solid transparent;
+    }
+}
+
+// This probably won't be used but I thought I would add it in.
+// Mixin that calculates if text needs to be light or dark
+// depending on the background color passed.
+
+// From this W3C document: http://www.webmasterworld.com/r.cgi?f=88&d=9769&url=http://www.w3.org/TR/AERT#color-contrast
+			
+// Color brightness is determined by the following formula: 
+// ((Red value X 299) + (Green value X 587) + (Blue value X 114)) / 1000
+
+// Usage below
+// .class{
+// background-color:#000000; 
+// 	@include text-contrast(#000000);
+// }
+@mixin text-contrast($n) {
+	$color-brightness: round((red($n) * 299) + (green($n) * 587) + (blue($n) * 114) / 1000);
+	$light-color: round((red(#ffffff) * 299) + (green(#ffffff) * 587) + (blue(#ffffff) * 114) / 1000);
+	
+	@if abs($color-brightness) < ($light-color/2.7){
+	  color: white;
+	}
+  
+	@else {
+	  color: black;
+	}
+  }

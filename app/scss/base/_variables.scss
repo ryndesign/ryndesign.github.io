@@ -1,0 +1,79 @@
+// Scss Document
+
+// ======================================
+//  Variables
+// ======================================
+
+
+// Base
+$base_font_family: 'Montserrat', sans-serif;
+$base_font_weight:500; 
+$base_font_size:18px; 
+$base_color_text:#333333; 
+$base_line_height:1.6; 
+
+// Containers
+$min_container_height: 600px;
+
+
+// Colors
+$white: #fff;
+$black: #101010;
+
+$color_text: #333333;
+$color_primary: #333333;   
+$color_primary_light: lighten($color_primary, 50%);
+
+$color_secondary: #000000; // dark violet red
+$color_secondary_light: lighten($color_secondary, 50%);
+
+$color_link: #337ab7;
+$color_link_hover: #FF404C;
+$color_shade: #000000;
+
+$color_bg: #333333;
+$color_bg_light: lighten($color_bg, 50%);
+
+
+// Fonts
+$font_stack_secondary: 'Open Sans', sans-serif;
+
+$font_size_small: 0.778em;
+$font_size_regular: 1em; //Paragraph
+$font_size_large: 1.25em;
+$font_size_x_large: 1.75em;
+$font_size_xx_large: 2.000em;
+$font_size_xxx_large: 2.225em;  //H2
+$font_size_xxxx_large: 3.550em; //H1
+
+// Font Weight
+$font_weight_light: 300;
+$font_weight_regular: 500;
+$font_weight_semibold: 700;
+$font_weight_bold: 900;
+
+// Line Height
+$line_height_small: 1.25em;
+$line_height_regular: 1.6em; //Base Line Height
+$line_height_large: 1.8em;
+
+
+// Layout
+$max_width: 1000px;
+
+//Breakpoints
+$break_xs: 480px;
+$break_s: 767px;
+$break_m: 768px;
+$break_l: 991px;
+$break_xl: 1024px;
+$break_xxl: 1200px;
+$break_xxxl: 1440px;
+
+//Devices
+// $ipads-both: "only screen and (min-device-width : 768px) and (max-device-width : 1024px)";
+// $ipads-landscape: "only screen and (min-device-width : 768px) and (max-device-width : 1024px) and (orientation : landscape)";
+// $ipads-portrait: "only screen and (min-device-width : 768px) and (max-device-width : 1024px) and (orientation : portrait)";
+// $smartphones-both: "only screen and (min-device-width : 320px) and (max-device-width : 480px)";
+// $smartphones-landscape: "only screen and (min-width : 321px)";
+// $smartphones-portrait: "only screen and (max-width : 320px)";

@@ -1,0 +1,10 @@
+User-agent: *
+Disallow: /staging.bedbuginspection.ca/
+Disallow: /old-bkp/
+Disallow: /old_live_insp/
+
+Sitemap: https://www.bedbuginspection.ca/sitemap.xml
+
+User-Agent: Googlebot
+Allow: .js
+Allow: .css
