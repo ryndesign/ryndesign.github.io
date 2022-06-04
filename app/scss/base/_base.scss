@@ -1,0 +1,87 @@
+// Scss Document 
+
+// ======================================
+//  Base Styles
+// ======================================
+
+img[alt=””], img:not([alt]) { border: 2px dashed #c00 }
+
+
+html,body { 
+  overflow-x: hidden;
+  font-family: $base_font_family; 
+  font-weight: $base_font_weight; 
+  font-size:$base_font_size; 
+  color: $base_color_text; 
+  line-height: $base_line_height;  
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  
+  &:hover {
+    color: #c00;
+    text-decoration: underline;
+  }
+  &:active {
+    color: inherit;
+  }
+}
+
+
+//Typography
+
+h1{ 
+  font-size: 15em;   
+  font-weight: 900; 
+  color: $white; 
+  line-height: 0.85em;
+}
+
+
+
+p{ 
+  font-size:$font_size_regular; 
+  font-weight: $font_weight_regular;   
+  color: $color_primary; 
+  line-height: $line_height_regular;
+    
+}
+
+/* applies to GIF and PNG images; avoids blurry edges */
+// img[src$=".gif"], img[src$=".png"] {
+//   image-rendering: auto;
+// }
+
+a.skip-main {
+  left:-999px;
+  position:absolute;
+  top:auto;
+  width:1px;
+  height:1px;
+  overflow:hidden;
+  z-index:-999;
+  &:focus, &:active {
+    color: #fff;
+    background-color:#333;
+    left: auto;
+    top: 0;
+    width: 20%;
+    height: 50px;
+    overflow:auto;
+    margin: 0%;
+    padding:5px;
+    text-align:center;
+    font-size:1.2em;
+    z-index:1031; 
+  }
+}
+
+
+
+
+
+
+
+

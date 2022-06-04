@@ -1,0 +1,23 @@
+//Scss Document
+
+// ======================================
+//  Layout
+// ======================================
+
+// File to set strict or specific Layout Rules for .i.e. #sidebar, #header, #article .etc.
+
+
+.headerPad{
+    @include padding(30, 15, 30, 15);
+
+    // @media (max-width: 1200px) {
+    //     @include padding(10, 30, 10, 30);
+    // }
+    // @media (max-width: 991px) {
+    //     @include padding(10, 100, 10, 100);
+    // }
+} 
+
+
+.main{ background-color: $white; min-height: $min_container_height; }
+
