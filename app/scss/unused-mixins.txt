@@ -1,0 +1,165 @@
+////   Back-ups / Not used
+
+//Padding Mixin Start
+
+// padding: 5px 10px 25px; // top, right/left, bottom
+// padding: 5px 10px; //top/bottom,
+
+@mixin padding($top:null, $right:null, $bottom:null, $left:null){
+
+	$new_half_top: calc(#{$top}/2);
+	$new_half_right: calc(#{$right}/2);
+	$new_half_bottom: calc(#{$bottom}/2);
+	$new_half_left: calc(#{$left}/2);
+
+	$new_quarter_top: calc(#{$top}/4);
+	$new_quarter_right: calc(#{$right}/4);
+	$new_quarter_bottom: calc(#{$bottom}/4);
+	$new_quarter_left: calc(#{$left}/4);
+	// padding: #{$top}px #{$right}px #{$bottom}px #{$left}px;
+	@media ($break_l) {
+		padding: #{$new_half_top}px #{$new_half_right}px #{$new_half_bottom}px #{$new_half_left}px;
+	}
+	@media ($break_s) {
+		padding: #{$new_quarter_top}px #{$new_quarter_right}px #{$new_quarter_bottom}px #{$new_quarter_left}px;
+	}
+}
+
+@mixin padding($top:null, $right:null, $bottom:null, $left:null){
+	$new_full_top: $top;
+	$new_half_top: $top;
+	$new_quarter_top: $top;
+	$new_full_right: $right;
+	$new_half_right: $right;
+	$new_quarter_right: $right;
+	$new_full_bottom: $bottom;
+	$new_half_bottom: $bottom;
+	$new_quarter_bottom: $bottom;
+	$new_full_left: $left;
+	$new_half_left: $left;
+	$new_quarter_left: $left;
+
+	@if($top){
+		$new_full_top: #{$top}px;
+		$calc_half_top: calc(#{$top}/2);
+		$calc_quarter_top: calc(#{$top}/4);
+		$new_half_top: #{$calc_half_top}px;
+		$new_quarter_top: #{$calc_quarter_top}px;
+	}
+
+	@if($right){
+		$new_full_right: #{$right}px;
+		$calc_half_right: calc(#{$right}/2);
+		$calc_quarter_right: calc(#{$right}/4);
+		$new_half_right: #{$calc_half_right}px;
+		$new_quarter_right: #{$calc_quarter_right}px;
+	}
+
+	@if($bottom){
+		$new_full_bottom: #{$bottom}px;
+		$calc_half_bottom: calc(#{$bottom}/2);
+		$calc_quarter_bottom: calc(#{$bottom}/4);
+		$new_half_bottom: #{$calc_half_bottom}px;
+		$new_quarter_bottom: #{$calc_quarter_bottom}px;
+	}
+
+	@if($left){
+		$new_full_left: #{$left}px;
+		$calc_half_left: calc(#{$left}/2);
+		$calc_quarter_left: calc(#{$left}/4);
+		$new_half_left: #{$calc_half_left}px;
+		$new_quarter_left: #{$calc_quarter_left}px;
+	}
+
+	padding: #{$new_full_top} #{$new_full_right} #{$new_full_bottom} #{$new_full_left};
+
+	@media ($break_l) {
+		padding: #{$new_half_top} #{$new_half_right} #{$new_half_bottom} #{$new_half_left};
+	}
+	@media ($break_s) {
+		padding: #{$new_quarter_top} #{$new_quarter_right} #{$new_quarter_bottom} #{$new_quarter_left};
+	}
+}
+
+
+// / Horizontally and vertically centers block elements
+// / Important: you must have a parent element with `position: relative`.
+// / @access public
+// / @example scss - Usage
+// /   .foo {
+// /     @include center-both;
+// /   }
+// / @example css - Result
+// /   .foo {
+// /     position: absolute;
+// /     top: 50%;
+// /     left: 50%;
+// /     -webkit-transform: translate(-50%, -50%);
+// /     -ms-transform: translate(-50%, -50%);
+// /     transform: translate(-50%, -50%);
+// /   }
+@mixin center-both {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    @include prefix(transform, translate(-50%, -50%), 'webkit' 'ms');
+}
+
+// / Horizontally centers block elements
+// / @access public
+// / @example scss - Usage
+// /   .foo {
+// /     @include center-block;
+// /   }
+// / @example css - Result
+// /   .foo {
+// /     display: block;
+// /     margin-left: auto;
+// /     margin-right: auto;
+// /   }
+@mixin center-block {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+// / Vertically centers block elements with known height.
+// / @access public
+// / @param {Length} $height - Element's height
+// / @example scss - Usage
+// /   .foo {
+// /     @include center-h(42px);
+// /   }
+// / @example css - Result
+// /   .foo {
+// /     position: absolute;
+// /     top: 50%;
+// /     height: 42px;
+// /     margin-top: -21px;
+// /   }
+@mixin center-h($height) {
+    position: absolute;
+    top: 50%;
+    height: $height;
+    margin-top: -($height / 2);
+}
+
+// / Vertically centers block elements with unknown height.
+// / @access public
+// / @example scss - Usage
+// /   .foo {
+// /     @include center-h--unk;
+// /   }
+// / @example css - Result
+// /   .foo {
+// /     position: relative;
+// /     top: 50%;
+// /     -webkit-transform: translateY(-50%);
+// /     -ms-transform: translateY(-50%);
+// /     transform: translateY(-50%);
+// /   }
+@mixin center-h--unk {
+    position: relative;
+    top: 50%;
+    @include prefix(transform, translateY(-50%), 'webkit' 'ms');
+}
