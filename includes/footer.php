@@ -1,0 +1,1 @@
+<div class="footer container-fluid"><div class="row"><div class="col-sm-12 text-center"><p>Ryan Newport ® <?php echo date("Y"); ?>&nbsp;&nbsp;|&nbsp;&nbsp;ryndesign@gmail.com&nbsp;&nbsp;|&nbsp;&nbsp;(905) 391-8804</p></div></div></div>
