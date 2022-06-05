@@ -65,6 +65,13 @@ a {
   a:active {
     color: inherit; }
 
+a.-white-link {
+  color: #ffffff;
+  font-size: 14px; }
+
+a.-white-link:hover {
+  color: #00afef; }
+
 a.-link {
   color: #00afef; }
 
