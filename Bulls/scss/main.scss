@@ -12,12 +12,15 @@ body{
 header{
     background-color: #3CB4E7;
     position: fixed;
+    width: 100%;
+    margin: auto 0;
+    text-align: center;
     left: 50%;
-    top: 50px;
+    top: 35px;
     transform: translate(-50%, 0);
     img{
-      height: 125px;
-      transition: all .2s ease-in-out;
+      height: 120px;
+      padding: 0px 0px 10px;
     }
 }
 
