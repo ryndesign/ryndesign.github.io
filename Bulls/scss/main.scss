@@ -13,17 +13,24 @@ header{
     background-color: #3CB4E7;
     position: fixed;
     left: 50%;
-    top: 30px;
+    top: 45px;
     transform: translate(-50%, 0);
     img{
       height: 250px;
+      transition: all .2s ease-in-out;
       @media (max-width: 991px) {
           height: 250px;
       }
     }
 }
+
+.highlight {
+  height: 100px;
+  transition: all .2s ease-in-out;
+}
+
 main {
-    margin-top: 300px;
+    margin-top: 325px;
   }
 
 
@@ -61,10 +68,11 @@ table.dataTable.no-footer {
 // TICKER
 
 .ticker_wrapper{
-    position: relative;
+    position: fixed;
     margin: 0 auto;
-    width: 80%;
+    width: 100%;
     overflow: hidden;
+    top: 0px;
     @media (max-width: 767px) {
         width: 100%;
     }
