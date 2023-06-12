@@ -19,12 +19,12 @@ header{
       height: 120px;
     }
     @media (max-width: 991px) {
-     top: 50px!important;
+     top: 48px!important;
   }
 }
 
 main {
-  margin-top: 180px;
+  margin-top: 183px;
 }
 
 .dataTables_wrapper {
@@ -52,6 +52,15 @@ table.dataTable {
         width: 100%;
         margin-bottom: 0px;
     }
+}
+
+.sorting_1, .sorting_desc{
+  background-color: #ececec;
+  font-weight: 600;
+}
+
+td strong{
+  font-weight: 600;
 }
 
 table.dataTable.no-footer {
