@@ -13,10 +13,10 @@ header{
     background-color: #3CB4E7;
     position: fixed;
     left: 50%;
-    top: 60px;
+    top: 40px;
     transform: translate(-50%, 0);
     img{
-      height: 250px;
+      height: 240px;
       transition: all .2s ease-in-out;
       @media (max-width: 991px) {
           height: 250px;
@@ -30,22 +30,21 @@ header{
 }
 
 main {
-    margin-top: 325px;
-  }
-
+  margin-top: 325px;
+}
 
 .dataTables_wrapper {
     background-color: #FFFFFF;
     position: relative;
     clear: both;
-    @media (max-width: 767px) {
-        width: 767px!important;
+    @media (max-width: 991px) {
+        width: 991px!important;
     }
 }
 
 table.dataTable {
-    @media (max-width: 767px) {
-        width: 767px!important;
+    @media (max-width: 991px) {
+        width: 991px!important;
     }
 }
 
@@ -54,7 +53,8 @@ table.dataTable {
     margin: 0 auto;
     width: 80%;
     border: 1px solid #D1D3D4;
-    @media (max-width: 767px) {
+    margin-bottom: 30px;
+    @media (max-width: 991px) {
         width: 100%;
     }
 }
@@ -73,7 +73,7 @@ table.dataTable.no-footer {
     width: 100%;
     overflow: hidden;
     top: 0px;
-    @media (max-width: 767px) {
+    @media (max-width: 991px) {
         width: 100%;
     }
 }
