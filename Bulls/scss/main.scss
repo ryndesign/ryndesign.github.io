@@ -13,10 +13,10 @@ header{
     background-color: #3CB4E7;
     position: fixed;
     left: 50%;
-    top: 60px;
+    top: 50px;
     transform: translate(-50%, 0);
     img{
-      height: 240px;
+      height: 125px;
       transition: all .2s ease-in-out;
       @media (max-width: 991px) {
           height: 250px;
@@ -24,13 +24,9 @@ header{
     }
 }
 
-.highlight {
-  height: 125px;
-  transition: all .2s ease-in-out;
-}
 
 main {
-  margin-top: 330px;
+  margin-top: 200px;
 }
 
 .dataTables_wrapper {
@@ -52,8 +48,8 @@ table.dataTable {
     position: relative;
     margin: 0 auto;
     width: 80%;
-    border: 1px solid #D1D3D4;
-    margin-bottom: 20px;
+    border: 0px solid #D1D3D4;
+    margin-bottom: 15px;
     @media (max-width: 991px) {
         width: 100%;
         margin-bottom: 0px;
@@ -65,6 +61,9 @@ table.dataTable.no-footer {
     border-bottom: 0px solid rgba(0, 0, 0, 0.0)!important;
 }
 
+table.dataTable tbody td {
+  padding: 7px 10px!important;
+}
 
 // TICKER
 

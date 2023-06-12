@@ -51,7 +51,7 @@
 <table id="example" class="stripe" style="width:100%">
         <thead>
             <tr>                
-                <th width="20%">Player</th>
+                <th width="17%">Player</th>
                 <th>G</th>
                 <th>AB</th>
                 <th>H</th> 
@@ -294,30 +294,5 @@
   
 </script>
 
-<script>
-    // Select the image element
-    const image = document.getElementById('myImage');
-
-    // Function to add the class when scrolling
-    function addClassOnScroll() {
-      // Calculate the scroll position
-      const scrollPosition = window.scrollY || window.pageYOffset;
-
-      // Define the scroll position threshold
-      const threshold = 25;
-
-      // Check if the scroll position exceeds the threshold
-      if (scrollPosition > threshold) {
-        // Add the class to the image
-        image.classList.add('highlight');
-      } else {
-        // Remove the class from the image
-        image.classList.remove('highlight');
-      }
-    }
-
-    // Attach the event listener to the scroll event
-    window.addEventListener('scroll', addClassOnScroll);
-  </script>
 </body>
 </html>
