@@ -4,14 +4,27 @@
   
 html { scroll-padding-top: 0px; scroll-behavior: smooth; }
 
-body, html, main, header{  
-    background-color: #3CB4E7;
+body{  
+    background-color: #3CB4E7!important;
 }
 
 header{
-    position: sticky;
-    top: 0;
+    background-color: #3CB4E7;
+    position: fixed;
+    left: 50%;
+    top: 30px;
+    transform: translate(-50%, 0);
+    img{
+    height: 300px;
+    @media (max-width: 991px) {
+        height: 300px;
+    }
+    }
 }
+main {
+    margin-top: 360px;
+  }
+
 
 .dataTables_wrapper {
     background-color: #FFFFFF;
@@ -38,17 +51,8 @@ table.dataTable {
     }
 }
 
-.logo{
-    width: 300px;
-    @media (max-width: 991px) {
-        width: 380px;
-    }
-}
+
 
 table.dataTable.no-footer {
     border-bottom: 0px solid rgba(0, 0, 0, 0.0)!important;
-}
-
-.hello{
-    color:red;
 }
