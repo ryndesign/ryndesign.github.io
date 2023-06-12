@@ -13,7 +13,7 @@ header{
     background-color: #3CB4E7;
     position: fixed;
     left: 50%;
-    top: 50px;
+    top: 60px;
     transform: translate(-50%, 0);
     img{
       height: 240px;
@@ -25,12 +25,12 @@ header{
 }
 
 .highlight {
-  height: 135px;
+  height: 125px;
   transition: all .2s ease-in-out;
 }
 
 main {
-  margin-top: 325px;
+  margin-top: 330px;
 }
 
 .dataTables_wrapper {
@@ -53,9 +53,10 @@ table.dataTable {
     margin: 0 auto;
     width: 80%;
     border: 1px solid #D1D3D4;
-    margin-bottom: 30px;
+    margin-bottom: 20px;
     @media (max-width: 991px) {
         width: 100%;
+        margin-bottom: 0px;
     }
 }
 
