@@ -1,0 +1,24 @@
+
+* { margin: 0; padding: 0; border: 0; }
+*, ::after, ::before { box-sizing: border-box; }
+  
+html { scroll-padding-top: 53px; scroll-behavior: smooth; }
+
+body{  
+    background-color: #FFF;
+}
+
+.dataTables_wrapper {
+    position: relative;
+    clear: both;
+    @media (max-width: 991px) {
+        width: 767px!important;
+    }
+}
+
+
+table.dataTable {
+    @media (max-width: 991px) {
+        width: 767px!important;
+    }
+}
