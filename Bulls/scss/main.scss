@@ -2,13 +2,20 @@
 * { margin: 0; padding: 0; border: 0; }
 *, ::after, ::before { box-sizing: border-box; }
   
-html { scroll-padding-top: 53px; scroll-behavior: smooth; }
+html { scroll-padding-top: 0px; scroll-behavior: smooth; }
 
-body{  
-    background-color: #FFF;
+body, html, main, header{  
+    background-color: #3CB4E7;
+}
+
+header{
+    position: fixed;
+    left: 50%;
+    transform: translate(-50%, 0);
 }
 
 .dataTables_wrapper {
+    background-color: #FFFFFF;
     position: relative;
     clear: both;
     @media (max-width: 991px) {
@@ -16,9 +23,29 @@ body{
     }
 }
 
-
 table.dataTable {
     @media (max-width: 991px) {
         width: 767px!important;
     }
+}
+
+.stats{
+    position: relative;
+    margin: 0 auto;
+    width: 80%;
+    border: 1px solid #D1D3D4;
+    @media (max-width: 991px) {
+        width: 100%;
+    }
+}
+
+.logo{
+    width: 300px;
+    @media (max-width: 991px) {
+        width: 380px;
+    }
+}
+
+table.dataTable.no-footer {
+    border-bottom: 0px solid rgba(0, 0, 0, 0.0)!important;
 }
