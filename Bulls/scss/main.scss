@@ -12,20 +12,19 @@ body{
 header{
     background-color: #3CB4E7;
     position: fixed;
-    width: 100%;
-    margin: auto 0;
-    text-align: center;
     left: 50%;
-    top: 35px;
+    top: 45px;
     transform: translate(-50%, 0);
     img{
       height: 120px;
-      padding: 0px 0px 10px;
     }
+    @media (max-width: 991px) {
+     top: 35px;
+  }
 }
 
 main {
-  margin-top: 200px;
+  margin-top: 185px;
 }
 
 .dataTables_wrapper {
