@@ -18,9 +18,6 @@ header{
     img{
       height: 125px;
       transition: all .2s ease-in-out;
-      @media (max-width: 991px) {
-          height: 250px;
-      }
     }
 }
 
