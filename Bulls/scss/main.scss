@@ -18,7 +18,7 @@ header{
     img{
       height: 120px;
     }
-    @media (max-width: 991px) {
+    @media (max-width: 767px) {
      top: 48px!important;
   }
 }
@@ -31,14 +31,14 @@ main {
     background-color: #FFFFFF;
     position: relative;
     clear: both;
-    @media (max-width: 991px) {
-        width: 991px!important;
+    @media (max-width: 767px) {
+        width: 767px!important;
     }
 }
 
 table.dataTable {
-    @media (max-width: 991px) {
-        width: 991px!important;
+    @media (max-width: 767px) {
+        width: 767px!important;
     }
 }
 
@@ -48,7 +48,7 @@ table.dataTable {
     width: 80%;
     border: 0px solid #D1D3D4;
     margin-bottom: 15px;
-    @media (max-width: 991px) {
+    @media (max-width: 767px) {
         width: 100%;
         margin-bottom: 0px;
     }
@@ -80,7 +80,7 @@ table.dataTable tbody td {
     width: 100%;
     overflow: hidden;
     top: 0px;
-    @media (max-width: 991px) {
+    @media (max-width: 767px) {
         width: 100%;
     }
 }

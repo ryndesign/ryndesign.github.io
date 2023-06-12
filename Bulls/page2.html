@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <link href="images/logo-rev.svg" rel="icon"/>
+  
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex">
+  
+  <title>Greenbank Bulls</title>
+  <link rel="stylesheet" href="css/main.min.css">
+
+</head>
+
+<body>
+
+<header>
+    <a href="index.html"><img id="myImage" src="images/logo.svg" class="logo" alt="Greenbank Bulls"></a>
+</header>
+
+<main> 
+
+    <div class="ticker_wrapper">
+        <div class="ticker-wrap">
+            <div class="ticker">
+                <div class="ticker__item">Bulls 26 - Brewers 14</div>
+                <div class="ticker__item">Bulls 31 - A's 30</div>
+                <div class="ticker__item">Bulls 30 - Orioles 8</div>
+                <div class="ticker__item">Bulls 29 - A's 20</div>
+                <div class="ticker__item">Bulls 35 - Hillbillies 19</div>
+                <div class="ticker__item">June 18 Bulls at Bulldogs 6:30</div>
+                <div class="ticker__item">June 25 - Bulls at Little Britain (Poutine game) 6:30</div>
+                <div class="ticker__item">July 3 - (Mon) BYE week</div>
+                <div class="ticker__item">July 8/9 - Tournament in Cannington (5 games)</div>
+                <div class="ticker__item">July 16 - Donkeys at Bulls 5:00</div>
+                <div class="ticker__item">July 23 - Bulls at Wobblers 6:00</div>
+                <div class="ticker__item">July 30 - Huskies at Bulls 7:00</div>
+                <div class="ticker__item">Aug 7 - (Mon) Bulls at Cardinal 4:00</div>
+                <div class="ticker__item">Aug 13 - Bulls at Cannington 6:00</div>
+                <div class="ticker__item">Aug 20 - Outcasts at Bulls 5:00</div>
+                <div class="ticker__item">Aug 27 - Orioles at Bulls 5:00 * Al Porter bobble head day!</div>
+                <div class="ticker__item">Sept 4 - (Mon) Wobblers at Bulls 4:00</div>
+                 <div class="ticker__item">Sept 9/10 - Year end tournament that we are hosting.</div>
+            </div>
+        </div>
+    </div>
+
+<div class="stats">
+<table id="pitchers" class="stripe" style="width:100%">
+        <thead>
+            <tr>                
+                <th width="16%">Player</th>
+                <th width="7%">S</th>
+                <th width="7%">W</th>
+                <th width="7%">L</th> 
+                <th width="9%">ERA</th> 
+                <th width="10%">ER</th> 
+                <th width="10%">IP</th> 
+                <th width="9%">BB</th> 
+                <th width="9%">K</th> 
+                
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Jeff Taylor</strong></td>
+                <td>7</td><!-- S -->
+                <td>7</td><!-- W -->
+                <td>0</td><!-- L -->
+                <td>12.63</td><!-- ERA -->
+                <td>73</td><!-- ER -->
+                <td>52</td><!-- IP -->
+                <td>3</td><!-- BB -->
+                <td>5</td><!-- K -->
+            </tr>
+            <tr>
+                <td><strong>Ryan Newport</strong></td>
+                <td>2</td><!-- S -->
+                <td>2</td><!-- W -->
+                <td>0</td><!-- L -->
+                <td>7.83</td><!-- ERA -->
+                <td>14</td><!-- ER -->
+                <td>16</td><!-- IP -->
+                <td>0</td><!-- BB -->
+                <td>0</td><!-- K -->
+            </tr>
+            
+        </tbody>
+    </table>
+</div>
+
+</main>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap" rel="stylesheet">
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+
+<script src="https://kit.fontawesome.com/3cd07e3007.js" crossorigin="anonymous"></script>
+
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+<link href="https://nightly.datatables.net/fixedcolumns/css/fixedColumns.dataTables.css" rel="stylesheet" type="text/css" />
+<script src="https://nightly.datatables.net/fixedcolumns/js/dataTables.fixedColumns.js"></script>
+ 
+<script>
+  $(document).ready(function () {
+
+    $('#pitchers').DataTable({  
+        columnDefs: [
+            {targets: [ 0,1,2,3,4,5,6,7,8 ], orderSequence: [ "desc" ]}
+            ],
+        order: [[4, 'asc']],  
+        paging: false, 
+        bLengthChange: false,
+        info: false,
+        bFilter: false,
+        fixedColumns:   {
+            left: 1,
+            right: 0
+        }
+    });  
+
+  });  
+  
+</script>
+
+</body>
+</html>
