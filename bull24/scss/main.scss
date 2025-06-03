@@ -1,0 +1,218 @@
+
+* { margin: 0; padding: 0; border: 0; }
+*, ::after, ::before { box-sizing: border-box; }
+  
+html { scroll-padding-top: 0px; scroll-behavior: smooth; }
+
+body{  
+    background-color: #3CB4E7!important;
+    font-size: 0.875em!important;
+}
+
+header{
+    background-color: #3CB4E7;
+    position: fixed;
+    left: 50%;
+    top: 45px;
+    transform: translate(-50%, 0);
+    img{
+      height: 120px;
+    }
+    @media (max-width: 767px) {
+     top: 48px!important;
+  }
+}
+
+main {
+  margin-top: 183px;
+}
+
+.dataTables_wrapper {
+    background-color: #FFFFFF;
+    position: relative;
+    clear: both;
+    @media (max-width: 767px) {
+        width: 767px!important;
+    }
+}
+
+table.dataTable {
+    @media (max-width: 767px) {
+        width: 767px!important;
+    }
+}
+
+.stats{
+    position: relative;
+    margin: 0 auto;
+    width: 80%;
+    border: 0px solid #D1D3D4;
+    margin-bottom: 15px;
+    @media (max-width: 767px) {
+        width: 100%;
+        margin-bottom: 0px;
+    }
+}
+
+.sorting_1, .sorting_desc{
+  background-color: #ececec;
+  font-weight: 600;
+}
+
+td strong{
+  font-weight: 600;
+}
+
+table.dataTable.no-footer {
+    border: 0px!important;
+    border-bottom: 0px solid rgba(0, 0, 0, 0.0)!important;
+}
+
+table.dataTable tbody td {
+  padding: 7px 10px!important;
+}
+
+// TICKER
+
+.ticker_wrapper{
+    position: fixed;
+    margin: 0 auto;
+    width: 100%;
+    overflow: hidden;
+    top: 0px;
+    @media (max-width: 767px) {
+        width: 100%;
+    }
+}
+
+$duration: 100s;
+
+@-webkit-keyframes ticker {
+  0% {
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+    visibility: visible;
+  }
+
+  100% {
+    -webkit-transform: translate3d(-100%, 0, 0);
+    transform: translate3d(-100%, 0, 0);
+  }
+}
+
+@keyframes ticker {
+  0% {
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+    visibility: visible;
+  }
+
+  100% {
+    -webkit-transform: translate3d(-100%, 0, 0);
+    transform: translate3d(-100%, 0, 0);
+  }
+}
+
+.ticker-heading {
+    position: absolute;
+    background: black;
+    display: block;
+    left: 0;
+    top: 0;
+    height: 2.5rem;
+    padding: 11px 30px;
+    z-index: 2;
+    color: white;
+    text-transform: uppercase;
+    font-size: 0.875rem;
+}
+.ticker-wrap .ticker__item:before {
+    content: '';
+    height: 5px;
+    width: 5px;
+    display: inline-block;
+    background-color: #1E90B3;
+    border-radius: 100%;
+    position: relative;
+    margin-right: 5px;
+    margin-bottom: 2px;
+}
+
+.ticker-heading:after {
+    content: '';
+    width: 0;
+    height: 0;
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+    border-left: 8px solid black;
+    position: absolute;
+    margin-left: 28px;
+}
+
+.ticker-wrap {
+  position: relative;
+  bottom: 0;
+  width: 100%;
+  overflow: hidden;
+  height: 2.5rem;
+  background-color: transparent; 
+  padding-left: 100%;
+  box-sizing: content-box;
+.ticker:hover {
+ -webkit-animation-play-state: paused;
+  -moz-animation-play-state: paused;
+  -ms-animation-play-state: paused;
+  -o-animation-play-state: paused;  
+  animation-play-state: paused;
+  }
+  .ticker {
+
+    display: inline-block;
+    height: 2.5rem;
+    line-height: 2.5rem;  
+    white-space: nowrap;
+    padding-right: 100%;
+    box-sizing: content-box;
+
+    -webkit-animation-iteration-count: infinite; 
+            animation-iteration-count: infinite;
+    -webkit-animation-timing-function: linear;
+            animation-timing-function: linear;
+   -webkit-animation-name: ticker;
+           animation-name: ticker;
+    -webkit-animation-duration: $duration;
+            animation-duration: $duration;
+
+    &__item {
+
+      display: inline-block;
+      padding: 0 20px;
+      font-size: 0.875em;
+      text-transform: uppercase;
+      color: white;   
+    //   font-family: 'Orbitron', sans-serif;
+      letter-spacing: 0.05px;
+    }
+
+  }
+
+}
+
+.pulse {
+  -webkit-animation-name: pulse;
+  animation-name: pulse;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); } 
+} 
+
+
+.season-tabs{
+  color: #fff !important;
+
+}
+
+// https://github.com/ryndesign/ryndesign.github.io.git
