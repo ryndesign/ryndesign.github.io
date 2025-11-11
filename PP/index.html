@@ -1,79 +1,42 @@
-<!-- =========================================
-  Pixel People - Guess The Character
-  MASTER BUILD 1.4
-  File: index.master.html
-  Notes:
-   - Header hidden
-   - Larger input font
-   - Mobile soft keyboard disabled (on-screen keys only)
-   - Progress bar removed
-   - Keyboard placed under guess input
-   - Buttons in two rows (Hint/Give Up) and (Stats/Next)
-   - Level-complete modal shows 10 thumbnails (max 3 across)
-       * green border = correct, red = incorrect, locked/unsolved blurred (30px)
-   - Pixelated transition between puzzles
-   - Modal close is an "X" in top-right (removed bottom Close)
-   - Prevent double-tap zoom on mobile
-========================================= -->
 <!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
   <title>Pixel People - Guess The Character [MASTER]</title>
-  <!-- Prevent double-tap zoom; keep buttons >=16px -->
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-  <meta name="build" content="master-1.4" />
+  <meta name="build" content="master-1.8" />
   <style>
     :root { --bg:#0f1115; --panel:#171a21; --muted:#8b93a7; --text:#e9edf4; }
     html,body{height:100%;margin:0;background:#0f1115;color:#e9edf4;font:16px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;}
     * { -webkit-tap-highlight-color: transparent; }
-    .wrap{max-width:520px;margin:32px auto;padding:0 16px;}
-    header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px;flex-wrap:wrap; display:none;}
-    .title{font-weight:700;font-size:22px;letter-spacing:.2px;}
-    button{appearance:none;border:1px solid #222838;border-radius:10px;padding:10px 14px;background:#171a21;color:#e9edf4;font-size:16px;cursor:pointer; touch-action:manipulation;}
+    .wrap{max-width:520px;margin:15px auto;padding:0 16px;}
+    header{display:none}
+
+    button{
+      appearance:none;border:1px solid #222838;border-radius:10px;
+      padding:10px 14px;background:#171a21;color:#e9edf4;font-size:16px;
+      cursor:pointer; touch-action:manipulation;
+    }
     button:disabled{opacity:.6;cursor:not-allowed}
     button#next.active{background:#123524;border-color:#1e4d32;color:#b7ffd1;}
 
-    /* Stage */
     .stage{
-      margin-top:18px;
-      background:#171a21;
-      border:1px solid #23293a;
-      border-radius:16px;
-      padding:18px;
-      display:grid;
-      gap:14px;
+      margin-top:18px;background:#171a21;border:1px solid #23293a;border-radius:16px;
+      padding:18px;display:grid;gap:14px;position:relative; /* modal anchors here */
     }
     .artbox{
-      width:100%;
-      max-width:500px;
-      aspect-ratio:1/1;
-      margin:0 auto;
+      width:100%;max-width:500px;aspect-ratio:1/1;margin:0 auto;
       background:#ffffff url('pp_bgnd.jpg') center/cover no-repeat;
-      border:1px solid #202636;
-      border-radius:12px;
-      overflow:hidden;
-      position:relative;
+      border:1px solid #202636;border-radius:12px;overflow:hidden;position:relative;
     }
-    .artbox img{
-      position:absolute; inset:0; width:100%; height:100%; object-fit:contain;
-    }
-    .pxfx-canvas{
-      position:absolute; inset:0; width:100%; height:100%;
-      image-rendering: pixelated;
-      pointer-events:none;
-    }
+    .artbox img{ position:absolute; inset:0; width:100%; height:100%; object-fit:contain; opacity:1; transition:opacity .28s ease; }
 
     .col{display:grid;gap:14px;align-content:start}
-
-    /* Input row: larger font for guess input */
     .guess-row{display:grid;grid-template-columns:1fr;gap:8px}
     #guess{
       appearance:none;border:1px solid #222838;border-radius:10px;
       padding:12px 16px;background:#171a21;color:#e9edf4;
-      font-size:20px;
-      line-height:1.2;
-      touch-action:manipulation;
+      font-size:20px; line-height:1.2; touch-action:manipulation;
     }
 
     .result{font-weight:600;padding:10px 12px;border-radius:10px;display:none}
@@ -82,24 +45,15 @@
     .result.bad{background:#2a1416;border:1px solid #5a1e23;color:#ffc3c6}
     .result.revealed{background:#2a2310;border:1px solid #5a4720;color:#ffe8a1}
 
-    /* Level bar */
     .level-bar{display:flex;align-items:center;gap:12px;color:#8b93a7;font-size:14px;flex-wrap:wrap;justify-content:center;text-align:center}
     .pill{background:#1b2130;border:1px solid #263048;padding:6px 10px;border-radius:999px}
     .level-cells{display:flex;gap:4px;align-items:center}
-    .cell{
-      width:10px; height:22px; border-radius:3px;
-      background:#23293a; border:1px solid #2a3246;
-      box-sizing:border-box;
-    }
+    .cell{width:10px;height:22px;border-radius:3px;background:#23293a;border:1px solid #2a3246;box-sizing:border-box}
     .cell.ok{ background:#0e3a23; border-color:#1e4d32; }
     .cell.bad{ background:#3a1b1d; border-color:#5a1e23; }
     .cell.active{ box-shadow:0 0 0 2px #86eefc inset; }
 
-    /* On-screen keyboard */
-    .kb-row{
-      display:flex; justify-content:center; flex-wrap:nowrap;
-      gap:8px; margin-bottom:10px; max-width:500px; margin-left:auto; margin-right:auto;
-    }
+    .kb-row{ display:flex; justify-content:center; flex-wrap:nowrap; gap:8px; margin-bottom:10px; max-width:500px; margin-left:auto; margin-right:auto; }
     .kb-key{
       flex:1; max-width:48px; padding:10px 0;
       border:1px solid #263048; background:#171a21; border-radius:10px;
@@ -108,10 +62,8 @@
     .kb-key.wide{ flex:1.5; max-width:none; }
     .kb-key:hover{ background:#1f2637; }
 
-    /* Button rows */
     .btn-row{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
 
-    /* Confetti */
     .fx-confetti{ position:fixed; inset:0; pointer-events:none; overflow:hidden; z-index:999; }
     .fx-confetti .piece{
       position:absolute; top:-10px; left:0; width:var(--w,8px); height:var(--h,14px);
@@ -120,82 +72,45 @@
     }
     @keyframes confetti-fall{ to{ transform: translate(calc(var(--x,0) + var(--dx,0)), 110vh) rotate(var(--rot,360deg)); } }
 
-    /* Level modal */
-    .modal{ position:fixed; inset:0; display:none; place-items:center; z-index:1000; background:rgba(0,0,0,.5); }
+    /* Modal centered inside .stage */
+    .modal{ position:absolute; inset:0; display:none; place-items:center; z-index:1000; background:rgba(0,0,0,.5); }
     .modal.show{ display:grid; }
-    .modal-card{
-      width:min(420px, 94vw); /* updated per request */
-      background:#0f1115; border:1px solid #23293a; border-radius:16px; padding:20px; position:relative;
-    }
-    /* X close button (top-right) */
-    .modal-close{
-      position:absolute; top:10px; right:10px;
-      width:36px; height:36px; border-radius:10px;
-      background:#171a21; border:1px solid #263048; color:#e9edf4; font-size:20px; line-height:34px;
-      text-align:center; cursor:pointer; touch-action:manipulation;
-    }
+    .modal-card{ width:min(420px, 85%); background:#0f1115; border:1px solid #23293a; border-radius:16px; padding:20px; position:relative; }
+    .modal-close{ position:absolute; top:10px; right:10px; width:36px; height:36px; border-radius:10px; background:#171a21; border:1px solid #263048; color:#e9edf4; font-size:20px; line-height:34px; text-align:center; cursor:pointer; touch-action:manipulation;}
     .modal-title{ font-size:22px; font-weight:700; margin:0 0 8px 0; padding-right:46px; }
-    .modal-sub{ color:#8b93a7; margin-bottom:14px; }
     .modal-rows{ display:grid; gap:8px; margin:12px 0 14px; }
     .modal-row{ display:flex; justify-content:space-between; color:#cbd5e1; }
 
-    /* Thumbnails grid for level summary (max 3 across) */
-    .thumb-grid{
-      display:grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap:10px;
-      margin: 8px 0 16px;
-    }
-    .thumb{
-      aspect-ratio:1/1;
-      border:3px solid #2a3246;
-      border-radius:10px;
-      overflow:hidden;
-      background:#0b0d12;
-      position:relative;
-    }
+    .thumb-grid{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin:8px 0 16px; }
+    .thumb{ aspect-ratio:1/1; border:3px solid #2a3246; border-radius:10px; overflow:hidden; background:#0b0d12; position:relative; }
     .thumb.ok{ border-color:#1e4d32; }
     .thumb.bad{ border-color:#5a1e23; }
-    .thumb.locked img{ filter: blur(30px) brightness(1); } /* updated per request */
+    .thumb.locked img{ filter: blur(30px) brightness(1); }
     .thumb.locked .cap{ opacity:.2; }
     .thumb img{ width:100%; height:100%; object-fit:cover; display:block; }
-    .thumb .cap{
-      position:absolute; left:6px; bottom:6px; right:6px;
-      background:rgba(0,0,0,.55); color:#e5f3ff; font-size:11px; padding:3px 6px; border-radius:6px;
-      text-overflow:ellipsis; white-space:nowrap; overflow:hidden;
-      pointer-events:none;
-    }
-
+    .thumb .cap{ position:absolute; left:6px; bottom:6px; right:6px; background:rgba(0,0,0,.55); color:#e5f3ff; font-size:11px; padding:3px 6px; border-radius:6px; text-overflow:ellipsis; white-space:nowrap; overflow:hidden; pointer-events:none;}
     .modal-actions{ display:flex; gap:10px; justify-content:flex-end; align-items:center; }
     .note{font-size:12px;color:#8b93a7;margin-right:auto}
   </style>
 </head>
 <body>
   <div class="wrap">
-    <header>
-      <div class="title">Pixel People - Guess The Character</div>
-      <button id="reset">Reset Progress</button>
-    </header>
-
     <div class="level-bar">
       <span class="pill" id="levelLabel">Level 1</span>
       <div id="levelCells" class="level-cells" aria-label="Level progress"></div>
-      <span class="pill">Score: <strong id="scoreLabel">0</strong></span>
+      <span class="pill">Game Score: <strong id="scoreLabel">0</strong></span>
     </div>
 
-    <section class="stage" aria-live="polite" aria-atomic="true">
+    <section id="stage" class="stage" aria-live="polite" aria-atomic="true">
       <div class="artbox" id="artbox">
         <img id="art" alt="Character puzzle" src="" />
       </div>
 
       <div class="col">
-        <!-- Guess input -->
         <div class="guess-row">
-          <!-- Larger input, no Enter button; suppress mobile keyboard -->
           <input id="guess" type="text" placeholder="Type your guess..." autocomplete="off" inputmode="none" />
         </div>
 
-        <!-- On-screen keyboard directly under the input -->
         <div id="kb">
           <div class="kb-row" id="kb-r1"></div>
           <div class="kb-row" id="kb-r2"></div>
@@ -203,47 +118,36 @@
           <div class="kb-row" id="kb-r4"></div>
         </div>
 
-        <!-- Result message -->
         <div id="result" class="result"></div>
 
-        <!-- Buttons split across two rows -->
         <div class="btn-row">
           <button id="hint">Hint</button>
           <button id="giveup">Give Up</button>
-        </div>
-        <div class="btn-row">
           <button id="levelStats">Stats</button>
           <button id="next" disabled>Next Puzzle</button>
+        </div>
+      </div>
+
+      <!-- Level Modal -->
+      <div id="levelModal" class="modal">
+        <div class="modal-card">
+          <button id="modalCloseX" class="modal-close" aria-label="Close">×</button>
+          <h2 class="modal-title" id="modalTitle">Level 1</h2>
+          <div class="modal-rows">
+            <div class="modal-row"><span>Current Puzzle</span><strong id="mLevel">1/10</strong></div>
+            <div class="modal-row"><span>Game Score</span><strong id="mTotal">0</strong></div>
+          </div>
+          <div id="thumbGrid" class="thumb-grid" aria-label="Level puzzle thumbnails"></div>
+          <div class="modal-actions">
+            <div class="note" id="unlockNote" style="display:none;">Complete all 10 puzzles in this level to unlock next level.</div>
+            <button id="modalNext">Start Next Level</button>
+          </div>
         </div>
       </div>
     </section>
   </div>
 
   <div id="fx-confetti" class="fx-confetti" aria-hidden="true"></div>
-
-  <!-- Level Stats / Complete Modal -->
-  <div id="levelModal" class="modal">
-    <div class="modal-card">
-      <button id="modalCloseX" class="modal-close" aria-label="Close">×</button>
-      <h2 class="modal-title" id="modalTitle">Level Stats</h2>
-      <div class="modal-sub" id="modalSub">Live results</div>
-
-      <!-- Only keep Level/, Level score, Total score -->
-      <div class="modal-rows">
-        <div class="modal-row"><span>Level/</span><strong id="mLevel">1</strong></div>
-        <div class="modal-row"><span>Level score (10 each, 5 if hinted)</span><strong id="mScore">0</strong></div>
-        <div class="modal-row"><span>Total score</span><strong id="mTotal">0</strong></div>
-      </div>
-
-      <!-- Thumbnails of the 10 puzzles for this level (max 3 across) -->
-      <div id="thumbGrid" class="thumb-grid" aria-label="Level puzzle thumbnails"></div>
-
-      <div class="modal-actions">
-        <div class="note" id="unlockNote" style="display:none;">Complete all 10 puzzles in this level to unlock next level.</div>
-        <button id="modalNext">Start Next Level</button>
-      </div>
-    </div>
-  </div>
 
   <script>
     const $ = (s)=>document.querySelector(s);
@@ -252,22 +156,22 @@
       .replace(/[^a-z0-9\s'-]/g, "")
       .replace(/\s+/g, " ");
 
-    const LS_KEY="pp_state_scoring_multianswers_master_v1_4";
+    const LS_KEY="pp_state_scoring_multianswers_master_1_8";
 
     const State={current:0,solved:{},givenUp:{},hintsUsed:{},guessAttempts:{},total:0,score:0};
     let puzzles=[];
 
-    const art=$('#art'), artbox=$('#artbox'), guess=$('#guess'), giveup=$('#giveup'),
-          nextBtn=$('#next'), result=$('#result'), levelLabel=$('#levelLabel'),
-          reset=$('#reset'), scoreLabel=$('#scoreLabel'),
-          cellsWrap=$('#levelCells');
+    const art=$('#art'), artbox=$('#artbox'), guess=$('#guess'),
+          giveup=$('#giveup'), nextBtn=$('#next'), result=$('#result'),
+          levelLabel=$('#levelLabel'), scoreLabel=$('#scoreLabel'),
+          cellsWrap=$('#levelCells'), hintBtn=$('#hint');
 
-    const levelModal=$('#levelModal'), modalTitle=$('#modalTitle'), modalSub=$('#modalSub'),
-          mLevel=$('#mLevel'), mScore=$('#mScore'), mTotal=$('#mTotal'),
-          modalNext=$('#modalNext'), unlockNote=$('#unlockNote'), modalCloseX=$('#modalCloseX'),
-          thumbGrid=$('#thumbGrid');
+    const levelModal=$('#levelModal'), modalTitle=$('#modalTitle'),
+          mLevel=$('#mLevel'), mTotal=$('#mTotal'),
+          modalNext=$('#modalNext'), unlockNote=$('#unlockNote'),
+          modalCloseX=$('#modalCloseX'), thumbGrid=$('#thumbGrid');
 
-    // Disable soft keyboard on mobile/touch devices (use on-screen keyboard instead)
+    // Prevent mobile keyboard
     (function disableMobileKeyboard(){
       const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
       if (!isTouch) return;
@@ -276,7 +180,6 @@
       guess.addEventListener('focus', e => e.target.blur());
     })();
 
-    // Confetti
     function launchConfetti(pieces=80){
       const root=document.getElementById('fx-confetti'); if(!root)return;
       root.innerHTML='';
@@ -299,18 +202,14 @@
       setTimeout(()=>{root.innerHTML='';},2600);
     }
 
-    // Persistence
     function loadState(){try{const raw=localStorage.getItem(LS_KEY);if(!raw)return;Object.assign(State,JSON.parse(raw));}catch{}}
     function saveState(){localStorage.setItem(LS_KEY,JSON.stringify(State));}
     function resetState(){localStorage.removeItem(LS_KEY);State.current=0;State.solved={};State.givenUp={};State.hintsUsed={};State.guessAttempts={};State.score=0;saveState();}
 
-    // Levels
     function getLevel(i){return Math.floor(i/10)+1;}
     function levelRange(level){const s=(level-1)*10;return{start:s,end:Math.min(level*10-1,State.total-1)};}
     function levelComplete(level){const {start,end}=levelRange(level);for(let i=start;i<=end;i++){if(!State.solved[i]&&!State.givenUp[i])return false;}return true;}
-    function levelStats(level){const {start,end}=levelRange(level);let solved=0,revealed=0,hinted=0,score=0;for(let i=start;i<=end;i++){if(State.solved[i]){solved++;if(State.hintsUsed[i]){hinted++;score+=5;}else{score+=10;}}else if(State.givenUp[i])revealed++;}return{solved,revealed,hinted,score};}
 
-    // Level cells (10 vertical rectangles)
     function renderLevelCells(){
       const lvl=getLevel(State.current);
       const {start}=levelRange(lvl);
@@ -336,7 +235,10 @@
       levelLabel.textContent=`Level ${cur}`;
       scoreLabel.textContent=State.score.toFixed(0);
       renderLevelCells();
+      const finished = !!(State.solved[State.current] || State.givenUp[State.current]);
+      hintBtn.disabled = finished;
     }
+
     function showResult(t,c){result.textContent=t;result.className="result show "+(c||"");}
     function clearResult(){result.textContent="";result.className="result";}
     function lockNext(x){
@@ -344,86 +246,42 @@
       if(!x){ nextBtn.classList.add("active"); } else { nextBtn.classList.remove("active"); }
     }
 
-    // Render a puzzle (used on first load or after modal)
     function renderPuzzle(){
       if(State.current>=puzzles.length){
         showResult("All levels complete!","good");
-        guess.disabled=true; giveup.disabled=true;
+        guess.disabled=true; giveup.disabled=true; hintBtn.disabled=true;
         updateLevelLabels();
         return;
       }
       const p=puzzles[State.current];
       art.src=p.image; guess.value=""; clearResult();
-      lockNext(!(State.solved[State.current]||State.givenUp[State.current]));
-      updateLevelLabels(); guess.blur(); // keep mobile keyboard from opening
+      const finished = !!(State.solved[State.current] || State.givenUp[State.current]);
+      hintBtn.disabled = finished;
+      lockNext(!finished);
+      updateLevelLabels(); guess.blur();
+      art.style.opacity = 1;
     }
 
-    // Pixelation transition to next puzzle
-    function pixelateTransitionTo(nextIndex){
+    function fadeTransitionTo(nextIndex){
       const nextP = puzzles[nextIndex];
       if(!nextP) return;
-
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      canvas.className = 'pxfx-canvas';
-      const rect = artbox.getBoundingClientRect();
-      const w = Math.max(100, Math.floor(rect.width));
-      const h = Math.max(100, Math.floor(rect.height));
-      canvas.width = w;
-      canvas.height = h;
-      artbox.appendChild(canvas);
-
       const img = new Image();
       img.onload = () => {
-        const minCells = 12, maxCells = 90, dur = 420;
-        const start = performance.now();
-
-        function drawFrame(now){
-          const t = Math.min(1, (now - start) / dur);
-          const eased = t<0.5 ? (2*t*t) : (1 - Math.pow(-2*t+2,2)/2);
-          const cells = Math.round(minCells + (maxCells - minCells) * eased);
-
-          const cols = cells;
-          const aspect = img.width / img.height;
-          const rows = Math.round(cols / aspect);
-
-          const lw = Math.max(1, cols);
-          const lh = Math.max(1, rows);
-
-          const off = document.createElement('canvas');
-          const octx = off.getContext('2d', { willReadFrequently:true });
-          off.width = lw; off.height = lh;
-          octx.imageSmoothingEnabled = false;
-          octx.clearRect(0,0,lw,lh);
-          octx.drawImage(img, 0, 0, lw, lh);
-
-          ctx.imageSmoothingEnabled = false;
-          ctx.clearRect(0,0,w,h);
-
-          const scale = Math.min(w / lw, h / lh);
-          const dw = Math.floor(lw * scale);
-          const dh = Math.floor(lh * scale);
-          const dx = Math.floor((w - dw) / 2);
-          const dy = Math.floor((h - dh) / 2);
-          ctx.drawImage(off, 0, 0, lw, lh, dx, dy, dw, dh);
-
-          if (t < 1){
-            requestAnimationFrame(drawFrame);
-          } else {
-            art.src = nextP.image;
-            guess.value = "";
-            clearResult();
-            lockNext(!(State.solved[nextIndex]||State.givenUp[nextIndex]));
-            updateLevelLabels();
-            setTimeout(()=>{ canvas.remove(); }, 0);
-          }
-        }
-        requestAnimationFrame(drawFrame);
+        art.style.opacity = 0;
+        setTimeout(() => {
+          art.src = nextP.image;
+          guess.value = "";
+          clearResult();
+          const finished = !!(State.solved[nextIndex] || State.givenUp[nextIndex]);
+          hintBtn.disabled = finished;
+          lockNext(!finished);
+          updateLevelLabels();
+          requestAnimationFrame(() => { art.style.opacity = 1; });
+        }, 200);
       };
       img.src = nextP.image;
     }
 
-    // Build thumbnails for the just-finished (or current) level
     function buildThumbGrid(level){
       const {start,end}=levelRange(level);
       thumbGrid.innerHTML = "";
@@ -451,7 +309,6 @@
       }
     }
 
-    // Multi-answer matcher
     function isCorrect(answerOrPuzzle, guessStr){
       const toNorm = s => normalize(s).replace(/[^a-z0-9 ]/g,"");
       const g = toNorm(guessStr);
@@ -471,17 +328,15 @@
       });
     }
 
-    // Modal open
     function openLevelModal(level,final=false){
-      const {score}=levelStats(level); // we only display level score and totals now
+      const curInLevel = ((State.current % 10) + 1) + "/10";
+      mLevel.textContent = curInLevel;
+      mTotal.textContent = State.score;
 
-      mLevel.textContent=level;
-      mScore.textContent=score;
-      mTotal.textContent=State.score;
+      // Title: Level N or All Levels Complete
+      modalTitle.textContent = final ? "All Levels Complete" : `Level ${level}`;
 
       const complete=levelComplete(level);
-      modalTitle.textContent=final?"All Levels Complete":complete?"Level Complete":"Level Stats";
-      modalSub.textContent=final?"You finished every puzzle":complete?"Great job":"Live results";
       unlockNote.style.display=!final&&!complete?"block":"none";
       modalNext.textContent=final?"Play Again":"Start Next Level";
       modalNext.disabled=!final&&!complete;
@@ -492,7 +347,6 @@
       setTimeout(()=>{(!modalNext.disabled?modalNext:modalCloseX).focus();},0);
     }
 
-    // Guess handling
     function handleGuess(){
       const idx=State.current, p=puzzles[idx], val=guess.value;
       if(!val.trim()) return;
@@ -503,6 +357,7 @@
         State.score += State.hintsUsed[idx] ? 5 : 10;
         saveState();
         showResult("Correct. Nice job.","good");
+        hintBtn.disabled = true;
         lockNext(false);
         updateLevelLabels();
         launchConfetti();
@@ -513,6 +368,7 @@
           State.givenUp[idx]=true;
           delete State.solved[idx];
           showResult(`Revealed: ${p.name}`,"revealed");
+          hintBtn.disabled = true;
           lockNext(false);
           saveState();
           updateLevelLabels();
@@ -528,6 +384,7 @@
       State.givenUp[idx]=true;
       saveState();
       showResult(`Revealed: ${puzzles[idx].name}`,"revealed");
+      hintBtn.disabled = true;
       lockNext(false);
       updateLevelLabels();
     }
@@ -542,7 +399,7 @@
         return;
       }
       const nextIndex = Math.min(State.current+1, puzzles.length-1);
-      pixelateTransitionTo(nextIndex);
+      fadeTransitionTo(nextIndex);
       State.current = nextIndex;
       saveState();
     }
@@ -550,13 +407,13 @@
     function handleHint(){
       const idx=State.current, p=puzzles[idx];
       if(!p) return;
+      if(State.solved[idx]||State.givenUp[idx]) return;
       State.hintsUsed[idx]=true;
       saveState();
       const text=p.hint&&p.hint.trim()?p.hint:`Starts with "${(p.name||"").trim().charAt(0)}"`;
       showResult(`Hint: ${text}`,"revealed");
     }
 
-    // Events
     document.addEventListener("keydown",e=>{
       if(e.key==="Enter"&&document.activeElement===guess){e.preventDefault();handleGuess();}
       else if(e.key==="Escape"){guess.blur();}
@@ -564,16 +421,15 @@
     });
     giveup.addEventListener("click",handleGiveUp);
     nextBtn.addEventListener("click",handleNext);
-    $("#hint").addEventListener("click", handleHint);
+    hintBtn.addEventListener("click", handleHint);
     $("#levelStats").addEventListener("click", ()=> openLevelModal(getLevel(State.current), State.current>=puzzles.length-1 && levelComplete(getLevel(State.current))));
-    modalCloseX.addEventListener("click", ()=> levelModal.classList.remove('show'));
+    modalCloseX.addEventListener("click", () => levelModal.classList.remove('show'));
     modalNext.addEventListener("click", ()=>{
       if(modalNext.disabled) return;
-      const lvl=parseInt(mLevel.textContent,10);
+      const lvl=Math.floor(State.current/10)+1;
       const final=modalTitle.textContent.includes("All Levels Complete");
       levelModal.classList.remove('show');
       if(final){
-        // Restart run.
         State.current=0;
         State.solved={}; State.givenUp={}; State.hintsUsed={}; State.guessAttempts={};
         State.score=0;
@@ -581,14 +437,12 @@
       }else{
         const { end } = levelRange(lvl);
         const nextIndex = Math.min(end+1, puzzles.length-1);
-        pixelateTransitionTo(nextIndex);
+        fadeTransitionTo(nextIndex);
         State.current = nextIndex;
         saveState();
       }
     });
-    reset?.addEventListener("click",()=>{if(confirm("Clear your progress?")){resetState();renderPuzzle();}});
 
-    // Puzzles with hints and multiple accepted answers (sample 100)
     const LIVE_PUZZLES = [
       { image:"images/1.png",  name:"Michael Jackson", hint:"Beat It, Thriller, Billie Jean",
         answers:["MJ","Michael","Jackson","King of Pop","Michael J Jackson"] },
@@ -801,7 +655,6 @@
         answers:["Castaway","Tom Hanks Cast Away","Chuck Noland"] },
     ];
 
-    /* Keyboard layout */
     const KB_ROWS = [
       ["Q","W","E","R","T","Y","U","I","O","P"],
       ["A","S","D","F","G","H","J","K","L"],
@@ -828,7 +681,7 @@
         case ".":      guess.value += "."; break;
         default:       guess.value += label.toLowerCase();
       }
-      guess.blur(); // keep mobile software keyboard hidden
+      guess.blur(); // keep mobile keyboard closed
     }
 
     (function buildKeyboard(){
@@ -839,13 +692,14 @@
       KB_ROWS[3].forEach(k=>addKey(r4,k,true));
     })();
 
-    (function init(){
+    function init(){
       loadState();
       puzzles = LIVE_PUZZLES;
       State.total = puzzles.length;
       if(State.current >= puzzles.length) State.current = 0;
       renderPuzzle();
-    })();
+    }
+    init();
   </script>
 </body>
 </html>
