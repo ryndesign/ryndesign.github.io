@@ -1,16 +1,36 @@
+<!-- =========================================
+  Pixel People - Guess The Character
+  MASTER BUILD 1.4
+  File: index.master.html
+  Notes:
+   - Header hidden
+   - Larger input font
+   - Mobile soft keyboard disabled (on-screen keys only)
+   - Progress bar removed
+   - Keyboard placed under guess input
+   - Buttons in two rows (Hint/Give Up) and (Stats/Next)
+   - Level-complete modal shows 10 thumbnails (max 3 across)
+       * green border = correct, red = incorrect, locked/unsolved blurred (30px)
+   - Pixelated transition between puzzles
+   - Modal close is an "X" in top-right (removed bottom Close)
+   - Prevent double-tap zoom on mobile
+========================================= -->
 <!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Pixel People - Guess The Character</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Pixel People - Guess The Character [MASTER]</title>
+  <!-- Prevent double-tap zoom; keep buttons >=16px -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <meta name="build" content="master-1.4" />
   <style>
     :root { --bg:#0f1115; --panel:#171a21; --muted:#8b93a7; --text:#e9edf4; }
-    html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font:16px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;}
-    .wrap{max-width:720px;margin:32px auto;padding:0 16px;}
+    html,body{height:100%;margin:0;background:#0f1115;color:#e9edf4;font:16px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;}
+    * { -webkit-tap-highlight-color: transparent; }
+    .wrap{max-width:520px;margin:32px auto;padding:0 16px;}
     header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px;flex-wrap:wrap; display:none;}
     .title{font-weight:700;font-size:22px;letter-spacing:.2px;}
-    button,input[type=text]{appearance:none;border:1px solid #222838;border-radius:10px;padding:10px 14px;background:#171a21;color:#e9edf4;font-size:16px;cursor:pointer}
+    button{appearance:none;border:1px solid #222838;border-radius:10px;padding:10px 14px;background:#171a21;color:#e9edf4;font-size:16px;cursor:pointer; touch-action:manipulation;}
     button:disabled{opacity:.6;cursor:not-allowed}
     button#next.active{background:#123524;border-color:#1e4d32;color:#b7ffd1;}
 
@@ -36,16 +56,24 @@
       position:relative;
     }
     .artbox img{
-      position:absolute; inset:0; width:100%; height:100%; object-fit:contain; transition:transform .2s ease;
+      position:absolute; inset:0; width:100%; height:100%; object-fit:contain;
     }
+    .pxfx-canvas{
+      position:absolute; inset:0; width:100%; height:100%;
+      image-rendering: pixelated;
+      pointer-events:none;
+    }
+
     .col{display:grid;gap:14px;align-content:start}
 
     /* Input row: larger font for guess input */
     .guess-row{display:grid;grid-template-columns:1fr;gap:8px}
     #guess{
-      font-size:20px; /* larger font */
+      appearance:none;border:1px solid #222838;border-radius:10px;
+      padding:12px 16px;background:#171a21;color:#e9edf4;
+      font-size:20px;
       line-height:1.2;
-      padding:12px 16px;
+      touch-action:manipulation;
     }
 
     .result{font-weight:600;padding:10px 12px;border-radius:10px;display:none}
@@ -53,8 +81,6 @@
     .result.good{background:#0f291a;border:1px solid #1e4d32;color:#b7ffd1}
     .result.bad{background:#2a1416;border:1px solid #5a1e23;color:#ffc3c6}
     .result.revealed{background:#2a2310;border:1px solid #5a4720;color:#ffe8a1}
-    .progress{height:8px;width:100%;background:#121621;border:1px solid #1d2435;border-radius:999px;overflow:hidden}
-    .progress>div{height:100%;width:0%;background:linear-gradient(90deg,#5ee6a8,#86eefc);transition:width .2s ease}
 
     /* Level bar */
     .level-bar{display:flex;align-items:center;gap:12px;color:#8b93a7;font-size:14px;flex-wrap:wrap;justify-content:center;text-align:center}
@@ -77,10 +103,13 @@
     .kb-key{
       flex:1; max-width:48px; padding:10px 0;
       border:1px solid #263048; background:#171a21; border-radius:10px;
-      color:#e9edf4; cursor:pointer; text-align:center; user-select:none; font-size:16px; transition:background .2s;
+      color:#e9edf4; cursor:pointer; text-align:center; user-select:none; font-size:16px; transition:background .2s; touch-action:manipulation;
     }
     .kb-key.wide{ flex:1.5; max-width:none; }
     .kb-key:hover{ background:#1f2637; }
+
+    /* Button rows */
+    .btn-row{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
 
     /* Confetti */
     .fx-confetti{ position:fixed; inset:0; pointer-events:none; overflow:hidden; z-index:999; }
@@ -94,11 +123,49 @@
     /* Level modal */
     .modal{ position:fixed; inset:0; display:none; place-items:center; z-index:1000; background:rgba(0,0,0,.5); }
     .modal.show{ display:grid; }
-    .modal-card{ width:min(600px, 92vw); background:#0f1115; border:1px solid #23293a; border-radius:16px; padding:20px; }
-    .modal-title{ font-size:22px; font-weight:700; margin:0 0 8px 0; }
+    .modal-card{
+      width:min(420px, 94vw); /* updated per request */
+      background:#0f1115; border:1px solid #23293a; border-radius:16px; padding:20px; position:relative;
+    }
+    /* X close button (top-right) */
+    .modal-close{
+      position:absolute; top:10px; right:10px;
+      width:36px; height:36px; border-radius:10px;
+      background:#171a21; border:1px solid #263048; color:#e9edf4; font-size:20px; line-height:34px;
+      text-align:center; cursor:pointer; touch-action:manipulation;
+    }
+    .modal-title{ font-size:22px; font-weight:700; margin:0 0 8px 0; padding-right:46px; }
     .modal-sub{ color:#8b93a7; margin-bottom:14px; }
-    .modal-rows{ display:grid; gap:8px; margin:12px 0 18px; }
+    .modal-rows{ display:grid; gap:8px; margin:12px 0 14px; }
     .modal-row{ display:flex; justify-content:space-between; color:#cbd5e1; }
+
+    /* Thumbnails grid for level summary (max 3 across) */
+    .thumb-grid{
+      display:grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap:10px;
+      margin: 8px 0 16px;
+    }
+    .thumb{
+      aspect-ratio:1/1;
+      border:3px solid #2a3246;
+      border-radius:10px;
+      overflow:hidden;
+      background:#0b0d12;
+      position:relative;
+    }
+    .thumb.ok{ border-color:#1e4d32; }
+    .thumb.bad{ border-color:#5a1e23; }
+    .thumb.locked img{ filter: blur(30px) brightness(1); } /* updated per request */
+    .thumb.locked .cap{ opacity:.2; }
+    .thumb img{ width:100%; height:100%; object-fit:cover; display:block; }
+    .thumb .cap{
+      position:absolute; left:6px; bottom:6px; right:6px;
+      background:rgba(0,0,0,.55); color:#e5f3ff; font-size:11px; padding:3px 6px; border-radius:6px;
+      text-overflow:ellipsis; white-space:nowrap; overflow:hidden;
+      pointer-events:none;
+    }
+
     .modal-actions{ display:flex; gap:10px; justify-content:flex-end; align-items:center; }
     .note{font-size:12px;color:#8b93a7;margin-right:auto}
   </style>
@@ -117,32 +184,36 @@
     </div>
 
     <section class="stage" aria-live="polite" aria-atomic="true">
-      <div class="artbox">
+      <div class="artbox" id="artbox">
         <img id="art" alt="Character puzzle" src="" />
       </div>
 
       <div class="col">
+        <!-- Guess input -->
         <div class="guess-row">
-          <!-- Larger input, and we'll suppress mobile keyboard via JS -->
+          <!-- Larger input, no Enter button; suppress mobile keyboard -->
           <input id="guess" type="text" placeholder="Type your guess..." autocomplete="off" inputmode="none" />
         </div>
 
-        <div id="result" class="result"></div>
-
-        <div class="flex" style="text-align:center; display:flex; justify-content:center; gap:10px;">
-          <button id="hint">Hint</button>
-          <button id="giveup">Give Up</button>
-          <button id="levelStats">Stats</button>
-          <button id="next" disabled>Next Puzzle</button>
-        </div>
-
-        <div class="progress" title="Progress"><div id="bar"></div></div>
-
+        <!-- On-screen keyboard directly under the input -->
         <div id="kb">
           <div class="kb-row" id="kb-r1"></div>
           <div class="kb-row" id="kb-r2"></div>
           <div class="kb-row" id="kb-r3"></div>
           <div class="kb-row" id="kb-r4"></div>
+        </div>
+
+        <!-- Result message -->
+        <div id="result" class="result"></div>
+
+        <!-- Buttons split across two rows -->
+        <div class="btn-row">
+          <button id="hint">Hint</button>
+          <button id="giveup">Give Up</button>
+        </div>
+        <div class="btn-row">
+          <button id="levelStats">Stats</button>
+          <button id="next" disabled>Next Puzzle</button>
         </div>
       </div>
     </section>
@@ -153,19 +224,22 @@
   <!-- Level Stats / Complete Modal -->
   <div id="levelModal" class="modal">
     <div class="modal-card">
+      <button id="modalCloseX" class="modal-close" aria-label="Close">×</button>
       <h2 class="modal-title" id="modalTitle">Level Stats</h2>
       <div class="modal-sub" id="modalSub">Live results</div>
+
+      <!-- Only keep Level/, Level score, Total score -->
       <div class="modal-rows">
-        <div class="modal-row"><span>Level</span><strong id="mLevel">1</strong></div>
-        <div class="modal-row"><span>Puzzles solved</span><strong id="mSolved">0</strong></div>
-        <div class="modal-row"><span>Puzzles revealed</span><strong id="mRevealed">0</strong></div>
-        <div class="modal-row"><span>Hints used</span><strong id="mHints">0</strong></div>
+        <div class="modal-row"><span>Level/</span><strong id="mLevel">1</strong></div>
         <div class="modal-row"><span>Level score (10 each, 5 if hinted)</span><strong id="mScore">0</strong></div>
         <div class="modal-row"><span>Total score</span><strong id="mTotal">0</strong></div>
       </div>
+
+      <!-- Thumbnails of the 10 puzzles for this level (max 3 across) -->
+      <div id="thumbGrid" class="thumb-grid" aria-label="Level puzzle thumbnails"></div>
+
       <div class="modal-actions">
         <div class="note" id="unlockNote" style="display:none;">Complete all 10 puzzles in this level to unlock next level.</div>
-        <button id="modalClose">Close</button>
         <button id="modalNext">Start Next Level</button>
       </div>
     </div>
@@ -173,22 +247,25 @@
 
   <script>
     const $ = (s)=>document.querySelector(s);
-    const normalize = s => (s||"").toString().trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9\s'-]/g, "").replace(/\s+/g, " ");
+    const normalize = s => (s||"").toString().trim().toLowerCase().normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9\s'-]/g, "")
+      .replace(/\s+/g, " ");
 
-    const LS_KEY="pp_state_scoring_multianswers_v1";
+    const LS_KEY="pp_state_scoring_multianswers_master_v1_4";
 
     const State={current:0,solved:{},givenUp:{},hintsUsed:{},guessAttempts:{},total:0,score:0};
     let puzzles=[];
 
-    const art=$('#art'), guess=$('#guess'), giveup=$('#giveup'),
+    const art=$('#art'), artbox=$('#artbox'), guess=$('#guess'), giveup=$('#giveup'),
           nextBtn=$('#next'), result=$('#result'), levelLabel=$('#levelLabel'),
-          bar=$('#bar'), reset=$('#reset'), scoreLabel=$('#scoreLabel'),
+          reset=$('#reset'), scoreLabel=$('#scoreLabel'),
           cellsWrap=$('#levelCells');
 
     const levelModal=$('#levelModal'), modalTitle=$('#modalTitle'), modalSub=$('#modalSub'),
-          mLevel=$('#mLevel'), mSolved=$('#mSolved'), mRevealed=$('#mRevealed'),
-          mHints=$('#mHints'), mScore=$('#mScore'), mTotal=$('#mTotal'),
-          modalNext=$('#modalNext'), unlockNote=$('#unlockNote'), modalClose=$('#modalClose');
+          mLevel=$('#mLevel'), mScore=$('#mScore'), mTotal=$('#mTotal'),
+          modalNext=$('#modalNext'), unlockNote=$('#unlockNote'), modalCloseX=$('#modalCloseX'),
+          thumbGrid=$('#thumbGrid');
 
     // Disable soft keyboard on mobile/touch devices (use on-screen keyboard instead)
     (function disableMobileKeyboard(){
@@ -236,7 +313,7 @@
     // Level cells (10 vertical rectangles)
     function renderLevelCells(){
       const lvl=getLevel(State.current);
-      const {start,end}=levelRange(lvl);
+      const {start}=levelRange(lvl);
       const activeIndex=State.current-start;
       cellsWrap.innerHTML="";
       for(let i=0;i<10;i++){
@@ -254,19 +331,6 @@
       }
     }
 
-    // Progress resets each level
-    function updateProgress(){
-      const lvl = getLevel(State.current);
-      const { start, end } = levelRange(lvl);
-      const levelTotal = Math.max(1, end - start + 1);
-      let done = 0;
-      for (let i = start; i <= end; i++){
-        if (State.solved[i] || State.givenUp[i]) done++;
-      }
-      const pct = Math.round((done / levelTotal) * 100);
-      bar.style.width = pct + "%";
-    }
-
     function updateLevelLabels(){
       const cur=getLevel(State.current);
       levelLabel.textContent=`Level ${cur}`;
@@ -280,7 +344,7 @@
       if(!x){ nextBtn.classList.add("active"); } else { nextBtn.classList.remove("active"); }
     }
 
-    // Render a puzzle
+    // Render a puzzle (used on first load or after modal)
     function renderPuzzle(){
       if(State.current>=puzzles.length){
         showResult("All levels complete!","good");
@@ -291,7 +355,100 @@
       const p=puzzles[State.current];
       art.src=p.image; guess.value=""; clearResult();
       lockNext(!(State.solved[State.current]||State.givenUp[State.current]));
-      updateProgress(); updateLevelLabels(); guess.focus();
+      updateLevelLabels(); guess.blur(); // keep mobile keyboard from opening
+    }
+
+    // Pixelation transition to next puzzle
+    function pixelateTransitionTo(nextIndex){
+      const nextP = puzzles[nextIndex];
+      if(!nextP) return;
+
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.className = 'pxfx-canvas';
+      const rect = artbox.getBoundingClientRect();
+      const w = Math.max(100, Math.floor(rect.width));
+      const h = Math.max(100, Math.floor(rect.height));
+      canvas.width = w;
+      canvas.height = h;
+      artbox.appendChild(canvas);
+
+      const img = new Image();
+      img.onload = () => {
+        const minCells = 12, maxCells = 90, dur = 420;
+        const start = performance.now();
+
+        function drawFrame(now){
+          const t = Math.min(1, (now - start) / dur);
+          const eased = t<0.5 ? (2*t*t) : (1 - Math.pow(-2*t+2,2)/2);
+          const cells = Math.round(minCells + (maxCells - minCells) * eased);
+
+          const cols = cells;
+          const aspect = img.width / img.height;
+          const rows = Math.round(cols / aspect);
+
+          const lw = Math.max(1, cols);
+          const lh = Math.max(1, rows);
+
+          const off = document.createElement('canvas');
+          const octx = off.getContext('2d', { willReadFrequently:true });
+          off.width = lw; off.height = lh;
+          octx.imageSmoothingEnabled = false;
+          octx.clearRect(0,0,lw,lh);
+          octx.drawImage(img, 0, 0, lw, lh);
+
+          ctx.imageSmoothingEnabled = false;
+          ctx.clearRect(0,0,w,h);
+
+          const scale = Math.min(w / lw, h / lh);
+          const dw = Math.floor(lw * scale);
+          const dh = Math.floor(lh * scale);
+          const dx = Math.floor((w - dw) / 2);
+          const dy = Math.floor((h - dh) / 2);
+          ctx.drawImage(off, 0, 0, lw, lh, dx, dy, dw, dh);
+
+          if (t < 1){
+            requestAnimationFrame(drawFrame);
+          } else {
+            art.src = nextP.image;
+            guess.value = "";
+            clearResult();
+            lockNext(!(State.solved[nextIndex]||State.givenUp[nextIndex]));
+            updateLevelLabels();
+            setTimeout(()=>{ canvas.remove(); }, 0);
+          }
+        }
+        requestAnimationFrame(drawFrame);
+      };
+      img.src = nextP.image;
+    }
+
+    // Build thumbnails for the just-finished (or current) level
+    function buildThumbGrid(level){
+      const {start,end}=levelRange(level);
+      thumbGrid.innerHTML = "";
+      for(let i=start;i<=end && i<State.total;i++){
+        const solved = !!State.solved[i];
+        const failed = !!State.givenUp[i];
+        const locked = !solved && !failed;
+
+        const th = document.createElement('div');
+        th.className = 'thumb' +
+          (solved ? ' ok' : (failed ? ' bad' : '')) +
+          (locked ? ' locked' : '');
+
+        const img = document.createElement('img');
+        img.src = puzzles[i].image;
+        img.alt = puzzles[i].name || `Puzzle ${i+1}`;
+
+        const cap = document.createElement('div');
+        cap.className = 'cap';
+        cap.textContent = locked ? "???" : puzzles[i].name;
+
+        th.appendChild(img);
+        th.appendChild(cap);
+        thumbGrid.appendChild(th);
+      }
     }
 
     // Multi-answer matcher
@@ -316,11 +473,9 @@
 
     // Modal open
     function openLevelModal(level,final=false){
-      const {solved,revealed,hinted,score}=levelStats(level);
+      const {score}=levelStats(level); // we only display level score and totals now
+
       mLevel.textContent=level;
-      mSolved.textContent=solved;
-      mRevealed.textContent=revealed;
-      mHints.textContent=hinted;
       mScore.textContent=score;
       mTotal.textContent=State.score;
 
@@ -331,8 +486,10 @@
       modalNext.textContent=final?"Play Again":"Start Next Level";
       modalNext.disabled=!final&&!complete;
 
+      buildThumbGrid(level);
+
       levelModal.classList.add('show');
-      setTimeout(()=>{(!modalNext.disabled?modalNext:modalClose).focus();},0);
+      setTimeout(()=>{(!modalNext.disabled?modalNext:modalCloseX).focus();},0);
     }
 
     // Guess handling
@@ -348,7 +505,6 @@
         showResult("Correct. Nice job.","good");
         lockNext(false);
         updateLevelLabels();
-        updateProgress();
         launchConfetti();
       }else{
         State.guessAttempts[idx]=(State.guessAttempts[idx]||0)+1;
@@ -360,7 +516,6 @@
           lockNext(false);
           saveState();
           updateLevelLabels();
-          updateProgress();
         }else{
           showResult(`Not quite. Try again (${State.guessAttempts[idx]}/3).`,"bad");
         }
@@ -375,7 +530,6 @@
       showResult(`Revealed: ${puzzles[idx].name}`,"revealed");
       lockNext(false);
       updateLevelLabels();
-      updateProgress();
     }
 
     function atEndOfLevel(i){const lvl=getLevel(i),{end}=levelRange(lvl);return i===end;}
@@ -387,8 +541,10 @@
         openLevelModal(lvl,final);
         return;
       }
-      State.current=Math.min(State.current+1,puzzles.length);
-      saveState(); renderPuzzle();
+      const nextIndex = Math.min(State.current+1, puzzles.length-1);
+      pixelateTransitionTo(nextIndex);
+      State.current = nextIndex;
+      saveState();
     }
 
     function handleHint(){
@@ -403,14 +559,14 @@
     // Events
     document.addEventListener("keydown",e=>{
       if(e.key==="Enter"&&document.activeElement===guess){e.preventDefault();handleGuess();}
-      else if(e.key==="Escape"){guess.focus();}
+      else if(e.key==="Escape"){guess.blur();}
       else if((e.key==="n"||e.key==="N")&&!nextBtn.disabled){handleNext();}
     });
     giveup.addEventListener("click",handleGiveUp);
     nextBtn.addEventListener("click",handleNext);
     $("#hint").addEventListener("click", handleHint);
     $("#levelStats").addEventListener("click", ()=> openLevelModal(getLevel(State.current), State.current>=puzzles.length-1 && levelComplete(getLevel(State.current))));
-    modalClose.addEventListener("click", ()=> levelModal.classList.remove('show'));
+    modalCloseX.addEventListener("click", ()=> levelModal.classList.remove('show'));
     modalNext.addEventListener("click", ()=>{
       if(modalNext.disabled) return;
       const lvl=parseInt(mLevel.textContent,10);
@@ -421,15 +577,18 @@
         State.current=0;
         State.solved={}; State.givenUp={}; State.hintsUsed={}; State.guessAttempts={};
         State.score=0;
+        renderPuzzle();
       }else{
         const { end } = levelRange(lvl);
-        State.current=Math.min(end+1,puzzles.length);
+        const nextIndex = Math.min(end+1, puzzles.length-1);
+        pixelateTransitionTo(nextIndex);
+        State.current = nextIndex;
+        saveState();
       }
-      saveState(); renderPuzzle();
     });
     reset?.addEventListener("click",()=>{if(confirm("Clear your progress?")){resetState();renderPuzzle();}});
 
-    // Puzzles with improved hints and broader accepted answers
+    // Puzzles with hints and multiple accepted answers (sample 100)
     const LIVE_PUZZLES = [
       { image:"images/1.png",  name:"Michael Jackson", hint:"Beat It, Thriller, Billie Jean",
         answers:["MJ","Michael","Jackson","King of Pop","Michael J Jackson"] },
@@ -669,7 +828,7 @@
         case ".":      guess.value += "."; break;
         default:       guess.value += label.toLowerCase();
       }
-      guess.focus();
+      guess.blur(); // keep mobile software keyboard hidden
     }
 
     (function buildKeyboard(){
