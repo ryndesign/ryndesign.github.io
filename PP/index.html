@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <title>Pixel People - Guess The Character [MASTER]</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-  <meta name="build" content="master-1.8" />
+  <meta name="build" content="master-1.10" />
   <style>
     :root { --bg:#0f1115; --panel:#171a21; --muted:#8b93a7; --text:#e9edf4; }
     html,body{height:100%;margin:0;background:#0f1115;color:#e9edf4;font:16px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;}
@@ -22,7 +22,7 @@
 
     .stage{
       margin-top:10px;background:#171a21;border:1px solid #23293a;border-radius:10px;
-      padding:10px;display:grid;gap:14px;position:relative; /* modal anchors here */
+      padding:10px;display:grid;gap:14px;position:relative;
     }
     .artbox{
       width:100%;max-width:500px;aspect-ratio:1/1;margin:0 auto;
@@ -32,12 +32,14 @@
     .artbox img{ position:absolute; inset:0; width:100%; height:100%; object-fit:contain; opacity:1; transition:opacity .28s ease; }
 
     .col{display:grid;gap:14px;align-content:start}
-    .guess-row{display:grid;grid-template-columns:1fr;gap:8px}
+
+    .guess-row{display:grid;grid-template-columns:1fr auto;gap:8px}
     #guess{
       appearance:none;border:1px solid #222838;border-radius:10px;
       padding:12px 16px;background:#171a21;color:#e9edf4;
       font-size:20px; line-height:1.2; touch-action:manipulation;
     }
+    #next{min-width:110px}
 
     .result{font-weight:600;padding:10px 12px;border-radius:10px;display:none}
     .result.show{display:block}
@@ -47,6 +49,9 @@
 
     .level-bar{display:flex;align-items:center;gap:12px;color:#8b93a7;font-size:14px;flex-wrap:wrap;justify-content:center;text-align:center}
     .pill{background:#1b2130;border:1px solid #263048;padding:6px 10px;border-radius:999px}
+    #levelLabel{cursor:pointer; user-select:none; outline:none;}
+    #levelLabel:focus{box-shadow:0 0 0 2px #86eefc;}
+
     .level-cells{display:flex;gap:4px;align-items:center}
     .cell{width:10px;height:22px;border-radius:3px;background:#23293a;border:1px solid #2a3246;box-sizing:border-box}
     .cell.ok{ background:#0e3a23; border-color:#1e4d32; }
@@ -87,7 +92,7 @@
     .thumb.bad{ border-color:#5a1e23; }
     .thumb.locked img{ filter: blur(30px) brightness(1); }
     .thumb.locked .cap{ opacity:.2; }
-    .thumb img{ width:100%; height:100%; object-fit:cover; display:block; }
+    .thumb img{ width:90%; height:90%; padding: 5%; object-fit:cover; display:block; }
     .thumb .cap{ position:absolute; left:6px; bottom:6px; right:6px; background:rgba(0,0,0,.55); color:#e5f3ff; font-size:11px; padding:3px 6px; border-radius:6px; text-overflow:ellipsis; white-space:nowrap; overflow:hidden; pointer-events:none;}
     .modal-actions{ display:flex; gap:10px; justify-content:flex-end; align-items:center; }
     .note{font-size:12px;color:#8b93a7;margin-right:auto; width: 50%;}
@@ -96,9 +101,9 @@
 <body>
   <div class="wrap">
     <div class="level-bar">
-      <span class="pill" id="levelLabel">Level 1</span>
+      <span class="pill" id="levelLabel" role="button" tabindex="0" aria-controls="levelModal" aria-expanded="false">Level 1</span>
       <div id="levelCells" class="level-cells" aria-label="Level progress"></div>
-      <span class="pill">Game Score: <strong id="scoreLabel">0</strong></span>
+      <span class="pill">Score: <strong id="scoreLabel">0</strong></span>
     </div>
 
     <section id="stage" class="stage" aria-live="polite" aria-atomic="true">
@@ -107,8 +112,10 @@
       </div>
 
       <div class="col">
+        <!-- Guess + Next side-by-side -->
         <div class="guess-row">
           <input id="guess" type="text" placeholder="Type your guess..." autocomplete="off" inputmode="none" />
+          <button id="next" disabled>Next</button>
         </div>
 
         <div id="result" class="result"></div>
@@ -118,13 +125,11 @@
           <div class="kb-row" id="kb-r2"></div>
           <div class="kb-row" id="kb-r3"></div>
           <div class="kb-row" id="kb-r4"></div>
-        </div>       
+        </div>
 
         <div class="btn-row">
-          <button id="levelStats">Level</button>
           <button id="hint">Hint</button>
-          <button id="giveup">Give Up</button>          
-          <button id="next" disabled>Next Puzzle</button>
+          <button id="giveup">Give Up</button>
         </div>
       </div>
 
@@ -156,7 +161,7 @@
       .replace(/[^a-z0-9\s'-]/g, "")
       .replace(/\s+/g, " ");
 
-    const LS_KEY="pp_state_scoring_multianswers_master_1_8";
+    const LS_KEY="pp_state_scoring_multianswers_master_1_10";
 
     const State={current:0,solved:{},givenUp:{},hintsUsed:{},guessAttempts:{},total:0,score:0};
     let puzzles=[];
@@ -248,7 +253,7 @@
 
     function renderPuzzle(){
       if(State.current>=puzzles.length){
-        showResult("All levels complete!","good");
+        showResult("All levels complete.","good");
         guess.disabled=true; giveup.disabled=true; hintBtn.disabled=true;
         updateLevelLabels();
         return;
@@ -333,7 +338,6 @@
       mLevel.textContent = curInLevel;
       mTotal.textContent = State.score;
 
-      // Title: Level N or All Levels Complete
       modalTitle.textContent = final ? "All Levels Complete" : `Level ${level}`;
 
       const complete=levelComplete(level);
@@ -343,6 +347,7 @@
 
       buildThumbGrid(level);
 
+      levelLabel.setAttribute('aria-expanded','true');
       levelModal.classList.add('show');
       setTimeout(()=>{(!modalNext.disabled?modalNext:modalCloseX).focus();},0);
     }
@@ -356,7 +361,7 @@
         State.solved[idx]=true;
         State.score += State.hintsUsed[idx] ? 5 : 10;
         saveState();
-        showResult("Correct. Nice job.","good");
+        showResult(`Correct. Answer: ${p.name}`,"good");
         hintBtn.disabled = true;
         lockNext(false);
         updateLevelLabels();
@@ -367,7 +372,7 @@
         if(State.guessAttempts[idx]>=3){
           State.givenUp[idx]=true;
           delete State.solved[idx];
-          showResult(`Revealed: ${p.name}`,"revealed");
+          showResult(`Answer: ${p.name}`,"revealed");
           hintBtn.disabled = true;
           lockNext(false);
           saveState();
@@ -383,7 +388,7 @@
       if(State.solved[idx]||State.givenUp[idx]) return;
       State.givenUp[idx]=true;
       saveState();
-      showResult(`Revealed: ${puzzles[idx].name}`,"revealed");
+      showResult(`Answer: ${puzzles[idx].name}`,"revealed");
       hintBtn.disabled = true;
       lockNext(false);
       updateLevelLabels();
@@ -414,21 +419,33 @@
       showResult(`Hint: ${text}`,"revealed");
     }
 
+    // Events
     document.addEventListener("keydown",e=>{
       if(e.key==="Enter"&&document.activeElement===guess){e.preventDefault();handleGuess();}
       else if(e.key==="Escape"){guess.blur();}
       else if((e.key==="n"||e.key==="N")&&!nextBtn.disabled){handleNext();}
+      if((document.activeElement===levelLabel) && (e.key==="Enter" || e.key===" ")){
+        e.preventDefault();
+        openLevelModal(getLevel(State.current), State.current>=puzzles.length-1 && levelComplete(getLevel(State.current)));
+      }
     });
+
     giveup.addEventListener("click",handleGiveUp);
     nextBtn.addEventListener("click",handleNext);
     hintBtn.addEventListener("click", handleHint);
-    $("#levelStats").addEventListener("click", ()=> openLevelModal(getLevel(State.current), State.current>=puzzles.length-1 && levelComplete(getLevel(State.current))));
-    modalCloseX.addEventListener("click", () => levelModal.classList.remove('show'));
+
+    // Make the level pill open the modal
+    levelLabel.addEventListener("click", ()=>{
+      openLevelModal(getLevel(State.current), State.current>=puzzles.length-1 && levelComplete(getLevel(State.current)));
+    });
+
+    modalCloseX.addEventListener("click", () => { levelModal.classList.remove('show'); levelLabel.setAttribute('aria-expanded','false'); });
     modalNext.addEventListener("click", ()=>{
       if(modalNext.disabled) return;
       const lvl=Math.floor(State.current/10)+1;
       const final=modalTitle.textContent.includes("All Levels Complete");
       levelModal.classList.remove('show');
+      levelLabel.setAttribute('aria-expanded','false');
       if(final){
         State.current=0;
         State.solved={}; State.givenUp={}; State.hintsUsed={}; State.guessAttempts={};
