@@ -35,11 +35,11 @@
 
     .guess-row{display:grid;grid-template-columns:1fr auto;gap:8px}
     #guess{
-      appearance:none;border:1px solid #222838;border-radius:10px;
+      appearance:none;border:2px solid #263048;border-radius:10px;
       padding:12px 16px;background:#171a21;color:#e9edf4;
       font-size:20px; line-height:1.2; touch-action:manipulation;
     }
-    #next{min-width:110px}
+    #next{max-width:100px;}
 
     .result{font-weight:600;padding:10px 12px;border-radius:10px;display:none}
     .result.show{display:block}
@@ -48,7 +48,7 @@
     .result.revealed{background:#2a2310;border:1px solid #5a4720;color:#ffe8a1}
 
     .level-bar{display:flex;align-items:center;gap:12px;color:#8b93a7;font-size:14px;flex-wrap:wrap;justify-content:center;text-align:center}
-    .pill{background:#1b2130;border:1px solid #263048;padding:6px 10px;border-radius:999px}
+    .pill{background:#1b2130;border:2px solid #263048;padding:6px 10px;border-radius:999px}
     #levelLabel{cursor:pointer; user-select:none; outline:none;}
     #levelLabel:focus{box-shadow:0 0 0 2px #86eefc;}
 
