@@ -57,7 +57,7 @@
     .guess-row{display:grid;grid-template-columns:1fr auto;gap:8px}
     #guess{
       appearance:none;border:1px solid #263048;border-radius:8px;
-      padding:8px 13px;background:#171a21;color:#e9edf4;
+      padding:9px 13px;background:#171a21;color:#e9edf4;
       font-size:19px; line-height:1.2; touch-action:manipulation;
     }
     #next{max-width:140px;border-radius:8px;}
@@ -289,7 +289,7 @@
       resultTimer = setTimeout(()=>{
         result.classList.add('fading');
         resultHideTimer = setTimeout(()=>{ clearResult(); }, 420);
-      }, 5000);
+      }, 7000);
     }
 
     function clearResult(){
@@ -434,21 +434,23 @@
         updateLevelLabels();
         launchConfetti();
       }else{
-        State.guessAttempts[idx]=(State.guessAttempts[idx]||0)+1;
+        State.guessAttempts[idx] = (State.guessAttempts[idx] || 0) + 1;
         saveState();
-        if(State.guessAttempts[idx]>=3){
-          State.givenUp[idx]=true;
+
+        if (State.guessAttempts[idx] >= 3) {
+          State.givenUp[idx] = true;
           delete State.solved[idx];
-          showResult(`Answer: ${p.name}`,"revealed");
+          showResult(`Answer: ${p.name}`, "revealed");
           hintBtn.disabled = true;
           giveup.disabled = true;
           lockNext(false);
           saveState();
           updateLevelLabels();
-        }else{
-          showResult(`Not quite. Try again (${State.guessAttempts[idx]}/3).`,"bad");
+        } else {
+          showResult(`Not quite. Try again (${State.guessAttempts[idx]}/3).`, "bad");
+          guess.value = ""; // <-- clears the input box after incorrect guess
         }
-      }
+}
     }
 
     function handleGiveUp(){
