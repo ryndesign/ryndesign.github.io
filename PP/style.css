@@ -30,7 +30,6 @@ button#next.active{background:#123524;border-color:#1e4d32;color:#b7ffd1;}
     max-height: 340px;
   }
 }
-
 .result-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:2;}
 .result{font-weight:600;padding:10px 12px;border-radius:8px;display:none;max-width:90%;text-align:center;transition:opacity .4s ease;}
 .result.show{display:inline-block}
