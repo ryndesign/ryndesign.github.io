@@ -1,5 +1,3 @@
-
-
 /* VARIABLES */
 :root { --bg:#121213; --panel:#121213; --muted:#8b93a7; --text:#e9edf4; }
 
@@ -26,10 +24,9 @@ button#next.active{background:#123524;border-color:#1e4d32;color:#b7ffd1;}
 
 /* Limit artbox height on mobile screens */
 @media (max-width: 600px) {
-  .artbox {
-    max-height: 340px;
-  }
+  .artbox { max-height: 340px; }
 }
+
 .result-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:2;}
 .result{font-weight:600;padding:10px 12px;border-radius:8px;display:none;max-width:90%;text-align:center;transition:opacity .4s ease;}
 .result.show{display:inline-block}
@@ -49,6 +46,8 @@ button#next.active{background:#123524;border-color:#1e4d32;color:#b7ffd1;}
 
 .level-bar{display:flex;align-items:center;gap:10px;color:#8b93a7;font-size:14px;flex-wrap:wrap;justify-content:center;text-align:center;background-color: var(--panel);padding-top: 7px; padding-bottom: 7px; border-bottom: 1px solid #424242;}
 .pill{background:#1b2130;border:1px solid #263048;padding:6px 10px;border-radius:8px}
+#homeBtn{cursor:pointer;user-select:none;outline:none;}
+#homeBtn:focus{box-shadow:0 0 0 2px #86eefc;}
 #levelLabel{cursor:pointer;user-select:none;outline:none;}
 #levelLabel:focus{box-shadow:0 0 0 2px #86eefc;}
 
@@ -58,20 +57,40 @@ button#next.active{background:#123524;border-color:#1e4d32;color:#b7ffd1;}
 .cell.bad{background:#3a1b1d;}
 .cell.active{box-shadow:0 0 0 1px #86eefc inset;}
 
+/* KEYBOARD (unchanged) */
 .kb-row{display:flex;justify-content:center;flex-wrap:nowrap;gap:5px;margin-bottom:5px;max-width:500px;margin-left:auto;margin-right:auto;}
 .kb-key{flex:1;max-width:48px;padding:10px 0;border:1px solid #263048;background:#171a21;border-radius:5px;color:#e9edf4;cursor:pointer;text-align:center;user-select:none;font-weight: 600; font-size:16px;transition:background .2s;touch-action:manipulation;}
 .kb-key:hover{background:#1f2637;}
 .kb-key.enter,.kb-key.delete{max-width:none;}
 .kb-key.space{flex:2;max-width:none;}
 
-.modal{position:absolute;inset:0;display:none;place-items:center;z-index:1000;background:rgba(0,0,0,.5);}
+/* ===== HOME: vertical center stack ===== */
+.home{display:none;padding:16px;}
+.home.show{display:block;}
+.home-card{
+  background:#0f1115;border:1px solid #23293a;border-radius:8px;
+  padding:16px;display:grid;gap:16px;
+  justify-items:center;text-align:center;
+}
+.home-logo{display:grid;gap:8px;justify-items:center;}
+.logo-mark{width:56px;height:56px;border-radius:8px;background:#1b2130;border:1px solid #263048;display:grid;place-items:center;font-weight:800;}
+.logo-type{font-size:22px;font-weight:800;letter-spacing:.3px;}
+.home-current{display:grid;gap:8px;justify-items:center;} /* stacked: label, number, image */
+.home-number{font-size:28px;font-weight:800;}
+.home-art{aspect-ratio:1/1;background:#fff url('pp_bgnd.jpg') center/cover no-repeat;border:1px solid #202636;border-radius:8px;position:relative;overflow:hidden;width:100%;max-width:260px;}
+.home-art img{position:absolute;inset:0;width:90%;height:90%;padding:5%;object-fit:contain;margin:auto;}
+.home-actions{display:grid;gap:10px;justify-items:center;}
+.btn-link{display:inline-block;text-align:center;padding:10px 14px;border-radius:8px;background:#263048;color:#e9edf4;text-decoration:none;border:0}
+
+/* MODALS */
+.modal{position:fixed;inset:0;display:none;place-items:center;z-index:1000;background:rgba(0,0,0,.5);}
 .modal.show{display:grid;}
 .modal-card{width:min(420px,85%);background:#0f1115;border:1px solid #23293a;border-radius:8px;padding:20px;position:relative;}
 .modal-close{position:absolute;top:10px;right:10px;width:36px;height:36px;border-radius:8px;background:#171a21;border:1px solid #263048;color:#e9edf4;font-size:26px;line-height:17px;padding:8px;text-align:center;cursor:pointer;}
 .modal-reset{position:absolute;top:10px;right:56px;height:36px;padding:8px 10px;border-radius:8px;background:#171a21;border:1px solid #263048;color:#e9edf4;cursor:pointer;font-size:14px;line-height:20px;}
 .modal-reset:focus{outline:none;box-shadow:0 0 0 2px #86eefc;}
-
 .modal-title{font-size:22px;font-weight:700;margin:0 0 8px 0;padding-right:46px;}
+.score-blurb{margin:-2px 0 10px;color:#cbd5e1;font-size:13px;line-height:1.35;}
 .modal-rows{display:grid;gap:8px;margin:12px 0 14px;}
 .modal-row{display:flex;justify-content:space-between;color:#cbd5e1;}
 
@@ -87,37 +106,10 @@ button#next.active{background:#123524;border-color:#1e4d32;color:#b7ffd1;}
 .note{font-size:12px;color:#8b93a7;margin-right:auto;width:50%;}
 .confirm-text{color:#cbd5e1;margin:6px 0 16px;}
 
-/* Prevent long-press save on thumbnails too */
-.thumb,
-.thumb img {
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  user-select: none;
-}
-.thumb img { pointer-events: none; }      /* thumbs aren’t interactive, so safe to block */
-.thumb::before {                          /* invisible shield like artbox */
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-}
-
-/* Block long-press save and selection on mobile */
-.artbox,
-.artbox img#art {
-  -webkit-touch-callout: none; /* iOS Safari: no "Save Image" sheet */
-  -webkit-user-select: none;
-  user-select: none;
-}
-
-.artbox img#art {
-  pointer-events: none;/* no direct touch on the <img> itself */
-}
-
-.artbox::before {
-  /* Invisible overlay to catch taps so the image itself never receives the long-press */
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-}
+/* Touch-safety identical to your source */
+.thumb, .thumb img { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+.thumb img { pointer-events: none; }
+.thumb::before { content: ""; position: absolute; inset: 0; z-index: 1; }
+.artbox, .artbox img#art { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+.artbox img#art { pointer-events: none; }
+.artbox::before { content: ""; position: absolute; inset: 0; z-index: 1; }

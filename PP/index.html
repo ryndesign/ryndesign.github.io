@@ -4,24 +4,92 @@
   <meta charset="utf-8" />
   <title>Pixel People - Guess The Character [MASTER]</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-  <meta name="build" content="master-1.12.7" />
+  <meta name="build" content="master-1.13.2" />
   <script src="puzzles.js" defer></script>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="wrap">
     <div class="level-bar">
+      <span class="pill" id="homeBtn" role="button" tabindex="0" aria-controls="homeScreen" aria-expanded="false">Home</span>
       <span class="pill" id="levelLabel" role="button" tabindex="0" aria-controls="levelModal" aria-expanded="false">Level 1</span>
       <div id="levelCells" class="level-cells"></div>
       <span class="pill">Score: <strong id="scoreLabel">0</strong></span>
     </div>
+
+    <!-- HOME SCREEN -->
+    <section id="homeScreen" class="home" aria-hidden="true">
+      <div class="home-card">
+        <div class="home-logo" aria-label="Pixel People Logo">
+          <div class="logo-mark">PP</div>
+          <div class="logo-type">Pixel People</div>
+        </div>
+
+        <div class="home-current">
+          <div class="home-label">Current Puzzle</div>
+          <div class="home-number" id="homePuzzleNum">1</div>
+          <div class="home-art" id="homeArtBox">
+            <img id="homeArt" alt="Current puzzle preview" src="" draggable="false" oncontextmenu="return false">
+          </div>
+        </div>
+
+        <div class="home-actions">
+          <button id="homePlay">Play Now</button>
+          <button id="homeHowTo">How To Play</button>
+          <button id="homeShare">Share</button>
+          <a id="homeCoffee" class="btn-link" href="#" target="_blank" rel="noopener">Buy Us A Coffee</a>
+        </div>
+      </div>
+
+      <!-- How To Play modal lives under HOME -->
+      <div id="howToModal" class="modal" role="dialog" aria-labelledby="howToTitle">
+        <div class="modal-card">
+          <button id="howToCloseX" class="modal-close">×</button>
+          <h2 class="modal-title" id="howToTitle">How To Play</h2>
+          <div class="howto-body">
+            <ol>
+              <li>Look at the pixel art and guess the character or title.</li>
+              <li>Type your guess or use the on screen keyboard. Press Enter to submit.</li>
+              <li>Hints reduce points. A perfect guess scores higher. Bonus words give extra points.</li>
+              <li>Skip reveals the answer and ends this puzzle.</li>
+              <li>Finish all 9 puzzles to unlock the next level.</li>
+            </ol>
+          </div>
+          <div class="modal-actions"><button id="howToOk">Got It</button></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Level Summary -->
+      <div id="levelModal" class="modal" role="dialog" aria-labelledby="modalTitle">
+        <div class="modal-card">
+          <button id="modalReset" class="modal-reset">Reset</button>
+          <button id="modalCloseX" class="modal-close">×</button>
+          <h2 class="modal-title" id="modalTitle">Level 1</h2>
+          <p class="score-blurb" id="scoreBlurb">
+            Scoring: Bonus word 20 points, exact name 10, accepted answer 8, with hint 4. Skipping reveals the answer and ends the puzzle.
+          </p>
+          <div class="modal-rows">
+            <div class="modal-row"><span>Correct Puzzles</span><strong id="mCorrect">0/9</strong></div>
+            <div class="modal-row"><span>Game Score</span><strong id="mTotal">0</strong></div>
+          </div>
+          <div id="thumbGrid" class="thumb-grid"></div>
+          <div class="modal-actions">
+            <div class="note" id="unlockNote" style="display:none;">Complete all 9 puzzles in this level to unlock next level.</div>
+            <button id="modalNext">Start Next Level</button>
+          </div>
+        </div>
+      </div>
+
+    <!-- GAME STAGE -->
     <section id="stage" class="stage">
       <div class="artbox" id="artbox">
-        <img id="art" alt="Character puzzle" src="" draggable="false" oncontextmenu="return false;" />
+        <img id="art" alt="Character puzzle" src="" draggable="false" oncontextmenu="return false" />
         <div class="result-overlay"><div id="result" class="result"></div></div>
         <button id="hint" class="fab left">Hint</button>
         <button id="giveup" class="fab right">Skip</button>
       </div>
+
       <div class="col">
         <div class="guess-row">
           <input id="guess" type="text" placeholder="Type your guess..." autocomplete="off" inputmode="none" />
@@ -33,38 +101,21 @@
           <div class="kb-row" id="kb-r3"></div>
           <div class="kb-row" id="kb-r4"></div>
         </div>
-      </div>      
+      </div>
 
+      <!-- Confirm Give Up -->
       <div id="confirmModal" class="modal" role="dialog" aria-labelledby="confirmTitle">
         <div class="modal-card">
           <button id="confirmCloseX" class="modal-close">×</button>
           <h2 class="modal-title" id="confirmTitle">Give Up?</h2>
-          <div class="confirm-text">Are You Sure. You’ll lose the chance to earn full points for this puzzle.</div>
+          <div class="confirm-text">Are You Sure. You will lose the chance to earn full points for this puzzle.</div>
           <div class="modal-actions"><button id="confirmYes">Yes, I Give Up</button></div>
         </div>
       </div>
-
-      <div id="levelModal" class="modal" role="dialog" aria-labelledby="modalTitle">
-        <div class="modal-card">
-          <button id="modalReset" class="modal-reset">Reset</button>
-          <button id="modalCloseX" class="modal-close">×</button>
-          <h2 class="modal-title" id="modalTitle">Level 1</h2>
-          <div class="modal-rows">
-            <div class="modal-row"><span>Correct Puzzles</span><strong id="mCorrect">0/9</strong></div>
-            <div class="modal-row"><span>Game Score</span><strong id="mTotal">0</strong></div>
-          </div>
-          <div id="thumbGrid" class="thumb-grid"></div>
-          <div class="modal-actions">
-            <div class="note" id="unlockNote" style="display:none;">Complete all 9 puzzles in this level to unlock next level.</div>
-            <button id="modalNext">Start Next Level</button>
-          </div>
-        </div>
-    </div>
-
+      
     </section>
-    
-    
   </div>
+
   <div id="fx-confetti" class="fx-confetti"></div>
   <script src="main.js"></script>
 </body>

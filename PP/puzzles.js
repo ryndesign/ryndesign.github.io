@@ -40,35 +40,35 @@ window.LIVE_PUZZLES = [
     answers:["Sagdiyev"], bonus:"Very Nice" },
 
  //LEVEL 2
-  { image:"images/11.png", name:"Beyoncé", hint:"Single Ladies, Formation",
-    answers:["Beyonce","Queen Bey","Bey"], bonus:"Name" },
+  { image:"images/11.png", name:"Beyonce", hint:"Single Ladies, Formation",
+    answers:["Bey"], bonus:"Queen Bey" },
 
   { image:"images/12.png", name:"WALL-E", hint:"Trash compacting robot in space",
-    answers:["WALL E","WALLE","Wall E","Wall-E"], bonus:"Name" },
+    answers:["WALL E","WALLE","Wall E","Wall-E"], bonus:"2805" },
 
   { image:"images/13.png", name:"Michael Jordan", hint:"Air 23, Chicago Bulls",
-    answers:["MJ","Air Jordan","Jordan","Mike Jordan"], bonus:"Name" },
+    answers:["MJ","Air Jordan","Jordan","Mike Jordan"], bonus:"The Goat" },
 
-  { image:"images/14.png", name:"Boba Fett", hint:"Mandalorian bounty hunter",
-    answers:["Fett"], bonus:"Name" },
+  { image:"images/14.png", name:"Boba Fett", hint:"Bounty hunter",
+    answers:["Fett"], bonus:"Mandalorian" },
 
   { image:"images/15.png", name:"Vanilla Ice", hint:"Ice Ice Baby",
-    answers:["Robert Van Winkle","Van Winkle"], bonus:"Name" },
+    answers:["Ice","Vanilla"], bonus:"Robert Van Winkle" },
 
-  { image:"images/16.png", name:"Steve Jobs", hint:"Black turtleneck, Apple keynotes",
-    answers:["Jobs","Steven Jobs"], bonus:"Name" },
+  { image:"images/16.png", name:"Steve Jobs", hint:"Black turtleneck, Apple",
+    answers:["Jobs","Steven Jobs"], bonus:"Macintosh" },
 
   { image:"images/17.png", name:"Mr. T", hint:"I pity the fool",
-    answers:["Mister T","Mr T","Clubber Lang","BA Baracus","B. A. Baracus"], bonus:"Name" },
+    answers:["Mister T","Mr T"], bonus:"BA Baracus" },
 
   { image:"images/18.png", name:"Gizmo", hint:"Cute Mogwai, no water",
-    answers:["Gremlins Gizmo","Mogwai"], bonus:"Name" },
+    answers:["Gremlins"], bonus:"Mogwai" },
 
   { image:"images/19.png", name:"Flavor Flav", hint:"Giant clock necklace",
-    answers:["Flav","Flavor Flave","William Drayton"], bonus:"Name" },
+    answers:["Flav","Flavor Flave"], bonus:"Public Enemy" },
 
   { image:"images/20.png", name:"Forrest Gump", hint:"Box of chocolates",
-    answers:["Forest Gump","Forrest"], bonus:"Name" },
+    answers:["Forest Gump","Forrest", "Gump"], bonus:"Jenny" },
 
 // LEVEL 3
   { image:"images/21.png", name:"Charizard", hint:"Final form of Charmander",

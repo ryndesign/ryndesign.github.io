@@ -5,12 +5,17 @@ const toNormCompare = s => normalize(s).replace(/\s+/g, "");
 
 // bump LS key since scoring rules changed
 const LS_KEY="pp_state_scoring_bonuswords_1_13_0";
+const COFFEE_URL = "https://buymeacoffee.com/pixelpeople"; // change to your real link
 
 const State={current:0,solved:{},givenUp:{},hintsUsed:{},guessAttempts:{},total:0,score:0};
 let puzzles=[];
 
 const art=$('#art'), guess=$('#guess'), giveup=$('#giveup'), nextBtn=$('#next'), result=$('#result'),
       levelLabel=$('#levelLabel'), scoreLabel=$('#scoreLabel'), cellsWrap=$('#levelCells'), hintBtn=$('#hint');
+
+const stage=$('#stage'), homeScreen=$('#homeScreen'), homeBtn=$('#homeBtn'),
+      homePlay=$('#homePlay'), homeHowTo=$('#homeHowTo'), homeShare=$('#homeShare'),
+      homeCoffee=$('#homeCoffee'), homeArt=$('#homeArt'), homeNum=$('#homePuzzleNum');
 
 // Prevent saving or dragging puzzle image on mobile
 ['contextmenu','dragstart','gesturestart','selectstart'].forEach(evt=>{
@@ -40,6 +45,8 @@ const levelModal=$('#levelModal'), modalTitle=$('#modalTitle'),
 
 const confirmModal=$('#confirmModal'), confirmCloseX=$('#confirmCloseX'), confirmYes=$('#confirmYes');
 
+const howToModal=$('#howToModal'), howToCloseX=$('#howToCloseX'), howToOk=$('#howToOk');
+
 let resultTimer=null, resultHideTimer=null;
 
 (function disableMobileKeyboard(){
@@ -53,16 +60,12 @@ let resultTimer=null, resultHideTimer=null;
 // ===== Levels: 9 puzzles per level =====
 const PUZZLES_PER_LEVEL = 9;
 
-function getLevel(i){
-  return Math.floor(i / PUZZLES_PER_LEVEL) + 1;
-}
-
+function getLevel(i){ return Math.floor(i / PUZZLES_PER_LEVEL) + 1; }
 function levelRange(level){
   const s = (level - 1) * PUZZLES_PER_LEVEL;
   const e = Math.min(level * PUZZLES_PER_LEVEL - 1, State.total - 1);
   return { start: s, end: e };
 }
-
 function levelComplete(level){
   const { start, end } = levelRange(level);
   for (let i = start; i <= end; i++) {
@@ -99,6 +102,10 @@ function updateLevelLabels(){
   const finished = !!(State.solved[State.current] || State.givenUp[State.current]);
   hintBtn.disabled = finished;
   giveup.disabled = finished;
+
+  // Update home preview bits
+  homeNum.textContent = String(State.current + 1);
+  if (puzzles[State.current]) homeArt.src = puzzles[State.current].image;
 }
 
 function showResult(t,c){
@@ -131,6 +138,10 @@ function renderPuzzle(){
   const finished = !!(State.solved[State.current] || State.givenUp[State.current]);
   hintBtn.disabled = finished; giveup.disabled = finished;
   lockNext(!finished); updateLevelLabels(); guess.blur(); art.style.opacity = 1;
+
+  // keep home preview in sync
+  homeArt.src = p.image;
+  homeNum.textContent = String(State.current + 1);
 }
 
 function fadeTransitionTo(nextIndex){
@@ -175,22 +186,15 @@ function matchAny(cands, g){
   if (typeof cands === "string") return normEq(cands, g);
   return false;
 }
-
-/**
- * Returns one of: 'bonus' | 'name' | 'answer' | null
- */
+/** Returns one of: 'bonus' | 'name' | 'answer' | null */
 function classifyGuess(p, guessStr){
   const g = guessStr || "";
   if (!g.trim()) return null;
-  // bonus first (highest value)
   if (matchAny(p.bonus, g)) return "bonus";
-  // primary name
   if (p.name && normEq(p.name, g)) return "name";
-  // alt answers
   if (Array.isArray(p.answers) && p.answers.some(c => normEq(c, g))) return "answer";
   return null;
 }
-// ----------------------------
 
 function correctProgressForLevel(level){
   const { end } = levelRange(level);
@@ -290,10 +294,75 @@ function handleNext(){
   State.current = nextIndex; saveState();
 }
 
+// ===== HOME TOGGLE =====
+function showHome(){
+  homeScreen.classList.add('show');
+  homeScreen.setAttribute('aria-hidden','false');
+  stage.style.display = 'none';
+  homeBtn.setAttribute('aria-expanded','true');
+  if (puzzles[State.current]) {
+    homeArt.src = puzzles[State.current].image;
+    homeNum.textContent = String(State.current + 1);
+  }
+}
+function showGame(){
+  homeScreen.classList.remove('show');
+  homeScreen.setAttribute('aria-hidden','true');
+  stage.style.display = '';
+  homeBtn.setAttribute('aria-expanded','false');
+}
+
+// Home button now ALWAYS goes Home, no toggle
+homeBtn.addEventListener('click', showHome);
+homeBtn.addEventListener('keydown', (e)=>{
+  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); showHome(); }
+});
+
+// Level click already opens the modal; it works from Home too.
+// Play Now returns to game
+homePlay.addEventListener('click', showGame);
+
+// How To Play modal
+homeHowTo.addEventListener('click', ()=>{
+  howToModal.classList.add('show');
+  setTimeout(()=>{ howToOk.focus(); },0);
+});
+howToOk.addEventListener('click', ()=> howToModal.classList.remove('show'));
+howToCloseX.addEventListener('click', ()=> howToModal.classList.remove('show'));
+
+// Share
+homeShare.addEventListener('click', async ()=>{
+  const url = window.location.href;
+  try{
+    if (navigator.share) {
+      await navigator.share({ title: "Pixel People", text: "Play Pixel People", url });
+      showResult("Shared successfully.","good");
+    } else if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(url);
+      showResult("Link copied to clipboard.","good");
+    } else {
+      // fallback
+      const tmp=document.createElement('input');
+      tmp.value=url; document.body.appendChild(tmp); tmp.select(); document.execCommand('copy'); document.body.removeChild(tmp);
+      showResult("Link copied to clipboard.","good");
+    }
+  }catch{
+    showResult("Share canceled.","bad");
+  }
+});
+
+// Coffee link
+homeCoffee.setAttribute('href', COFFEE_URL);
+
 // Events
 document.addEventListener("keydown",e=>{
   if(e.key==="Enter"&&document.activeElement===guess){e.preventDefault();handleGuess();}
-  else if(e.key==="Escape"){guess.blur();}
+  else if(e.key==="Escape"){
+    if (howToModal.classList.contains('show')) { howToModal.classList.remove('show'); return; }
+    if (confirmModal.classList.contains('show')) { confirmModal.classList.remove('show'); return; }
+    if (levelModal.classList.contains('show')) { levelModal.classList.remove('show'); levelLabel.setAttribute('aria-expanded','false'); return; }
+    guess.blur();
+  }
   else if((e.key==="n"||e.key==="N")&&!nextBtn.disabled){handleNext();}
   if((document.activeElement===levelLabel) && (e.key==="Enter" || e.key===" ")){
     e.preventDefault();
@@ -403,10 +472,19 @@ function init(){
   }
   State.total = puzzles.length;
   if(State.current >= puzzles.length) State.current = 0;
+
+  // set coffee link
+  homeCoffee.setAttribute('href', COFFEE_URL);
+
+  // keep home preview synced
+  if (puzzles[State.current]) {
+    homeArt.src = puzzles[State.current].image;
+    homeNum.textContent = String(State.current + 1);
+  }
+
   renderPuzzle();
   updateLevelLabels();
 }
-// Ensure puzzles.js (defer) has run first
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", init);
 } else {
