@@ -21,8 +21,10 @@
     button:disabled{opacity:.6;cursor:not-allowed}
     button#next.active{background:#123524;border-color:#1e4d32;color:#b7ffd1;}
 
+    #hint, #giveup{ background-color: #5B8341; padding: 5px 10px; font-size: 15px; border: 0px; border-radius: 5px; color: #89C95B;}
+
     .stage{
-      margin-top:10px;background:#171a21;border:1px solid #23293a;border-radius:8px;
+      margin-top:10px;background:#171a21;border:0px solid #23293a;border-radius:8px;
       padding:10px;display:grid;gap:14px;position:relative;
     }
     .artbox{
@@ -50,7 +52,7 @@
     .guess-row{display:grid;grid-template-columns:1fr auto;gap:8px}
     #guess{
       appearance:none;border:1px solid #263048;border-radius:8px;
-      padding:12px 16px;background:#171a21;color:#e9edf4;
+      padding:8px 13px;background:#171a21;color:#e9edf4;
       font-size:20px; line-height:1.2; touch-action:manipulation;
     }
     #next{max-width:140px;border-radius:8px;}
@@ -61,10 +63,10 @@
     #levelLabel:focus{box-shadow:0 0 0 2px #86eefc;}
 
     .level-cells{display:flex;gap:4px;align-items:center}
-    .cell{width:10px;height:22px;border-radius:8px;background:#23293a;border:1px solid #2a3246;box-sizing:border-box}
+    .cell{width:10px;height:22px;border-radius:2px;background:#23293a;border:0px solid #2a3246;box-sizing:border-box}
     .cell.ok{ background:#0e3a23; border-color:#1e4d32; }
     .cell.bad{ background:#3a1b1d; border-color:#5a1e23; }
-    .cell.active{ box-shadow:0 0 0 2px #86eefc inset; }
+    .cell.active{ box-shadow:0 0 0 1px #86eefc inset; }
 
     .kb-row{ display:flex; justify-content:center; flex-wrap:nowrap; gap:5px; margin-bottom:5px; max-width:500px; margin-left:auto; margin-right:auto; }
     .kb-key{
@@ -121,7 +123,7 @@
         </div>
         <!-- Overlay Hint/Give Up -->
         <button id="hint" class="fab left">Hint</button>
-        <button id="giveup" class="fab right">Give Up</button>
+        <button id="giveup" class="fab right">Skip</button>
       </div>
 
       <div class="col">
