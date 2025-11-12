@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <title>Pixel People - Guess The Character [MASTER]</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-  <meta name="build" content="master-1.12" />
+  <meta name="build" content="master-1.12.4" />
   <style>
     :root { --bg:#0f1115; --panel:#171a21; --muted:#8b93a7; --text:#e9edf4; }
     html,body{height:100%;margin:0;background:#0f1115;color:#e9edf4;font:16px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;}
@@ -21,7 +21,8 @@
     button:disabled{opacity:.6;cursor:not-allowed}
     button#next.active{background:#123524;border-color:#1e4d32;color:#b7ffd1;}
 
-    #hint, #giveup{ background-color: #5B8341; padding: 5px 10px; font-size: 15px; border: 0px; border-radius: 5px; color: #89C95B;}
+    /* Overlay action buttons */
+    #hint, #giveup{ background-color:#5B8341; padding:5px 10px; font-size:15px; border:0; border-radius:8px; color:#89C95B; }
 
     .stage{
       margin-top:10px;background:#171a21;border:0px solid #23293a;border-radius:8px;
@@ -36,13 +37,17 @@
 
     /* Result overlay centered over artbox */
     .result-overlay{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; pointer-events:none; z-index:2; }
-    .result{font-weight:600;padding:10px 12px;border-radius:8px;display:none; max-width:90%; text-align:center}
+    .result{
+      font-weight:600;padding:10px 12px;border-radius:8px;display:none; max-width:90%; text-align:center;
+      transition:opacity .4s ease;
+    }
     .result.show{display:inline-block}
     .result.good{background:#0f291a;border:1px solid #1e4d32;color:#b7ffd1}
     .result.bad{background:#2a1416;border:1px solid #5a1e23;color:#ffc3c6}
     .result.revealed{background:#2a2310;border:1px solid #5a4720;color:#ffe8a1}
+    .result.fading{ opacity:0; }
 
-    /* Overlay Hint/Give Up */
+    /* Overlay Hint/Give Up positions */
     .fab{ position:absolute; bottom:10px; z-index:3; border-radius:8px; }
     .fab.left{ left:10px; }
     .fab.right{ right:10px; }
@@ -53,7 +58,7 @@
     #guess{
       appearance:none;border:1px solid #263048;border-radius:8px;
       padding:8px 13px;background:#171a21;color:#e9edf4;
-      font-size:20px; line-height:1.2; touch-action:manipulation;
+      font-size:19px; line-height:1.2; touch-action:manipulation;
     }
     #next{max-width:140px;border-radius:8px;}
 
@@ -68,14 +73,17 @@
     .cell.bad{ background:#3a1b1d; border-color:#5a1e23; }
     .cell.active{ box-shadow:0 0 0 1px #86eefc inset; }
 
+    /* Keyboard */
     .kb-row{ display:flex; justify-content:center; flex-wrap:nowrap; gap:5px; margin-bottom:5px; max-width:500px; margin-left:auto; margin-right:auto; }
     .kb-key{
       flex:1; max-width:48px; padding:13px 0;
       border:1px solid #263048; background:#171a21; border-radius:8px;
       color:#e9edf4; cursor:pointer; text-align:center; user-select:none; font-size:16px; transition:background .2s; touch-action:manipulation;
     }
-    .kb-key.wide{ flex:1.5; max-width:none; }
     .kb-key:hover{ background:#1f2637; }
+    /* Row 4 sizing: Enter/Delete equal, Space larger */
+    .kb-key.enter, .kb-key.delete { max-width:none; }
+    .kb-key.space { flex:2; max-width:none; }
 
     .fx-confetti{ position:fixed; inset:0; pointer-events:none; overflow:hidden; z-index:999; }
     .fx-confetti .piece{
@@ -85,7 +93,7 @@
     }
     @keyframes confetti-fall{ to{ transform: translate(calc(var(--x,0) + var(--dx,0)), 110vh) rotate(var(--rot,360deg)); } }
 
-    /* Modal centered inside .stage */
+    /* Modal base */
     .modal{ position:absolute; inset:0; display:none; place-items:center; z-index:1000; background:rgba(0,0,0,.5); }
     .modal.show{ display:grid; }
     .modal-card{ width:min(420px, 85%); background:#0f1115; border:1px solid #23293a; border-radius:8px; padding:20px; position:relative; }
@@ -104,6 +112,7 @@
     .thumb .cap{ position:absolute; left:6px; bottom:6px; right:6px; background:rgba(0,0,0,.55); color:#e5f3ff; font-size:11px; padding:3px 6px; border-radius:8px; text-overflow:ellipsis; white-space:nowrap; overflow:hidden; pointer-events:none;}
     .modal-actions{ display:flex; gap:10px; justify-content:flex-end; align-items:center; }
     .note{font-size:12px;color:#8b93a7;margin-right:auto; width: 50%;}
+    .confirm-text{ color:#cbd5e1; margin:6px 0 16px; }
   </style>
 </head>
 <body>
@@ -122,8 +131,8 @@
           <div id="result" class="result"></div>
         </div>
         <!-- Overlay Hint/Give Up -->
-        <button id="hint" class="fab left">Hint</button>
-        <button id="giveup" class="fab right">Skip</button>
+        <button id="hint" class="fab left" aria-label="Show a hint" title="Hint">Hint</button>
+        <button id="giveup" class="fab right" aria-label="Skip this puzzle" title="Skip">Skip</button>
       </div>
 
       <div class="col">
@@ -142,18 +151,30 @@
       </div>
 
       <!-- Level Modal -->
-      <div id="levelModal" class="modal">
+      <div id="levelModal" class="modal" aria-modal="true" role="dialog" aria-labelledby="modalTitle">
         <div class="modal-card">
           <button id="modalCloseX" class="modal-close" aria-label="Close">×</button>
           <h2 class="modal-title" id="modalTitle">Level 1</h2>
           <div class="modal-rows">
-            <div class="modal-row"><span>Current Puzzle</span><strong id="mLevel">1/10</strong></div>
+            <div class="modal-row"><span>Correct Puzzles</span><strong id="mCorrect">0/10</strong></div>
             <div class="modal-row"><span>Game Score</span><strong id="mTotal">0</strong></div>
           </div>
           <div id="thumbGrid" class="thumb-grid" aria-label="Level puzzle thumbnails"></div>
           <div class="modal-actions">
             <div class="note" id="unlockNote" style="display:none;">Complete all 10 puzzles in this level to unlock next level.</div>
             <button id="modalNext">Start Next Level</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Give Up Confirm Modal -->
+      <div id="confirmModal" class="modal" aria-modal="true" role="dialog" aria-labelledby="confirmTitle">
+        <div class="modal-card">
+          <button id="confirmCloseX" class="modal-close" aria-label="Close">×</button>
+          <h2 class="modal-title" id="confirmTitle">Give Up? </h2>
+          <div class="confirm-text">Are You Sure</div>
+          <div class="modal-actions">
+            <button id="confirmYes">Yes, I Give Up</button>
           </div>
         </div>
       </div>
@@ -168,8 +189,9 @@
       .replace(/[\u0300-\u036f]/g, "")
       .replace(/[^a-z0-9\s'-]/g, "")
       .replace(/\s+/g, " ");
+    const toNormCompare = s => normalize(s).replace(/\s+/g, "");
 
-    const LS_KEY="pp_state_scoring_multianswers_master_1_12";
+    const LS_KEY="pp_state_scoring_multianswers_master_1_12_4";
 
     const State={current:0,solved:{},givenUp:{},hintsUsed:{},guessAttempts:{},total:0,score:0};
     let puzzles=[];
@@ -180,9 +202,14 @@
           cellsWrap=$('#levelCells'), hintBtn=$('#hint');
 
     const levelModal=$('#levelModal'), modalTitle=$('#modalTitle'),
-          mLevel=$('#mLevel'), mTotal=$('#mTotal'),
+          mTotal=$('#mTotal'), mCorrect=$('#mCorrect'),
           modalNext=$('#modalNext'), unlockNote=$('#unlockNote'),
           modalCloseX=$('#modalCloseX'), thumbGrid=$('#thumbGrid');
+
+    const confirmModal=$('#confirmModal'), confirmCloseX=$('#confirmCloseX'), confirmYes=$('#confirmYes');
+
+    // Result fade timers
+    let resultTimer=null, resultHideTimer=null;
 
     // Prevent mobile keyboard
     (function disableMobileKeyboard(){
@@ -216,8 +243,8 @@
     }
 
     function loadState(){try{const raw=localStorage.getItem(LS_KEY);if(!raw)return;Object.assign(State,JSON.parse(raw));}catch{}}
-    function saveState(){localStorage.setItem(LS_KEY,JSON.stringify(State));}
-    function resetState(){localStorage.removeItem(LS_KEY);State.current=0;State.solved={};State.givenUp={};State.hintsUsed={};State.guessAttempts={};State.score=0;saveState();}
+    function saveState(){try{localStorage.setItem(LS_KEY,JSON.stringify(State));}catch{}}
+    function resetState(){try{localStorage.removeItem(LS_KEY);}catch{} State.current=0;State.solved={};State.givenUp={};State.hintsUsed={};State.guessAttempts={};State.score=0;saveState();}
 
     function getLevel(i){return Math.floor(i/10)+1;}
     function levelRange(level){const s=(level-1)*10;return{start:s,end:Math.min(level*10-1,State.total-1)};}
@@ -253,8 +280,25 @@
       giveup.disabled = finished;
     }
 
-    function showResult(t,c){result.textContent=t;result.className="result show "+(c||"");}
-    function clearResult(){result.textContent="";result.className="result";}
+    function showResult(t,c){
+      if(resultTimer){ clearTimeout(resultTimer); resultTimer=null; }
+      if(resultHideTimer){ clearTimeout(resultHideTimer); resultHideTimer=null; }
+      result.textContent=t;
+      result.className="result show "+(c||"");
+      result.style.opacity = 1;
+      resultTimer = setTimeout(()=>{
+        result.classList.add('fading');
+        resultHideTimer = setTimeout(()=>{ clearResult(); }, 420);
+      }, 5000);
+    }
+
+    function clearResult(){
+      if(resultTimer){ clearTimeout(resultTimer); resultTimer=null; }
+      if(resultHideTimer){ clearTimeout(resultHideTimer); resultHideTimer=null; }
+      result.textContent="";
+      result.className="result";
+      result.style.opacity = "";
+    }
 
     function lockNext(x){
       nextBtn.disabled=x;
@@ -327,8 +371,7 @@
     }
 
     function isCorrect(answerOrPuzzle, guessStr){
-      const toNorm = s => normalize(s).replace(/[^a-z0-9 ]/g,"");
-      const g = toNorm(guessStr);
+      const g = toNormCompare(guessStr);
       if (!g) return false;
 
       let candidates = [];
@@ -340,16 +383,27 @@
         candidates = [primary, ...extras];
       }
       return candidates.some(c => {
-        const a = toNorm(c);
+        const a = toNormCompare(c);
         return a && a === g;
       });
     }
 
-    function openLevelModal(level,final=false){
-      const curInLevel = ((State.current % 10) + 1) + "/10";
-      mLevel.textContent = curInLevel;
-      mTotal.textContent = State.score;
+    // cumulative correct up to end of current level (e.g., 3/10, 7/20, 12/30)
+    function correctProgressForLevel(level){
+      const { end } = levelRange(level);
+      const total = Math.min(level * 10, State.total);
+      let correct = 0;
+      for(let i=0; i<=end && i<State.total; i++){
+        if (State.solved[i]) correct++;
+      }
+      return { correct, total };
+    }
 
+    function openLevelModal(level,final=false){
+      const { correct, total } = correctProgressForLevel(level);
+      if (mCorrect) mCorrect.textContent = `${correct}/${total}`;
+
+      mTotal.textContent = State.score;
       modalTitle.textContent = final ? "All Levels Complete" : `Level ${level}`;
 
       const complete=levelComplete(level);
@@ -448,15 +502,31 @@
       }
     });
 
-    giveup.addEventListener("click",handleGiveUp);
+    // Give Up opens confirm modal
+    giveup.addEventListener("click", ()=>{
+      const idx = State.current;
+      if(giveup.disabled) return;
+      if(State.solved[idx] || State.givenUp[idx]) return;
+      levelLabel.setAttribute('aria-expanded','false');
+      confirmModal.classList.add('show');
+      setTimeout(()=>{ confirmYes.focus(); },0);
+    });
+    // Confirm modal actions
+    confirmCloseX.addEventListener("click", ()=>{
+      confirmModal.classList.remove('show');
+    });
+    confirmYes.addEventListener("click", ()=>{
+      confirmModal.classList.remove('show');
+      handleGiveUp();
+    });
+
     nextBtn.addEventListener("click",handleNext);
     hintBtn.addEventListener("click", handleHint);
 
-    // Make the level pill open the modal
+    // Level modal open and actions
     levelLabel.addEventListener("click", ()=>{
       openLevelModal(getLevel(State.current), State.current>=puzzles.length-1 && levelComplete(getLevel(State.current)));
     });
-
     modalCloseX.addEventListener("click", () => { levelModal.classList.remove('show'); levelLabel.setAttribute('aria-expanded','false'); });
     modalNext.addEventListener("click", ()=>{
       if(modalNext.disabled) return;
@@ -492,7 +562,7 @@
       { image:"images/6.png",  name:"Wonder Woman", hint:"Lasso of Truth, Amazon warrior",
         answers:["Diana Prince","Diana"] },
       { image:"images/7.png",  name:"Scream", hint:"Scream mask and voice",
-        answers:["Scream","Ghost Face"] },
+        answers:["Ghost Face","Ghostface","Scream"] },
       { image:"images/8.png",  name:"Buzz Lightyear", hint:"To infinity and beyond",
         answers:["Buzz","Lightyear","Toy Story Buzz"] },
       { image:"images/9.png",  name:"Deadpool", hint:"Fourth wall breaks, red suit",
@@ -697,10 +767,10 @@
       ["Enter","Space","Delete"],
     ];
 
-    function addKey(rowEl,label,wide=false){
+    function addKey(rowEl,label,extraClass="",displayHTML=null){
       const b=document.createElement("button");
-      b.className="kb-key"+(wide?" wide":"");
-      b.textContent=label;
+      b.className="kb-key"+(extraClass?(" "+extraClass):"");
+      if(displayHTML){ b.innerHTML = displayHTML; } else { b.textContent = label; }
       b.addEventListener("click",()=>pressKey(label));
       rowEl.appendChild(b);
     }
@@ -724,7 +794,10 @@
       KB_ROWS[0].forEach(k=>addKey(r1,k));
       KB_ROWS[1].forEach(k=>addKey(r2,k));
       KB_ROWS[2].forEach(k=>addKey(r3,k));
-      KB_ROWS[3].forEach(k=>addKey(r4,k,true));
+      // Row 4 with class hooks and visual nbsp padding on Space
+      addKey(r4,"Enter","enter");
+      addKey(r4,"Space","space","&nbsp;Space&nbsp;");
+      addKey(r4,"Delete","delete");
     })();
 
     function init(){
