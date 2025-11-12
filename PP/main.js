@@ -12,6 +12,26 @@ let puzzles=[];
 const art=$('#art'), guess=$('#guess'), giveup=$('#giveup'), nextBtn=$('#next'), result=$('#result'),
       levelLabel=$('#levelLabel'), scoreLabel=$('#scoreLabel'), cellsWrap=$('#levelCells'), hintBtn=$('#hint');
 
+// Prevent saving or dragging puzzle image on mobile
+['contextmenu','dragstart','gesturestart','selectstart'].forEach(evt=>{
+  art.addEventListener(evt, e => e.preventDefault(), { passive:false });
+});
+art.addEventListener('touchstart', e => e.preventDefault(), { passive:false });
+
+const artbox = document.getElementById('artbox');
+['contextmenu','gesturestart'].forEach(evt=>{
+  artbox.addEventListener(evt, e => e.preventDefault(), { passive:false });
+});
+
+// Also block context menu / drag on any images inside the stage & modal thumbs
+const blockIfGameImage = (e) => {
+  if (e.target.closest('#artbox, .thumb-grid')) e.preventDefault();
+};
+document.addEventListener('contextmenu', blockIfGameImage, { passive:false });
+document.addEventListener('dragstart',  blockIfGameImage, { passive:false });
+document.addEventListener('selectstart', blockIfGameImage, { passive:false });
+document.addEventListener('gesturestart',blockIfGameImage, { passive:false });
+
 const levelModal=$('#levelModal'), modalTitle=$('#modalTitle'),
       mTotal=$('#mTotal'), mCorrect=$('#mCorrect'),
       modalNext=$('#modalNext'), unlockNote=$('#unlockNote'),
@@ -127,6 +147,8 @@ function buildThumbGrid(level){
     const th = document.createElement('div');
     th.className = 'thumb' + (solved ? ' ok' : (failed ? ' bad' : '')) + (locked ? ' locked' : '');
     const img = document.createElement('img'); img.src = puzzles[i].image; img.alt = puzzles[i].name || `Puzzle ${i+1}`;
+    img.setAttribute('draggable','false');              
+    img.setAttribute('oncontextmenu','return false;');  
     const cap = document.createElement('div'); cap.className = 'cap'; cap.textContent = locked ? "???" : puzzles[i].name;
     th.appendChild(img); th.appendChild(cap); thumbGrid.appendChild(th);
   }
