@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <title>Pixel People - Guess The Character [MASTER]</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-  <meta name="build" content="master-1.12.4" />
+  <meta name="build" content="master-1.12.6" />
   <style>
     :root { --bg:#0f1115; --panel:#171a21; --muted:#8b93a7; --text:#e9edf4; }
     html,body{height:100%;margin:0;background:#0f1115;color:#e9edf4;font:16px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;}
@@ -25,7 +25,7 @@
     #hint, #giveup{ background-color:#5B8341; padding:5px 10px; font-size:15px; border:0; border-radius:8px; color:#89C95B; }
 
     .stage{
-      margin-top:10px;background:#171a21;border:0px solid #23293a;border-radius:8px;
+      margin-top:10px;background:#171a21;border-radius:8px;
       padding:10px;display:grid;gap:14px;position:relative;
     }
     .artbox{
@@ -33,7 +33,7 @@
       background:#ffffff url('pp_bgnd.jpg') center/cover no-repeat;
       border:1px solid #202636;border-radius:8px;overflow:hidden;position:relative;
     }
-    .artbox img{ position:absolute; inset:0; width:100%; height:100%; object-fit:contain; opacity:1; transition:opacity .28s ease; }
+    .artbox img{ position:absolute; inset:0; width:92%; height:92%; padding: 4%; object-fit:contain; opacity:1; transition:opacity .28s ease; }
 
     /* Result overlay centered over artbox */
     .result-overlay{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; pointer-events:none; z-index:2; }
@@ -68,9 +68,9 @@
     #levelLabel:focus{box-shadow:0 0 0 2px #86eefc;}
 
     .level-cells{display:flex;gap:4px;align-items:center}
-    .cell{width:10px;height:22px;border-radius:2px;background:#23293a;border:0px solid #2a3246;box-sizing:border-box}
-    .cell.ok{ background:#0e3a23; border-color:#1e4d32; }
-    .cell.bad{ background:#3a1b1d; border-color:#5a1e23; }
+    .cell{width:10px;height:22px;border-radius:2px;background:#23293a;box-sizing:border-box}
+    .cell.ok{ background:#0e3a23; }
+    .cell.bad{ background:#3a1b1d; }
     .cell.active{ box-shadow:0 0 0 1px #86eefc inset; }
 
     /* Keyboard */
@@ -97,7 +97,10 @@
     .modal{ position:absolute; inset:0; display:none; place-items:center; z-index:1000; background:rgba(0,0,0,.5); }
     .modal.show{ display:grid; }
     .modal-card{ width:min(420px, 85%); background:#0f1115; border:1px solid #23293a; border-radius:8px; padding:20px; position:relative; }
-    .modal-close{ position:absolute; top:10px; right:10px; width:36px; height:36px; border-radius:8px; background:#171a21; border:1px solid #263048; color:#e9edf4; font-size:26px; line-height:17px; padding: 10px; text-align:center; cursor:pointer; touch-action:manipulation;}
+    .modal-close{ position:absolute; top:10px; right:10px; width:36px; height:36px; border-radius:8px; background:#171a21; border:1px solid #263048; color:#e9edf4; font-size:26px; line-height:17px; padding: 8px; text-align:center; cursor:pointer;}
+    .modal-reset{ position:absolute; top:10px; right:56px; height:36px; padding:8px 10px; border-radius:8px; background:#171a21; border:1px solid #263048; color:#e9edf4; cursor:pointer; font-size:14px; line-height:20px; }
+    .modal-reset:focus{ outline:none; box-shadow:0 0 0 2px #86eefc; }
+
     .modal-title{ font-size:22px; font-weight:700; margin:0 0 8px 0; padding-right:46px; }
     .modal-rows{ display:grid; gap:8px; margin:12px 0 14px; }
     .modal-row{ display:flex; justify-content:space-between; color:#cbd5e1; }
@@ -153,6 +156,7 @@
       <!-- Level Modal -->
       <div id="levelModal" class="modal" aria-modal="true" role="dialog" aria-labelledby="modalTitle">
         <div class="modal-card">
+          <button id="modalReset" class="modal-reset" aria-label="Reset progress">Reset</button>
           <button id="modalCloseX" class="modal-close" aria-label="Close">×</button>
           <h2 class="modal-title" id="modalTitle">Level 1</h2>
           <div class="modal-rows">
@@ -187,11 +191,11 @@
     const $ = (s)=>document.querySelector(s);
     const normalize = s => (s||"").toString().trim().toLowerCase().normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "")
-      .replace(/[^a-z0-9\s'-]/g, "")
-      .replace(/\s+/g, " ");
-    const toNormCompare = s => normalize(s).replace(/\s+/g, "");
+      .replace(/[^a-z0-9\\s'-]/g, "")
+      .replace(/\\s+/g, " ");
+    const toNormCompare = s => normalize(s).replace(/\\s+/g, "");
 
-    const LS_KEY="pp_state_scoring_multianswers_master_1_12_4";
+    const LS_KEY="pp_state_scoring_multianswers_master_1_12_6";
 
     const State={current:0,solved:{},givenUp:{},hintsUsed:{},guessAttempts:{},total:0,score:0};
     let puzzles=[];
@@ -204,7 +208,8 @@
     const levelModal=$('#levelModal'), modalTitle=$('#modalTitle'),
           mTotal=$('#mTotal'), mCorrect=$('#mCorrect'),
           modalNext=$('#modalNext'), unlockNote=$('#unlockNote'),
-          modalCloseX=$('#modalCloseX'), thumbGrid=$('#thumbGrid');
+          modalCloseX=$('#modalCloseX'), thumbGrid=$('#thumbGrid'),
+          modalReset=$('#modalReset');
 
     const confirmModal=$('#confirmModal'), confirmCloseX=$('#confirmCloseX'), confirmYes=$('#confirmYes');
 
@@ -244,7 +249,7 @@
 
     function loadState(){try{const raw=localStorage.getItem(LS_KEY);if(!raw)return;Object.assign(State,JSON.parse(raw));}catch{}}
     function saveState(){try{localStorage.setItem(LS_KEY,JSON.stringify(State));}catch{}}
-    function resetState(){try{localStorage.removeItem(LS_KEY);}catch{} State.current=0;State.solved={};State.givenUp={};State.hintsUsed={};State.guessAttempts={};State.score=0;saveState();}
+    function resetState(){try{localStorage.removeItem(LS_KEY);}catch{} Object.assign(State,{current:0,solved:{},givenUp:{},hintsUsed:{},guessAttempts:{},score:0}); saveState();}
 
     function getLevel(i){return Math.floor(i/10)+1;}
     function levelRange(level){const s=(level-1)*10;return{start:s,end:Math.min(level*10-1,State.total-1)};}
@@ -286,10 +291,11 @@
       result.textContent=t;
       result.className="result show "+(c||"");
       result.style.opacity = 1;
+      // start 10s auto fade
       resultTimer = setTimeout(()=>{
         result.classList.add('fading');
         resultHideTimer = setTimeout(()=>{ clearResult(); }, 420);
-      }, 7000);
+      }, 10000);
     }
 
     function clearResult(){
@@ -302,7 +308,7 @@
 
     function lockNext(x){
       nextBtn.disabled=x;
-      if(!x){ nextBtn.classList.add("active"); } else { nextBtn.classList.remove("active"); }
+      nextBtn.classList.toggle("active", !x);
     }
 
     function renderPuzzle(){
@@ -448,9 +454,9 @@
           updateLevelLabels();
         } else {
           showResult(`Not quite. Try again (${State.guessAttempts[idx]}/3).`, "bad");
-          guess.value = ""; // <-- clears the input box after incorrect guess
+          guess.value = ""; // clear input on wrong guess
         }
-}
+      }
     }
 
     function handleGiveUp(){
@@ -548,6 +554,18 @@
         State.current = nextIndex;
         saveState();
       }
+    });
+
+    modalReset.addEventListener("click", ()=>{
+      if(!confirm('Reset all progress for this game?')) return;
+      resetState();
+      levelModal.classList.remove('show');
+      levelLabel.setAttribute('aria-expanded','false');
+      puzzles = LIVE_PUZZLES;
+      State.total = puzzles.length;
+      renderPuzzle();
+      updateLevelLabels();
+      showResult('Progress reset.','revealed');
     });
 
     const LIVE_PUZZLES = [
@@ -808,6 +826,7 @@
       State.total = puzzles.length;
       if(State.current >= puzzles.length) State.current = 0;
       renderPuzzle();
+      updateLevelLabels();
     }
     init();
   </script>
