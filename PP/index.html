@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <title>Pixel People - Guess The Character [MASTER]</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-  <meta name="build" content="master-1.11" />
+  <meta name="build" content="master-1.12" />
   <style>
     :root { --bg:#0f1115; --panel:#171a21; --muted:#8b93a7; --text:#e9edf4; }
     html,body{height:100%;margin:0;background:#0f1115;color:#e9edf4;font:16px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;}
@@ -32,6 +32,14 @@
     }
     .artbox img{ position:absolute; inset:0; width:100%; height:100%; object-fit:contain; opacity:1; transition:opacity .28s ease; }
 
+    /* Result overlay centered over artbox */
+    .result-overlay{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; pointer-events:none; z-index:2; }
+    .result{font-weight:600;padding:10px 12px;border-radius:8px;display:none; max-width:90%; text-align:center}
+    .result.show{display:inline-block}
+    .result.good{background:#0f291a;border:1px solid #1e4d32;color:#b7ffd1}
+    .result.bad{background:#2a1416;border:1px solid #5a1e23;color:#ffc3c6}
+    .result.revealed{background:#2a2310;border:1px solid #5a4720;color:#ffe8a1}
+
     /* Overlay Hint/Give Up */
     .fab{ position:absolute; bottom:10px; z-index:3; border-radius:8px; }
     .fab.left{ left:10px; }
@@ -46,12 +54,6 @@
       font-size:20px; line-height:1.2; touch-action:manipulation;
     }
     #next{max-width:140px;border-radius:8px;}
-
-    .result{font-weight:600;padding:10px 12px;border-radius:8px;display:none}
-    .result.show{display:block}
-    .result.good{background:#0f291a;border:1px solid #1e4d32;color:#b7ffd1}
-    .result.bad{background:#2a1416;border:1px solid #5a1e23;color:#ffc3c6}
-    .result.revealed{background:#2a2310;border:1px solid #5a4720;color:#ffe8a1}
 
     .level-bar{display:flex;align-items:center;gap:12px;color:#8b93a7;font-size:14px;flex-wrap:wrap;justify-content:center;text-align:center}
     .pill{background:#1b2130;border:1px solid #263048;padding:6px 10px;border-radius:8px}
@@ -113,7 +115,11 @@
     <section id="stage" class="stage" aria-live="polite" aria-atomic="true">
       <div class="artbox" id="artbox">
         <img id="art" alt="Character puzzle" src="" />
-        <!-- Moved Hint/Give Up onto artbox -->
+        <!-- Centered overlay result -->
+        <div class="result-overlay">
+          <div id="result" class="result"></div>
+        </div>
+        <!-- Overlay Hint/Give Up -->
         <button id="hint" class="fab left">Hint</button>
         <button id="giveup" class="fab right">Give Up</button>
       </div>
@@ -124,8 +130,6 @@
           <input id="guess" type="text" placeholder="Type your guess..." autocomplete="off" inputmode="none" />
           <button id="next" disabled>Next</button>
         </div>
-
-        <div id="result" class="result"></div>
 
         <div id="kb">
           <div class="kb-row" id="kb-r1"></div>
@@ -163,7 +167,7 @@
       .replace(/[^a-z0-9\s'-]/g, "")
       .replace(/\s+/g, " ");
 
-    const LS_KEY="pp_state_scoring_multianswers_master_1_11";
+    const LS_KEY="pp_state_scoring_multianswers_master_1_12";
 
     const State={current:0,solved:{},givenUp:{},hintsUsed:{},guessAttempts:{},total:0,score:0};
     let puzzles=[];
@@ -249,6 +253,7 @@
 
     function showResult(t,c){result.textContent=t;result.className="result show "+(c||"");}
     function clearResult(){result.textContent="";result.className="result";}
+
     function lockNext(x){
       nextBtn.disabled=x;
       if(!x){ nextBtn.classList.add("active"); } else { nextBtn.classList.remove("active"); }
@@ -527,7 +532,7 @@
       { image:"images/26.png", name:"Prince", hint:"Purple Rain, The Artist",
         answers:["The Artist","TAFKAP","Prince Rogers Nelson","Symbol"] },
       { image:"images/27.png", name:"Vladimir Guerrero Jr.", hint:"Blue Jays slugger",
-        answers:["Vladdy Jr","Vlad Jr","Guerrero Jr","Vladimir Guerrero Junior","Vladimir Guerrero"] },
+        answers:["Vladdy Jr","Vlad Jr","Guerrero Jr","Vladimir Guerrero Junior","Vladimir Vladimir"] },
       { image:"images/28.png", name:"Ewok", hint:"Forest moon of Endor",
         answers:["Ewoks","Wicket"] },
       { image:"images/29.png", name:"The Terminator", hint:"I’ll be back",
