@@ -13,7 +13,7 @@
     header{display:none}
 
     button{
-      appearance:none;border:1px solid #222838;border-radius:10px;
+      appearance:none;border:1px solid #222838;border-radius:7px;
       padding:10px 14px;background:#171a21;color:#e9edf4;font-size:16px;
       cursor:pointer; touch-action:manipulation;
     }
@@ -31,11 +31,11 @@
     }
     .artbox img{ position:absolute; inset:0; width:100%; height:100%; object-fit:contain; opacity:1; transition:opacity .28s ease; }
 
-    .col{display:grid;gap:14px;align-content:start}
+    .col{display:grid;gap:10px;align-content:start}
 
     .guess-row{display:grid;grid-template-columns:1fr auto;gap:8px}
     #guess{
-      appearance:none;border:2px solid #263048;border-radius:10px;
+      appearance:none;border:1px solid #263048;border-radius:7px;
       padding:12px 16px;background:#171a21;color:#e9edf4;
       font-size:20px; line-height:1.2; touch-action:manipulation;
     }
@@ -48,7 +48,7 @@
     .result.revealed{background:#2a2310;border:1px solid #5a4720;color:#ffe8a1}
 
     .level-bar{display:flex;align-items:center;gap:12px;color:#8b93a7;font-size:14px;flex-wrap:wrap;justify-content:center;text-align:center}
-    .pill{background:#1b2130;border:2px solid #263048;padding:6px 10px;border-radius:999px}
+    .pill{background:#1b2130;border:1px solid #263048;padding:6px 10px;border-radius:999px}
     #levelLabel{cursor:pointer; user-select:none; outline:none;}
     #levelLabel:focus{box-shadow:0 0 0 2px #86eefc;}
 
@@ -61,7 +61,7 @@
     .kb-row{ display:flex; justify-content:center; flex-wrap:nowrap; gap:5px; margin-bottom:5px; max-width:500px; margin-left:auto; margin-right:auto; }
     .kb-key{
       flex:1; max-width:48px; padding:13px 0;
-      border:1px solid #263048; background:#171a21; border-radius:5px;
+      border:1px solid #263048; background:#171a21; border-radius:7px;
       color:#e9edf4; cursor:pointer; text-align:center; user-select:none; font-size:16px; transition:background .2s; touch-action:manipulation;
     }
     .kb-key.wide{ flex:1.5; max-width:none; }
@@ -361,7 +361,7 @@
         State.solved[idx]=true;
         State.score += State.hintsUsed[idx] ? 5 : 10;
         saveState();
-        showResult(`Correct. Answer: ${p.name}`,"good");
+        showResult(`Correct. ${p.name}`,"good");
         hintBtn.disabled = true;
         lockNext(false);
         updateLevelLabels();
@@ -469,11 +469,11 @@
         answers:["I am Groot","Baby Groot","Teen Groot"] },
       { image:"images/4.png",  name:"Lady Gaga", hint:"Poker Face, Bad Romance",
         answers:["Gaga","Stefani Germanotta","Stefani"] },
-      { image:"images/5.png",  name:"Donald Trump", hint:"The Apprentice catchphrase",
+      { image:"images/5.png",  name:"Donald Trump", hint:"The Apprentice",
         answers:["Trump","President Trump","Donald J Trump","DJT","Donald John Trump"] },
       { image:"images/6.png",  name:"Wonder Woman", hint:"Lasso of Truth, Amazon warrior",
         answers:["Diana Prince","Diana"] },
-      { image:"images/7.png",  name:"Ghostface", hint:"Scream mask and voice",
+      { image:"images/7.png",  name:"Scream", hint:"Scream mask and voice",
         answers:["Scream","Ghost Face"] },
       { image:"images/8.png",  name:"Buzz Lightyear", hint:"To infinity and beyond",
         answers:["Buzz","Lightyear","Toy Story Buzz"] },
