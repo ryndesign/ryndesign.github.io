@@ -35,32 +35,35 @@
         </div>
       </div>
       
+
       <div id="confirmModal" class="modal" role="dialog" aria-labelledby="confirmTitle">
         <div class="modal-card">
           <button id="confirmCloseX" class="modal-close">×</button>
           <h2 class="modal-title" id="confirmTitle">Give Up?</h2>
-          <div class="confirm-text">Are You Sure</div>
+          <div class="confirm-text">Are You Sure. You’ll lose the chance to earn full points for this puzzle.</div>
           <div class="modal-actions"><button id="confirmYes">Yes, I Give Up</button></div>
         </div>
       </div>
-    </section>
 
-    <div id="levelModal" class="modal" role="dialog" aria-labelledby="modalTitle">
+      <div id="levelModal" class="modal" role="dialog" aria-labelledby="modalTitle">
         <div class="modal-card">
           <button id="modalReset" class="modal-reset">Reset</button>
           <button id="modalCloseX" class="modal-close">×</button>
           <h2 class="modal-title" id="modalTitle">Level 1</h2>
           <div class="modal-rows">
-            <div class="modal-row"><span>Correct Puzzles</span><strong id="mCorrect">0/10</strong></div>
+            <div class="modal-row"><span>Correct Puzzles</span><strong id="mCorrect">0/9</strong></div>
             <div class="modal-row"><span>Game Score</span><strong id="mTotal">0</strong></div>
           </div>
           <div id="thumbGrid" class="thumb-grid"></div>
           <div class="modal-actions">
-            <div class="note" id="unlockNote" style="display:none;">Complete all 10 puzzles in this level to unlock next level.</div>
+            <div class="note" id="unlockNote" style="display:none;">Complete all 9 puzzles in this level to unlock next level.</div>
             <button id="modalNext">Start Next Level</button>
           </div>
         </div>
     </div>
+
+    </section>
+    
     
   </div>
   <div id="fx-confetti" class="fx-confetti"></div>

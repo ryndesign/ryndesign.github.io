@@ -50,20 +50,33 @@ let resultTimer=null, resultHideTimer=null;
   guess.addEventListener('focus', e => e.target.blur());
 })();
 
-function loadState(){try{const raw=localStorage.getItem(LS_KEY);if(!raw)return;Object.assign(State,JSON.parse(raw));}catch{}}
-function saveState(){try{localStorage.setItem(LS_KEY,JSON.stringify(State));}catch{}}
-function resetState(){try{localStorage.removeItem(LS_KEY);}catch{} Object.assign(State,{current:0,solved:{},givenUp:{},hintsUsed:{},guessAttempts:{},score:0}); saveState();}
+// ===== Levels: 9 puzzles per level =====
+const PUZZLES_PER_LEVEL = 9;
 
-function getLevel(i){return Math.floor(i/10)+1;}
-function levelRange(level){const s=(level-1)*10;return{start:s,end:Math.min(level*10-1,State.total-1)};}
-function levelComplete(level){const {start,end}=levelRange(level);for(let i=start;i<=end;i++){if(!State.solved[i]&&!State.givenUp[i])return false;}return true;}
+function getLevel(i){
+  return Math.floor(i / PUZZLES_PER_LEVEL) + 1;
+}
+
+function levelRange(level){
+  const s = (level - 1) * PUZZLES_PER_LEVEL;
+  const e = Math.min(level * PUZZLES_PER_LEVEL - 1, State.total - 1);
+  return { start: s, end: e };
+}
+
+function levelComplete(level){
+  const { start, end } = levelRange(level);
+  for (let i = start; i <= end; i++) {
+    if (!State.solved[i] && !State.givenUp[i]) return false;
+  }
+  return true;
+}
 
 function renderLevelCells(){
   const lvl=getLevel(State.current);
   const {start}=levelRange(lvl);
   const activeIndex=State.current-start;
   cellsWrap.innerHTML="";
-  for(let i=0;i<10;i++){
+  for(let i=0;i<PUZZLES_PER_LEVEL;i++){
     const idx=start+i;
     const div=document.createElement('div');
     div.className='cell';
@@ -147,8 +160,8 @@ function buildThumbGrid(level){
     const th = document.createElement('div');
     th.className = 'thumb' + (solved ? ' ok' : (failed ? ' bad' : '')) + (locked ? ' locked' : '');
     const img = document.createElement('img'); img.src = puzzles[i].image; img.alt = puzzles[i].name || `Puzzle ${i+1}`;
-    img.setAttribute('draggable','false');              
-    img.setAttribute('oncontextmenu','return false;');  
+    img.setAttribute('draggable','false');
+    img.setAttribute('oncontextmenu','return false;');
     const cap = document.createElement('div'); cap.className = 'cap'; cap.textContent = locked ? "???" : puzzles[i].name;
     th.appendChild(img); th.appendChild(cap); thumbGrid.appendChild(th);
   }
@@ -181,7 +194,7 @@ function classifyGuess(p, guessStr){
 
 function correctProgressForLevel(level){
   const { end } = levelRange(level);
-  const total = Math.min(level * 10, State.total);
+  const total = Math.min(level * PUZZLES_PER_LEVEL, State.total);
   let correct = 0;
   for(let i=0; i<=end && i<State.total; i++){ if (State.solved[i]) correct++; }
   return { correct, total };
@@ -313,7 +326,7 @@ levelLabel.addEventListener("click", ()=>{
 modalCloseX.addEventListener("click", () => { levelModal.classList.remove('show'); levelLabel.setAttribute('aria-expanded','false'); });
 modalNext.addEventListener("click", ()=>{
   if(modalNext.disabled) return;
-  const lvl=Math.floor(State.current/10)+1;
+  const lvl=getLevel(State.current);
   const final=modalTitle.textContent.includes("All Levels Complete");
   levelModal.classList.remove('show');
   levelLabel.setAttribute('aria-expanded','false');
@@ -378,6 +391,10 @@ function pressKey(label){
 })();
 
 // Init
+function loadState(){try{const raw=localStorage.getItem(LS_KEY);if(!raw)return;Object.assign(State,JSON.parse(raw));}catch{}}
+function saveState(){try{localStorage.setItem(LS_KEY,JSON.stringify(State));}catch{}}
+function resetState(){try{localStorage.removeItem(LS_KEY);}catch{} Object.assign(State,{current:0,solved:{},givenUp:{},hintsUsed:{},guessAttempts:{},score:0}); saveState();}
+
 function init(){
   loadState();
   puzzles = window.LIVE_PUZZLES || [];
