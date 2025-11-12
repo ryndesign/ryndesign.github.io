@@ -27,7 +27,7 @@ button#next.active{background:#123524;border-color:#1e4d32;color:#b7ffd1;}
 /* Limit artbox height on mobile screens */
 @media (max-width: 600px) {
   .artbox {
-    max-height: 345px;
+    max-height: 325px;
   }
 }
 
