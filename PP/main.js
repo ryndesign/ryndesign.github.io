@@ -228,7 +228,7 @@ function handleGuess(){
     // score rules
     let points = 0;
     if (State.hintsUsed[idx]) {
-      points = 3; // hint overrides all
+      points = 4; // hint overrides all
     } else if (kind === "bonus") {
       points = 20;
     } else if (kind === "answer") {
