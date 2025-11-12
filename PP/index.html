@@ -34,7 +34,18 @@
           <div class="kb-row" id="kb-r4"></div>
         </div>
       </div>
-      <div id="levelModal" class="modal" role="dialog" aria-labelledby="modalTitle">
+      
+      <div id="confirmModal" class="modal" role="dialog" aria-labelledby="confirmTitle">
+        <div class="modal-card">
+          <button id="confirmCloseX" class="modal-close">×</button>
+          <h2 class="modal-title" id="confirmTitle">Give Up?</h2>
+          <div class="confirm-text">Are You Sure</div>
+          <div class="modal-actions"><button id="confirmYes">Yes, I Give Up</button></div>
+        </div>
+      </div>
+    </section>
+
+    <div id="levelModal" class="modal" role="dialog" aria-labelledby="modalTitle">
         <div class="modal-card">
           <button id="modalReset" class="modal-reset">Reset</button>
           <button id="modalCloseX" class="modal-close">×</button>
@@ -49,16 +60,8 @@
             <button id="modalNext">Start Next Level</button>
           </div>
         </div>
-      </div>
-      <div id="confirmModal" class="modal" role="dialog" aria-labelledby="confirmTitle">
-        <div class="modal-card">
-          <button id="confirmCloseX" class="modal-close">×</button>
-          <h2 class="modal-title" id="confirmTitle">Give Up?</h2>
-          <div class="confirm-text">Are You Sure</div>
-          <div class="modal-actions"><button id="confirmYes">Yes, I Give Up</button></div>
-        </div>
-      </div>
-    </section>
+    </div>
+    
   </div>
   <div id="fx-confetti" class="fx-confetti"></div>
   <script src="main.js"></script>
