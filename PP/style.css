@@ -20,7 +20,7 @@ button#next.active{background:#123524;border-color:#1e4d32;color:#b7ffd1;}
 
 .stage{margin-top:10px;background:#171a21;border-radius:8px;padding:10px;display:grid;gap:14px;position:relative;}
 .artbox{width:100%;max-width:500px;aspect-ratio:1/1;margin:0 auto;background:#fff url('pp_bgnd.jpg') center/cover no-repeat;border:1px solid #202636;border-radius:8px;overflow:hidden;position:relative;}
-.artbox img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;opacity:1;transition:opacity .28s ease;}
+.artbox img{position:absolute;inset:0;width:90%;height:90%;padding: 5%;object-fit:contain;opacity:1;transition:opacity .28s ease;}
 
 .result-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:2;}
 .result{font-weight:600;padding:10px 12px;border-radius:8px;display:none;max-width:90%;text-align:center;transition:opacity .4s ease;}
