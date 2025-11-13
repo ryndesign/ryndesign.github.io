@@ -97,10 +97,45 @@ button#next.active{background:#123524;border-color:#1e4d32;color:#b7ffd1;}
 .home-actions button{width: 230px;border-radius: 4px;}
 .btn-link{display:inline-block;text-align:center;padding:8px 14px;border-radius:4px;background:#41FA9B;color:var(--panel);text-decoration:none;border:0;font-weight: 600;width: 200px;}
 
+/* TOP BAR */
+#levelLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px; /* space between icon and text */
+}
+
+#levelLabel .season-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#levelLabel .season-icon svg {
+  display: block;
+  height: 14px;
+  width: 14px;
+  fill: currentColor;
+}
+
+#levelLabel .season-code {
+  display: inline-flex;
+  align-items: center;
+}
+
+/* SEASONS */
+.season-summary {
+  margin: 4px 0 10px;
+  padding: 0 16px;
+  font-size: 14px;
+  color: var(--font);
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: bold;
+}
+
 /* MODALS */
 .modal{position:fixed;inset:0;display:none;place-items:center;z-index:1000;background:rgba(0,0,0,.5);}
 .modal.show{display:grid;}
-.modal-card{width:min(420px,85%);background:#0f1115;border:1px solid #23293a;border-radius:8px;padding:20px;position:relative;}
+.modal-card{width:min(400px,80%);background:#0f1115;border:1px solid #23293a;border-radius:8px;padding:20px;position:relative;}
 .modal-close{position:absolute;top:10px;right:10px;width:36px;height:36px;border-radius:8px;background:#171a21;border:1px solid #263048;color:#e9edf4;font-size:26px;line-height:17px;padding:8px;text-align:center;cursor:pointer;}
 .modal-reset{position:absolute;top:10px;right:56px;height:36px;padding:8px 10px;border-radius:8px;background:#171a21;border:1px solid #263048;color:#e9edf4;cursor:pointer;font-size:14px;line-height:20px;}
 .modal-reset:focus{outline:none;box-shadow:0 0 0 2px #86eefc;}
@@ -128,3 +163,4 @@ button#next.active{background:#123524;border-color:#1e4d32;color:#b7ffd1;}
 .artbox, .artbox img#art { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
 .artbox img#art { pointer-events: none; }
 .artbox::before { content: ""; position: absolute; inset: 0; z-index: 1; }
+

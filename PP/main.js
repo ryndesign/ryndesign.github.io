@@ -3,8 +3,17 @@ const normalize = s => (s||"").toString().trim().toLowerCase().normalize("NFD")
   .replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9\s'-]/g, "").replace(/\s+/g, " ");
 const toNormCompare = s => normalize(s).replace(/\s+/g, "");
 
-// bump LS key since scoring rules changed
-const LS_KEY="pp_state_scoring_bonuswords_1_13_0";
+// Local storage key base and season info
+const BASE_LS_KEY = "pp_state_scoring_bonuswords_1_13_0";
+
+// these get filled once the puzzle file has run
+let CURRENT_SEASON = 1;
+let NEXT_SEASON_URL = "";
+let HAS_NEXT_SEASON = false;
+
+// LS key will be updated in init()
+let LS_KEY = BASE_LS_KEY + "_s1";
+
 const COFFEE_URL = "https://buymeacoffee.com/pixelpeople"; // change to your real link
 
 const State={current:0,solved:{},givenUp:{},hintsUsed:{},guessAttempts:{},total:0,score:0};
@@ -15,7 +24,13 @@ const art=$('#art'), guess=$('#guess'), giveup=$('#giveup'), nextBtn=$('#next'),
 
 const stage=$('#stage'), homeScreen=$('#homeScreen'), homeBtn=$('#homeBtn'),
       homePlay=$('#homePlay'), homeHowTo=$('#homeHowTo'), homeShare=$('#homeShare'),
-      homeCoffee=$('#homeCoffee'), homeArt=$('#homeArt'), homeNum=$('#homePuzzleNum');
+      homeCoffee=$('#homeCoffee'), homeArt=$('#homeArt'), homeNum=$('#homePuzzleNum'),
+
+      seasonSplash=$('#seasonSplash'), seasonNumber=$('#seasonNumber'),
+      seasonSummary=$('#seasonSummary'), seasonPlayNext=$('#seasonPlayNext'),
+      seasonHome=$('#seasonHome'), seasonHowTo=$('#seasonHowTo'),
+      seasonShare=$('#seasonShare'), seasonCoffee=$('#seasonCoffee'),
+      seasonArt=$('#seasonArt');
 
 // Prevent saving or dragging puzzle image on mobile
 ['contextmenu','dragstart','gesturestart','selectstart'].forEach(evt=>{
@@ -28,7 +43,7 @@ const artbox = document.getElementById('artbox');
   artbox.addEventListener(evt, e => e.preventDefault(), { passive:false });
 });
 
-// Also block context menu / drag on any images inside the stage & modal thumbs
+// Also block context menu / drag on any images inside the stage and modal thumbs
 const blockIfGameImage = (e) => {
   if (e.target.closest('#artbox, .thumb-grid')) e.preventDefault();
 };
@@ -49,6 +64,10 @@ const howToModal=$('#howToModal'), howToCloseX=$('#howToCloseX'), howToOk=$('#ho
 
 let resultTimer=null, resultHideTimer=null;
 
+// Boot coordination flags
+window.PP_DOM_READY = window.PP_DOM_READY || false;
+window.PP_PUZZLES_READY = window.PP_PUZZLES_READY || false;
+
 (function disableMobileKeyboard(){
   const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
   if (!isTouch) return;
@@ -57,7 +76,7 @@ let resultTimer=null, resultHideTimer=null;
   guess.addEventListener('focus', e => e.target.blur());
 })();
 
-// ===== Levels: 9 puzzles per level =====
+// Levels: 9 puzzles per level
 const PUZZLES_PER_LEVEL = 9;
 
 function getLevel(i){ return Math.floor(i / PUZZLES_PER_LEVEL) + 1; }
@@ -69,6 +88,12 @@ function levelRange(level){
 function levelComplete(level){
   const { start, end } = levelRange(level);
   for (let i = start; i <= end; i++) {
+    if (!State.solved[i] && !State.givenUp[i]) return false;
+  }
+  return true;
+}
+function seasonIsComplete(){
+  for (let i = 0; i < State.total; i++){
     if (!State.solved[i] && !State.givenUp[i]) return false;
   }
   return true;
@@ -95,16 +120,26 @@ function renderLevelCells(){
 }
 
 function updateLevelLabels(){
-  const cur=getLevel(State.current);
-  levelLabel.textContent=`Level ${cur}`;
-  scoreLabel.textContent=State.score.toFixed(0);
+  const globalOffset = window.PP_GLOBAL_OFFSET || 0;
+  const globalPuzzleNum = State.current + 1 + globalOffset;
+
+  // Top bar: [SVG ICON] 1-27
+  levelLabel.innerHTML = `
+    <span class="season-icon" aria-hidden="true">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="20" height="20">
+        <path d="M256 144C256 117.5 277.5 96 304 96L336 96C362.5 96 384 117.5 384 144L384 496C384 522.5 362.5 544 336 544L304 544C277.5 544 256 522.5 256 496L256 144zM64 336C64 309.5 85.5 288 112 288L144 288C170.5 288 192 309.5 192 336L192 496C192 522.5 170.5 544 144 544L112 544C85.5 544 64 522.5 64 496L64 336zM496 160L528 160C554.5 160 576 181.5 576 208L576 496C576 522.5 554.5 544 528 544L496 544C469.5 544 448 522.5 448 496L448 208C448 181.5 469.5 160 496 160z"/>
+      </svg>
+    </span>
+    <span class="season-code">${CURRENT_SEASON}-${globalPuzzleNum}</span>
+  `;
+
   renderLevelCells();
   const finished = !!(State.solved[State.current] || State.givenUp[State.current]);
   hintBtn.disabled = finished;
   giveup.disabled = finished;
 
   // Update home preview bits
-  homeNum.textContent = String(State.current + 1);
+  homeNum.textContent = String(globalPuzzleNum);
   if (puzzles[State.current]) homeArt.src = puzzles[State.current].image;
 }
 
@@ -128,6 +163,12 @@ function clearResult(){
 function lockNext(x){ nextBtn.disabled=x; nextBtn.classList.toggle("active", !x); }
 
 function renderPuzzle(){
+  if(!puzzles || !Array.isArray(puzzles) || puzzles.length === 0){
+    showResult("Puzzle data missing. Check puzzles file is loaded.", "bad");
+    guess.disabled=true; giveup.disabled=true; hintBtn.disabled=true;
+    return;
+  }
+
   if(State.current>=puzzles.length){
     showResult("All levels complete.","good");
     guess.disabled=true; giveup.disabled=true; hintBtn.disabled=true;
@@ -137,11 +178,15 @@ function renderPuzzle(){
   art.src=p.image; guess.value=""; clearResult();
   const finished = !!(State.solved[State.current] || State.givenUp[State.current]);
   hintBtn.disabled = finished; giveup.disabled = finished;
-  lockNext(!finished); updateLevelLabels(); guess.blur(); art.style.opacity = 1;
+  lockNext(!finished); guess.blur(); art.style.opacity = 1;
 
-  // keep home preview in sync
+  // keep home preview in sync (global numbering)
+  const globalOffset = window.PP_GLOBAL_OFFSET || 0;
+  const globalPuzzleNum = State.current + 1 + globalOffset;
   homeArt.src = p.image;
-  homeNum.textContent = String(State.current + 1);
+  homeNum.textContent = String(globalPuzzleNum);
+
+  updateLevelLabels();
 }
 
 function fadeTransitionTo(nextIndex){
@@ -178,7 +223,7 @@ function buildThumbGrid(level){
   }
 }
 
-// ----- Scoring helpers -----
+// Scoring helpers
 function normEq(a,b){ return toNormCompare(a) === toNormCompare(b); }
 function matchAny(cands, g){
   if (!cands) return false;
@@ -208,7 +253,16 @@ function openLevelModal(level,final=false){
   const { correct, total } = correctProgressForLevel(level);
   if (mCorrect) mCorrect.textContent = `${correct}/${total}`;
   mTotal.textContent = State.score;
-  modalTitle.textContent = final ? "All Levels Complete" : `Level ${level}`;
+
+  if (final) {
+    modalTitle.textContent = "All Levels Complete";
+  } else {
+    const globalOffset = window.PP_GLOBAL_OFFSET || 0;
+    const currentGlobal = globalOffset + State.current + 1;
+    // Season X · Puzzle Y
+    modalTitle.textContent = `Season ${CURRENT_SEASON} · Puzzle ${currentGlobal}`;
+  }
+
   const complete=levelComplete(level);
   unlockNote.style.display=!final&&!complete?"block":"none";
   modalNext.textContent=final?"Play Again":"Start Next Level";
@@ -282,47 +336,106 @@ function handleGiveUp(){
 }
 
 function atEndOfLevel(i){const lvl=getLevel(i),{end}=levelRange(lvl);return i===end;}
+
 function handleNext(){
   if(nextBtn.disabled) { showResult("Solve to continue.","revealed"); return; }
+
   if(atEndOfLevel(State.current)){
-    const lvl=getLevel(State.current);
-    const final=State.current>=puzzles.length-1;
-    openLevelModal(lvl,final); return;
+    const lvl = getLevel(State.current);
+    const final = State.current >= puzzles.length - 1;
+
+    // If this is the final puzzle in the season and all puzzles are solved or given up
+    if (final && seasonIsComplete()) {
+      showSeasonSplash();
+      return;
+    }
+
+    // Otherwise, the regular level summary modal
+    openLevelModal(lvl, final);
+    return;
   }
-  const nextIndex = Math.min(State.current+1, puzzles.length-1);
+
+  const nextIndex = Math.min(State.current + 1, puzzles.length - 1);
   fadeTransitionTo(nextIndex);
   State.current = nextIndex; saveState();
 }
 
-// ===== HOME TOGGLE =====
+// HOME AND SEASON SCREENS
 function showHome(){
+  // Hide season splash if visible
+  if (seasonSplash) {
+    seasonSplash.classList.remove('show');
+    seasonSplash.setAttribute('aria-hidden','true');
+  }
+
   homeScreen.classList.add('show');
   homeScreen.setAttribute('aria-hidden','false');
   stage.style.display = 'none';
   homeBtn.setAttribute('aria-expanded','true');
   if (puzzles[State.current]) {
+    const globalOffset = window.PP_GLOBAL_OFFSET || 0;
+    const globalPuzzleNum = State.current + 1 + globalOffset;
     homeArt.src = puzzles[State.current].image;
-    homeNum.textContent = String(State.current + 1);
+    homeNum.textContent = String(globalPuzzleNum);
   }
 }
 function showGame(){
+  if (seasonSplash) {
+    seasonSplash.classList.remove('show');
+    seasonSplash.setAttribute('aria-hidden','true');
+  }
   homeScreen.classList.remove('show');
   homeScreen.setAttribute('aria-hidden','true');
   stage.style.display = '';
   homeBtn.setAttribute('aria-expanded','false');
 }
 
-// Home button now ALWAYS goes Home, no toggle
+function showSeasonSplash(){
+  // Hide game and home
+  stage.style.display = 'none';
+  homeScreen.classList.remove('show');
+  homeScreen.setAttribute('aria-hidden', 'true');
+  homeBtn.setAttribute('aria-expanded','false');
+
+  if (seasonSplash) {
+    seasonSplash.classList.add('show');
+    seasonSplash.setAttribute('aria-hidden', 'false');
+  }
+
+  // Display season number and summary
+  if (seasonNumber) seasonNumber.textContent = String(CURRENT_SEASON);
+  if (seasonSummary) {
+    const globalOffset = window.PP_GLOBAL_OFFSET || 0;
+    const firstGlobal = globalOffset + 1;
+    const lastGlobal = globalOffset + State.total;
+    seasonSummary.textContent = `You've Finished Season ${CURRENT_SEASON}! Score: ${State.score.toFixed(0)}.`;
+  }
+
+  // Coffee link
+  if (seasonCoffee) seasonCoffee.setAttribute('href', COFFEE_URL);
+
+  // Button text and enabled state
+  if (seasonPlayNext) {
+    if (HAS_NEXT_SEASON) {
+      seasonPlayNext.textContent = `Play Season ${CURRENT_SEASON + 1}`;
+      seasonPlayNext.disabled = false;
+    } else {
+      seasonPlayNext.textContent = `Season ${CURRENT_SEASON + 1} Coming Soon`;
+      seasonPlayNext.disabled = true;
+    }
+  }
+}
+
+// Home button now always goes Home
 homeBtn.addEventListener('click', showHome);
 homeBtn.addEventListener('keydown', (e)=>{
   if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); showHome(); }
 });
 
-// Level click already opens the modal; it works from Home too.
 // Play Now returns to game
 homePlay.addEventListener('click', showGame);
 
-// How To Play modal
+// How To Play modal from Home
 homeHowTo.addEventListener('click', ()=>{
   howToModal.classList.add('show');
   setTimeout(()=>{ howToOk.focus(); },0);
@@ -330,7 +443,7 @@ homeHowTo.addEventListener('click', ()=>{
 howToOk.addEventListener('click', ()=> howToModal.classList.remove('show'));
 howToCloseX.addEventListener('click', ()=> howToModal.classList.remove('show'));
 
-// Share
+// Share from Home
 homeShare.addEventListener('click', async ()=>{
   const url = window.location.href;
   try{
@@ -341,7 +454,6 @@ homeShare.addEventListener('click', async ()=>{
       await navigator.clipboard.writeText(url);
       showResult("Link copied to clipboard.","good");
     } else {
-      // fallback
       const tmp=document.createElement('input');
       tmp.value=url; document.body.appendChild(tmp); tmp.select(); document.execCommand('copy'); document.body.removeChild(tmp);
       showResult("Link copied to clipboard.","good");
@@ -354,13 +466,49 @@ homeShare.addEventListener('click', async ()=>{
 // Coffee link
 homeCoffee.setAttribute('href', COFFEE_URL);
 
-// Events
+// Season complete splash actions
+if (seasonHome) {
+  seasonHome.addEventListener('click', ()=>{
+    if (seasonSplash) {
+      seasonSplash.classList.remove('show');
+      seasonSplash.setAttribute('aria-hidden', 'true');
+    }
+    showHome();
+  });
+}
+if (seasonHowTo) {
+  seasonHowTo.addEventListener('click', ()=>{
+    howToModal.classList.add('show');
+    setTimeout(()=>{ howToOk.focus(); },0);
+  });
+}
+if (seasonShare) {
+  seasonShare.addEventListener('click', ()=>{
+    // reuse same sharing logic
+    homeShare.click();
+  });
+}
+if (seasonPlayNext) {
+  seasonPlayNext.addEventListener('click', ()=>{
+    // use live values that init() filled in
+    if (!HAS_NEXT_SEASON || !NEXT_SEASON_URL) return;
+    window.location.href = NEXT_SEASON_URL;
+  });
+}
+
+// Global key events
 document.addEventListener("keydown",e=>{
   if(e.key==="Enter"&&document.activeElement===guess){e.preventDefault();handleGuess();}
   else if(e.key==="Escape"){
     if (howToModal.classList.contains('show')) { howToModal.classList.remove('show'); return; }
     if (confirmModal.classList.contains('show')) { confirmModal.classList.remove('show'); return; }
     if (levelModal.classList.contains('show')) { levelModal.classList.remove('show'); levelLabel.setAttribute('aria-expanded','false'); return; }
+    if (seasonSplash && seasonSplash.classList.contains('show')) {
+      seasonSplash.classList.remove('show');
+      seasonSplash.setAttribute('aria-hidden','true');
+      showHome();
+      return;
+    }
     guess.blur();
   }
   else if((e.key==="n"||e.key==="N")&&!nextBtn.disabled){handleNext();}
@@ -411,15 +559,23 @@ modalNext.addEventListener("click", ()=>{
   }
 });
 
+function resetAllProgressAndGoToSeason1(){
+  // remove all season save slots for this game
+  try{
+    const keys = [];
+    for (let i = 0; i < localStorage.length; i++){
+      const k = localStorage.key(i);
+      if (k && k.indexOf(BASE_LS_KEY) === 0) keys.push(k);
+    }
+    keys.forEach(k => localStorage.removeItem(k));
+  }catch{}
+  // hard jump back to Season 1 entry page
+  window.location.href = "index.html";
+}
+
 modalReset.addEventListener("click", ()=>{
-  if(!confirm('Reset all progress for this game?')) return;
-  resetState();
-  levelModal.classList.remove('show');
-  levelLabel.setAttribute('aria-expanded','false');
-  puzzles = window.LIVE_PUZZLES || [];
-  State.total = puzzles.length;
-  renderPuzzle(); updateLevelLabels();
-  showResult('Progress reset.','revealed');
+  if (!confirm('Reset all progress and return to Season 1?')) return;
+  resetAllProgressAndGoToSeason1();
 });
 
 // Build keyboard
@@ -459,34 +615,60 @@ function pressKey(label){
   addKey(r4,"Delete","delete");
 })();
 
-// Init
+// State helpers
 function loadState(){try{const raw=localStorage.getItem(LS_KEY);if(!raw)return;Object.assign(State,JSON.parse(raw));}catch{}}
 function saveState(){try{localStorage.setItem(LS_KEY,JSON.stringify(State));}catch{}}
 function resetState(){try{localStorage.removeItem(LS_KEY);}catch{} Object.assign(State,{current:0,solved:{},givenUp:{},hintsUsed:{},guessAttempts:{},score:0}); saveState();}
 
+// Main init
 function init(){
+  // read season info from puzzle file (set at bottom of puzzles-1.js / puzzles-2.js)
+  CURRENT_SEASON = (typeof window !== "undefined" && window.PP_SEASON) ? window.PP_SEASON : 1;
+  NEXT_SEASON_URL = (typeof window !== "undefined" && window.PP_NEXT_SEASON_URL) ? window.PP_NEXT_SEASON_URL : "";
+  HAS_NEXT_SEASON = !!NEXT_SEASON_URL;
+
+  // update LS key now that we know the season
+  LS_KEY = BASE_LS_KEY + "_s" + CURRENT_SEASON;
+
+  // now it is safe to load / restore state
   loadState();
+
   puzzles = window.LIVE_PUZZLES || [];
   if(!Array.isArray(puzzles) || puzzles.length===0){
-    showResult("Puzzle data missing. Check puzzles.js is loaded.", "bad");
+    showResult("Puzzle data missing. Check puzzles file is loaded.", "bad");
   }
   State.total = puzzles.length;
   if(State.current >= puzzles.length) State.current = 0;
 
-  // set coffee link
-  homeCoffee.setAttribute('href', COFFEE_URL);
-
-  // keep home preview synced
-  if (puzzles[State.current]) {
-    homeArt.src = puzzles[State.current].image;
-    homeNum.textContent = String(State.current + 1);
-  }
-
   renderPuzzle();
   updateLevelLabels();
+
+  // Start on Home screen
+  showHome();
+
+  // If this season is already complete, show the season splash
+  if (seasonIsComplete() && puzzles.length > 0) {
+    showSeasonSplash();
+  }
 }
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", init);
-} else {
+
+// Bootstrap that waits for both DOM and puzzles
+function bootstrapPixelPeople(){
+  if (!window.PP_DOM_READY || !window.PP_PUZZLES_READY) return;
+  // Avoid double init
+  if (bootstrapPixelPeople._done) return;
+  bootstrapPixelPeople._done = true;
   init();
+}
+window.PP_BOOTSTRAP = bootstrapPixelPeople;
+
+// DOM ready hook
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", () => {
+    window.PP_DOM_READY = true;
+    if (window.PP_BOOTSTRAP) window.PP_BOOTSTRAP();
+  });
+} else {
+  window.PP_DOM_READY = true;
+  if (window.PP_BOOTSTRAP) window.PP_BOOTSTRAP();
 }
