@@ -175,34 +175,33 @@ button#next.active{background:#123524;border-color:#1e4d32;color:#b7ffd1;}
   z-index:2000;
 }
 
+/* Single fast animation, better for mobile */
 .fx-confetti-piece{
   position:absolute;
   width:8px;
   height:14px;
   border-radius:2px;
   opacity:0;
-  animation:confetti-fall linear forwards;
+  animation:confetti-fall 0.7s linear forwards;
 }
 
+/* Optional size tweaks, no duration override */
 .fx-confetti-piece.small{
-  width:10px;
-  height:18px;
-  animation-duration:1.1s;
+  width:8px;
+  height:14px;
 }
-
 .fx-confetti-piece.big{
   width:10px;
   height:18px;
-  animation-duration:1.1s;
 }
 
 @keyframes confetti-fall{
   0%{
-    transform:translate3d(0,-20px,0) rotateZ(0deg);
+    transform:translate3d(0,-8vh,0) rotateZ(0deg);
     opacity:1;
   }
   100%{
-    transform:translate3d(var(--confetti-x, 0px), 120vh, 0) rotateZ(340deg);
+    transform:translate3d(var(--confetti-x, 0px), 105vh, 0) rotateZ(300deg);
     opacity:0;
   }
 }

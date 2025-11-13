@@ -2,6 +2,7 @@ const $ = (s)=>document.querySelector(s);
 const normalize = s => (s||"").toString().trim().toLowerCase().normalize("NFD")
   .replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9\s'-]/g, "").replace(/\s+/g, " ");
 const toNormCompare = s => normalize(s).replace(/\s+/g, "");
+const IS_TOUCH = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
 
 // Local storage key base and season info
 const BASE_LS_KEY = "pp_state_scoring_bonuswords_1_13_0";
@@ -72,8 +73,7 @@ window.PP_DOM_READY = window.PP_DOM_READY || false;
 window.PP_PUZZLES_READY = window.PP_PUZZLES_READY || false;
 
 (function disableMobileKeyboard(){
-  const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-  if (!isTouch) return;
+  if (!IS_TOUCH) return;
   guess.readOnly = true;
   guess.setAttribute('inputmode','none');
   guess.addEventListener('focus', e => e.target.blur());
@@ -308,12 +308,15 @@ function confettiBurst(count, sizeClass){
   if (!confettiRoot) return;
   const colors = ["#ff6b6b","#feca57","#48dbfb","#1dd1a1","#f368e0"];
 
-  for (let i = 0; i < count; i++){
+  // Fewer pieces on touch devices
+  const numPieces = IS_TOUCH ? Math.max(10, Math.floor(count * 0.4)) : count;
+
+  for (let i = 0; i < numPieces; i++){
     const piece = document.createElement("div");
-    piece.className = "fx-confetti-piece " + sizeClass;
+    piece.className = "fx-confetti-piece " + (sizeClass || "");
     const left = Math.random() * 100;
-    const xDrift = (Math.random() - 0.5) * 120;
-    const delay = Math.random() * 0.25;
+    const xDrift = (Math.random() - 0.5) * 80;
+    const delay = Math.random() * 0.2;
 
     piece.style.left = left + "%";
     piece.style.top = "-10px";
@@ -323,16 +326,18 @@ function confettiBurst(count, sizeClass){
 
     confettiRoot.appendChild(piece);
 
-    setTimeout(()=>{ piece.remove(); }, 1500);
+    // Match the 0.7s animation plus a bit of buffer
+    setTimeout(()=>{ piece.remove(); }, 900);
   }
 }
 
 function confettiSeasonComplete(){
+  // Big burst count, auto-throttled on mobile
   confettiBurst(60, "big");
 }
 
-// use same burst for correct and season
 function confettiCorrect(){
+  // Same look as season complete, just reusing the same settings
   confettiBurst(60, "big");
 }
 
