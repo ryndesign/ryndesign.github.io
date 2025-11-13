@@ -32,6 +32,8 @@ const stage=$('#stage'), homeScreen=$('#homeScreen'), homeBtn=$('#homeBtn'),
       seasonShare=$('#seasonShare'), seasonCoffee=$('#seasonCoffee'),
       seasonArt=$('#seasonArt');
 
+const confettiRoot = $('#fx-confetti');
+
 // Prevent saving or dragging puzzle image on mobile
 ['contextmenu','dragstart','gesturestart','selectstart'].forEach(evt=>{
   art.addEventListener(evt, e => e.preventDefault(), { passive:false });
@@ -53,7 +55,7 @@ document.addEventListener('selectstart', blockIfGameImage, { passive:false });
 document.addEventListener('gesturestart',blockIfGameImage, { passive:false });
 
 const levelModal=$('#levelModal'), modalTitle=$('#modalTitle'),
-      mTotal=$('#mTotal'), mCorrect=$('#mCorrect'),
+      mTotal=$('#mTotal'), mGameTotal=$('#mGameTotal'), mCorrect=$('#mCorrect'),
       modalNext=$('#modalNext'), unlockNote=$('#unlockNote'),
       modalCloseX=$('#modalCloseX'), thumbGrid=$('#thumbGrid'),
       modalReset=$('#modalReset');
@@ -63,6 +65,7 @@ const confirmModal=$('#confirmModal'), confirmCloseX=$('#confirmCloseX'), confir
 const howToModal=$('#howToModal'), howToCloseX=$('#howToCloseX'), howToOk=$('#howToOk');
 
 let resultTimer=null, resultHideTimer=null;
+let lastModalWasFinal = false;
 
 // Boot coordination flags
 window.PP_DOM_READY = window.PP_DOM_READY || false;
@@ -123,7 +126,7 @@ function updateLevelLabels(){
   const globalOffset = window.PP_GLOBAL_OFFSET || 0;
   const globalPuzzleNum = State.current + 1 + globalOffset;
 
-  // Top bar: [SVG ICON] 1-27
+  // Top bar: [SVG ICON] S-Puzz
   levelLabel.innerHTML = `
     <span class="season-icon" aria-hidden="true">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="20" height="20">
@@ -170,7 +173,7 @@ function renderPuzzle(){
   }
 
   if(State.current>=puzzles.length){
-    showResult("All levels complete.","good");
+    showResult("All levels complete.", "good");
     guess.disabled=true; giveup.disabled=true; hintBtn.disabled=true;
     updateLevelLabels(); return;
   }
@@ -241,6 +244,38 @@ function classifyGuess(p, guessStr){
   return null;
 }
 
+// Global puzzle stats across all seasons
+function getGlobalPuzzleStats(){
+  let solved = 0;
+  let total = 0;
+
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i);
+      if (!k || !k.startsWith(BASE_LS_KEY)) continue;
+
+      const raw = localStorage.getItem(k);
+      if (!raw) continue;
+
+      const st = JSON.parse(raw);
+
+      // total puzzles for that season
+      if (typeof st.total === "number") {
+        total += st.total;
+      }
+
+      // count only solved as "correct"
+      if (st.solved) {
+        for (const idx in st.solved) {
+          if (st.solved[idx]) solved++;
+        }
+      }
+    }
+  } catch {}
+
+  return { solved, total };
+}
+
 function correctProgressForLevel(level){
   const { end } = levelRange(level);
   const total = Math.min(level * PUZZLES_PER_LEVEL, State.total);
@@ -249,24 +284,93 @@ function correctProgressForLevel(level){
   return { correct, total };
 }
 
+function getGlobalGameScore(){
+  let total = 0;
+  try{
+    for (let i = 0; i < localStorage.length; i++){
+      const k = localStorage.key(i);
+      if (!k || k.indexOf(BASE_LS_KEY) !== 0) continue;
+      const raw = localStorage.getItem(k);
+      if (!raw) continue;
+      try{
+        const st = JSON.parse(raw);
+        if (st && typeof st.score === "number") {
+          total += st.score;
+        }
+      }catch{}
+    }
+  }catch{}
+  return total;
+}
+
+// Simple confetti helpers
+function confettiBurst(count, sizeClass){
+  if (!confettiRoot) return;
+  const colors = ["#ff6b6b","#feca57","#48dbfb","#1dd1a1","#f368e0"];
+
+  for (let i = 0; i < count; i++){
+    const piece = document.createElement("div");
+    piece.className = "fx-confetti-piece " + sizeClass;
+    const left = Math.random() * 100;
+    const xDrift = (Math.random() - 0.5) * 120;
+    const delay = Math.random() * 0.25;
+
+    piece.style.left = left + "%";
+    piece.style.top = "-10px";
+    piece.style.setProperty("--confetti-x", xDrift + "px");
+    piece.style.backgroundColor = colors[i % colors.length];
+    piece.style.animationDelay = delay + "s";
+
+    confettiRoot.appendChild(piece);
+
+    setTimeout(()=>{ piece.remove(); }, 1500);
+  }
+}
+
+function confettiSeasonComplete(){
+  confettiBurst(60, "big");
+}
+
+// use same burst for correct and season
+function confettiCorrect(){
+  confettiBurst(60, "big");
+}
+
+// Level modal
 function openLevelModal(level,final=false){
-  const { correct, total } = correctProgressForLevel(level);
-  if (mCorrect) mCorrect.textContent = `${correct}/${total}`;
-  mTotal.textContent = State.score;
+  lastModalWasFinal = final;
+
+  const globalStats = getGlobalPuzzleStats();
+  if (mCorrect) mCorrect.textContent = `${globalStats.solved}/${globalStats.total || 0}`;
+  if (mTotal) mTotal.textContent = (State.score || 0).toFixed(0);
+  if (mGameTotal) mGameTotal.textContent = getGlobalGameScore().toFixed(0);
 
   if (final) {
-    modalTitle.textContent = "All Levels Complete";
+    // End of season modal
+    modalTitle.textContent = `Season ${CURRENT_SEASON} Complete`;
   } else {
     const globalOffset = window.PP_GLOBAL_OFFSET || 0;
     const currentGlobal = globalOffset + State.current + 1;
-    // Season X · Puzzle Y
     modalTitle.textContent = `Season ${CURRENT_SEASON} · Puzzle ${currentGlobal}`;
   }
 
   const complete=levelComplete(level);
-  unlockNote.style.display=!final&&!complete?"block":"none";
-  modalNext.textContent=final?"Play Again":"Start Next Level";
-  modalNext.disabled=!final&&!complete;
+
+  if (final) {
+    unlockNote.style.display = "none";
+    if (HAS_NEXT_SEASON) {
+      modalNext.textContent = `Play Season ${CURRENT_SEASON + 1}`;
+      modalNext.disabled = false;
+    } else {
+      modalNext.textContent = `Season ${CURRENT_SEASON + 1} Coming Soon`;
+      modalNext.disabled = true;
+    }
+  } else {
+    unlockNote.style.display=!complete?"block":"none";
+    modalNext.textContent="Start Next Level";
+    modalNext.disabled=!complete;
+  }
+
   buildThumbGrid(level);
   levelLabel.setAttribute('aria-expanded','true');
   levelModal.classList.add('show');
@@ -283,10 +387,9 @@ function handleGuess(){
   if(kind){
     State.solved[idx]=true;
 
-    // score rules
     let points = 0;
     if (State.hintsUsed[idx]) {
-      points = 4; // hint overrides all
+      points = 4;
     } else if (kind === "bonus") {
       points = 20;
     } else if (kind === "answer") {
@@ -297,7 +400,6 @@ function handleGuess(){
     State.score += points;
     saveState();
 
-    // feedback copy
     if (kind === "bonus" && !State.hintsUsed[idx]) {
       showResult(`Bonus found. ${p.name} (+${points})`,"good");
     } else if (kind === "answer" && !State.hintsUsed[idx]) {
@@ -307,6 +409,8 @@ function handleGuess(){
     } else {
       showResult(`Correct with hint. ${p.name} (+${points})`,"good");
     }
+
+    confettiCorrect();
 
     hintBtn.disabled = true; giveup.disabled = true; lockNext(false);
     updateLevelLabels();
@@ -344,14 +448,14 @@ function handleNext(){
     const lvl = getLevel(State.current);
     const final = State.current >= puzzles.length - 1;
 
-    // If this is the final puzzle in the season and all puzzles are solved or given up
-    if (final && seasonIsComplete()) {
-      showSeasonSplash();
+    // End of season now uses the final Level Modal with Season Complete + Play Next Season
+    if (final) {
+      openLevelModal(lvl, true);
+      confettiSeasonComplete();
       return;
     }
 
-    // Otherwise, the regular level summary modal
-    openLevelModal(lvl, final);
+    openLevelModal(lvl, false);
     return;
   }
 
@@ -362,7 +466,6 @@ function handleNext(){
 
 // HOME AND SEASON SCREENS
 function showHome(){
-  // Hide season splash if visible
   if (seasonSplash) {
     seasonSplash.classList.remove('show');
     seasonSplash.setAttribute('aria-hidden','true');
@@ -390,8 +493,8 @@ function showGame(){
   homeBtn.setAttribute('aria-expanded','false');
 }
 
+// Season splash still exists, used only if you land on a completed season on load
 function showSeasonSplash(){
-  // Hide game and home
   stage.style.display = 'none';
   homeScreen.classList.remove('show');
   homeScreen.setAttribute('aria-hidden', 'true');
@@ -402,19 +505,12 @@ function showSeasonSplash(){
     seasonSplash.setAttribute('aria-hidden', 'false');
   }
 
-  // Display season number and summary
   if (seasonNumber) seasonNumber.textContent = String(CURRENT_SEASON);
-  if (seasonSummary) {
-    const globalOffset = window.PP_GLOBAL_OFFSET || 0;
-    const firstGlobal = globalOffset + 1;
-    const lastGlobal = globalOffset + State.total;
-    seasonSummary.textContent = `You've Finished Season ${CURRENT_SEASON}! Score: ${State.score.toFixed(0)}.`;
-  }
 
-  // Coffee link
+  confettiSeasonComplete();
+
   if (seasonCoffee) seasonCoffee.setAttribute('href', COFFEE_URL);
 
-  // Button text and enabled state
   if (seasonPlayNext) {
     if (HAS_NEXT_SEASON) {
       seasonPlayNext.textContent = `Play Season ${CURRENT_SEASON + 1}`;
@@ -426,7 +522,7 @@ function showSeasonSplash(){
   }
 }
 
-// Home button now always goes Home
+// Home button always goes Home
 homeBtn.addEventListener('click', showHome);
 homeBtn.addEventListener('keydown', (e)=>{
   if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); showHome(); }
@@ -484,13 +580,11 @@ if (seasonHowTo) {
 }
 if (seasonShare) {
   seasonShare.addEventListener('click', ()=>{
-    // reuse same sharing logic
     homeShare.click();
   });
 }
 if (seasonPlayNext) {
   seasonPlayNext.addEventListener('click', ()=>{
-    // use live values that init() filled in
     if (!HAS_NEXT_SEASON || !NEXT_SEASON_URL) return;
     window.location.href = NEXT_SEASON_URL;
   });
@@ -544,23 +638,24 @@ modalCloseX.addEventListener("click", () => { levelModal.classList.remove('show'
 modalNext.addEventListener("click", ()=>{
   if(modalNext.disabled) return;
   const lvl=getLevel(State.current);
-  const final=modalTitle.textContent.includes("All Levels Complete");
   levelModal.classList.remove('show');
   levelLabel.setAttribute('aria-expanded','false');
-  if(final){
-    State.current=0;
-    State.solved={}; State.givenUp={}; State.hintsUsed={}; State.guessAttempts={};
-    State.score=0; renderPuzzle();
-  }else{
-    const { end } = levelRange(lvl);
-    const nextIndex = Math.min(end+1, puzzles.length-1);
-    fadeTransitionTo(nextIndex);
-    State.current = nextIndex; saveState();
+
+  if (lastModalWasFinal) {
+    // End of season: go to next season if it exists
+    if (HAS_NEXT_SEASON && NEXT_SEASON_URL) {
+      window.location.href = NEXT_SEASON_URL;
+    }
+    return;
   }
+
+  const { end } = levelRange(lvl);
+  const nextIndex = Math.min(end+1, puzzles.length-1);
+  fadeTransitionTo(nextIndex);
+  State.current = nextIndex; saveState();
 });
 
 function resetAllProgressAndGoToSeason1(){
-  // remove all season save slots for this game
   try{
     const keys = [];
     for (let i = 0; i < localStorage.length; i++){
@@ -569,7 +664,6 @@ function resetAllProgressAndGoToSeason1(){
     }
     keys.forEach(k => localStorage.removeItem(k));
   }catch{}
-  // hard jump back to Season 1 entry page
   window.location.href = "index.html";
 }
 
@@ -622,15 +716,12 @@ function resetState(){try{localStorage.removeItem(LS_KEY);}catch{} Object.assign
 
 // Main init
 function init(){
-  // read season info from puzzle file (set at bottom of puzzles-1.js / puzzles-2.js)
   CURRENT_SEASON = (typeof window !== "undefined" && window.PP_SEASON) ? window.PP_SEASON : 1;
   NEXT_SEASON_URL = (typeof window !== "undefined" && window.PP_NEXT_SEASON_URL) ? window.PP_NEXT_SEASON_URL : "";
   HAS_NEXT_SEASON = !!NEXT_SEASON_URL;
 
-  // update LS key now that we know the season
   LS_KEY = BASE_LS_KEY + "_s" + CURRENT_SEASON;
 
-  // now it is safe to load / restore state
   loadState();
 
   puzzles = window.LIVE_PUZZLES || [];
@@ -643,10 +734,9 @@ function init(){
   renderPuzzle();
   updateLevelLabels();
 
-  // Start on Home screen
   showHome();
 
-  // If this season is already complete, show the season splash
+  // If this season is already complete when you arrive, show the season splash
   if (seasonIsComplete() && puzzles.length > 0) {
     showSeasonSplash();
   }
@@ -655,7 +745,6 @@ function init(){
 // Bootstrap that waits for both DOM and puzzles
 function bootstrapPixelPeople(){
   if (!window.PP_DOM_READY || !window.PP_PUZZLES_READY) return;
-  // Avoid double init
   if (bootstrapPixelPeople._done) return;
   bootstrapPixelPeople._done = true;
   init();

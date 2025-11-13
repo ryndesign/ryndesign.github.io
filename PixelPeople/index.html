@@ -2,7 +2,14 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Pixel People - Guess The Character</title>
+  <title>Pixel People</title>
+  <meta property="og:title" content="Pixel People" />
+  <meta property="og:description" content="Can you guess all the Pixel People?" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://ryndesign.github.io/PixelPeople/index.html" />
+  <meta property="og:image" content="https://ryndesign.github.io/PixelPeople/cover.jpg" />
+  <meta property="twitter:card" content="summary_large_image" />
+  <meta property="twitter:image" content="https://ryndesign.github.io/PixelPeople/cover.jpg" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
   <meta name="build" content="master-1.13.2" />
   <link rel="icon" type="image/jpeg" href="favicon.jpg" />
@@ -17,6 +24,21 @@
 
       <!-- Season Pill moved to last position -->
       <span class="pill" id="levelLabel" role="button" tabindex="0" aria-controls="levelModal" aria-expanded="false"></span>
+    </div>
+
+    <!-- How To Play modal on ROOT -->
+    <div id="howToModal" class="modal" role="dialog" aria-labelledby="howToTitle">
+      <div class="modal-card">
+        <button id="howToCloseX" class="modal-close">×</button>
+        <h2 class="modal-title" id="howToTitle">How To Play</h2>
+        <div class="howto-body">
+          <h3>Look at the pixel art and guess the character or title.</h3>
+          <p><strong>PIXEL PEOPLE</strong> can include both real and fictional characters, as well as titles from movies, bands, TV shows, athletes, celebrities, and more.</p>
+          <p>If you find yourself stuck, remember to use your hint! If you want to give up and reveal the answer, just click on skip.</p>
+          <p>Finish all 9 puzzles to unlock the next level.</p>
+        </div>
+          <div class="modal-actions"><button id="howToOk">Got It</button></div>
+      </div>
     </div>
 
     <!-- HOME SCREEN -->
@@ -42,22 +64,7 @@
           <button id="homeShare">Share</button>
           <a id="homeCoffee" class="btn-link" href="#" target="_blank" rel="noopener">Buy Me A Coffee</a>
         </div>
-      </div>
-
-      <!-- How To Play modal lives under HOME -->
-      <div id="howToModal" class="modal" role="dialog" aria-labelledby="howToTitle">
-        <div class="modal-card">
-          <button id="howToCloseX" class="modal-close">×</button>
-          <h2 class="modal-title" id="howToTitle">How To Play</h2>
-          <div class="howto-body">
-            <h3>Look at the pixel art and guess the character or title.</h3>
-            <p><strong>PIXEL PEOPLE</strong> can include both real and fictional characters, as well as titles from movies, bands, TV shows, athletes, celebrities, and more.</p>
-            <p>If you find yourself stuck, remember to use your hint! If you want to give up and reveal the answer, just click on skip.</p>
-            <p>Finish all 9 puzzles to unlock the next level.</p>
-          </div>
-            <div class="modal-actions"><button id="howToOk">Got It</button></div>
-        </div>
-      </div>
+      </div>      
     </section>
 
     <!-- SEASON COMPLETE SPLASH -->
@@ -73,7 +80,7 @@
               Season <span id="seasonNumber">1</span> Complete
             </div>
           </div>
-        </div>
+        </div>        
 
         <div class="home-actions">
           <div class="home-art">
@@ -81,10 +88,6 @@
             <img id="seasonArt" alt="Season complete" src="images/0.png"
                  draggable="false" oncontextmenu="return false">
           </div>
-
-          <p id="seasonSummary" class="season-summary">
-            You finished this season.
-          </p>
 
           <button id="seasonPlayNext">Play Season 2</button>
           <button id="seasonHowTo">How To Play</button>
@@ -104,8 +107,9 @@
           Scoring: Exact name 10, accepted answer 8, with hint 4. Skipping reveals the answer and ends the puzzle.
         </p>
         <div class="modal-rows">
-          <div class="modal-row"><span>Correct Puzzles</span><strong id="mCorrect">0/9</strong></div>
-          <div class="modal-row"><span>Game Score</span><strong id="mTotal">0</strong></div>
+            <div class="modal-row"><span>Correct Puzzles</span><strong id="mCorrect">0/9</strong></div>
+          <div class="modal-row"><span>Season Score</span><strong id="mTotal">0</strong></div>
+          <div class="modal-row"><span>Game Score</span><strong id="mGameTotal">0</strong></div>
         </div>
         <div id="thumbGrid" class="thumb-grid"></div>
         <div class="modal-actions">
@@ -146,6 +150,7 @@
           <div class="modal-actions"><button id="confirmYes">Yes, I Give Up</button></div>
         </div>
       </div>
+      
     </section>
   </div>
 

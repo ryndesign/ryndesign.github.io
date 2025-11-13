@@ -12,7 +12,7 @@ window.LIVE_PUZZLES = [
 // LEVEL 1
   { image:"images/1.png",  name:"Michael Jackson", hint:"Beat It, Thriller, Billie Jean",
     answers:["MJ","Michael","Jackson"], bonus:"King of Pop" },
-  
+    
   { image:"images/2.png",  name:"Hulk Hogan", hint:"Hulkamania, red and yellow",
     answers:["Hogan","The Hulkster","Hollywood Hogan"], bonus:"Terry Bollea" },
 
@@ -36,8 +36,8 @@ window.LIVE_PUZZLES = [
 
   { image:"images/9.png",  name:"Deadpool", hint:"Fourth wall breaks, red suit",
     answers:["Dead Pool","Wade"], bonus:"Wade Wilson" },
+/*
 
- /* 
  //LEVEL 2
 
   { image:"images/10.png", name:"Borat", hint:"Kazakhstan journalist",
