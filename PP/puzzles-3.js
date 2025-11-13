@@ -9,53 +9,33 @@
 window.LIVE_PUZZLES = [
 
 // LEVEL 1 - SEASEON 2
-/*
-  { image:"images/91.png", name:"Pluto", hint:"Disney dog",
-    answers:["Mickey’s dog","Mickeys dog"], bonus:"Name" },
 
-  { image:"images/92.png", name:"Breaking Bad", hint:"Blue meth teacher",
-    answers:["Walter White","Heisenberg"], bonus:"Name" },
+  { image:"images/82.png", name:"Die Hard", hint:"Yippee ki yay",
+    answers:["John McClane","McClane","Bruce Willis Die Hard"], bonus:"Name" },
 
-  { image:"images/93.png", name:"Baymax", hint:"Healthcare companion",
-    answers:["Big Hero 6 Baymax"], bonus:"Name" },
+  { image:"images/83.png", name:"Eric Cartman", hint:"Respect my authority",
+    answers:["Cartman"], bonus:"Name" },
 
-  { image:"images/94.png", name:"Up", hint:"House with balloons",
-    answers:["Carl Fredricksen","Carl"], bonus:"Name" },
+  { image:"images/84.png", name:"Madonna", hint:"Material Girl",
+    answers:["Madonna Ciccone","Queen of Pop"], bonus:"Name" },
 
-  { image:"images/95.png", name:"Mike Wazowski", hint:"One-eyed monster",
-    answers:["Wazowski","Monsters Inc Mike"], bonus:"Name" },
+  { image:"images/85.png", name:"Yoda", hint:"Do or do not",
+    answers:["Master Yoda"], bonus:"Name" },
 
-  { image:"images/96.png", name:"Knight Rider", hint:"Talking car",
-    answers:["KITT","Michael Knight","David Hasselhoff"], bonus:"Name" },
+  { image:"images/86.png", name:"Tiger Woods", hint:"Green jacket",
+    answers:["Eldrick Woods","Eldrick T Woods"], bonus:"Name" },
 
-  { image:"images/97.png", name:"Happy Gilmore", hint:"Hockey slapshot golf",
-    answers:["Happy Gilmour","Adam Sandler Happy"], bonus:"Name" },
+  { image:"images/87.png", name:"Elon Musk", hint:"SpaceX and Tesla",
+    answers:["Musk"], bonus:"Name" },
 
-  { image:"images/98.png", name:"Howard Stern", hint:"Radio shock jock",
-    answers:["Stern","Howard Allan Stern"], bonus:"Name" },
+  { image:"images/88.png", name:"Iron Man", hint:"Genius billionaire",
+    answers:["Tony Stark","Anthony Stark","Mk 3","Mark 3"], bonus:"Name" },
 
-  { image:"images/99.png", name:"Andre Agassi", hint:"Tennis rebel",
-    answers:["Agassi","Andre Kirk Agassi"], bonus:"Name" },
+  { image:"images/89.png", name:"Billie Eilish", hint:"Bad Guy",
+    answers:["Eilish","Billie"], bonus:"Name" },
 
-// LEVEL 1 - SEASEON 2
-
-  { image:"images/100.png", name:"Cast Away", hint:"Lost on an Island",
-    answers:["Castaway","Tom Hanks"], bonus:"Wilson" },
-
-  { image:"images/101.png", name:"Twilight", hint:"Vampire Fantasy",
-    answers:["Edward","Vampire"], bonus:"Edward Cullen" },
-
-  { image:"images/102.png", name:"Fred Flintstone", hint:"Town of Bedrock",
-    answers:["Fred","Flintstone"], bonus:"Yabba Dabba Doo" },
-
-  { image:"images/103.png", name:"Chewbacca", hint:"AAARARRRGWWWH",
-    answers:["Chewie","Star wars"], bonus:"Walking Carpet" },
-
-  { image:"images/104.png", name:"E.T.", hint:"Phone Home",
-    answers:["ET","E T","Elliot"], bonus:"The Extra-Terrestrial" },
-*/
-  { image:"images/105.png", name:"Snoopy", hint:"Hint",
-    answers:["Dog","Peanuts"], bonus:"Charlie Brown" },
+  { image:"images/90.png", name:"Justin Bieber", hint:"Baby, Peaches",
+    answers:["Bieber","JB"], bonus:"Name" },
 
 ];
 
