@@ -40,5 +40,5 @@ window.LIVE_PUZZLES = [
 ];
 
 window.PP_SEASON = 3;
-window.PP_GLOBAL_OFFSET = 2;
+window.PP_GLOBAL_OFFSET = 18;
 //window.PP_NEXT_SEASON_URL = "index.html?s=4";
