@@ -35,7 +35,7 @@
   // Centralized configuration for default values
   const defaultConfettiConfig = {
     confettiesNumber: 250,
-    confettiRadius: 6,
+    confettiRadius: 4,
     confettiColors: [
       "#73E0FF", "#5CA6FF", "#D2FE50", "#89C95B", "#77BC3F", "#3093B2", "#ffffff", "#41FA9B"
     ],
@@ -172,7 +172,7 @@
         ...config,
       };
 
-      const baseY = (5 * window.innerHeight) / 7;
+      const baseY = (5 * window.innerHeight) / 9;
       for (let i = 0; i < confettiesNumber / 2; i++) {
         this.confetti.push(new Confetti({
           initialPosition: { x: 0, y: baseY },
