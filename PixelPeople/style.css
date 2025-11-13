@@ -166,42 +166,43 @@ button#next.active{background:#123524;border-color:#1e4d32;color:#b7ffd1;}
 .artbox img#art { pointer-events: none; }
 .artbox::before { content: ""; position: absolute; inset: 0; z-index: 1; }
 
-/* CONFETTI */
-.fx-confetti{
-  position:fixed;
-  inset:0;
-  pointer-events:none;
-  overflow:hidden;
-  z-index:2000;
+/* CONFETTI (mobile friendly) */
+.fx-confetti {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 2000;
 }
 
-/* Single fast animation, better for mobile */
-.fx-confetti-piece{
-  position:absolute;
-  width:8px;
-  height:14px;
-  border-radius:2px;
-  opacity:0;
-  animation:confetti-fall 0.7s linear forwards;
+/* Each piece uses a short, simple fall animation */
+.fx-confetti-piece {
+  position: absolute;
+  width: 7px;
+  height: 12px;
+  border-radius: 2px;
+  opacity: 0;
+  will-change: transform, opacity;
+  animation: confetti-fall 0.55s ease-out forwards;
 }
 
-/* Optional size tweaks, no duration override */
-.fx-confetti-piece.small{
-  width:8px;
-  height:14px;
-}
-.fx-confetti-piece.big{
-  width:10px;
-  height:18px;
+.fx-confetti-piece.small {
+  width: 6px;
+  height: 10px;
 }
 
-@keyframes confetti-fall{
-  0%{
-    transform:translate3d(0,-8vh,0) rotateZ(0deg);
-    opacity:1;
+.fx-confetti-piece.big {
+  width: 8px;
+  height: 14px;
+}
+
+@keyframes confetti-fall {
+  0% {
+    transform: translateY(-12%);
+    opacity: 1;
   }
-  100%{
-    transform:translate3d(var(--confetti-x, 0px), 105vh, 0) rotateZ(300deg);
-    opacity:0;
+  100% {
+    transform: translateY(110%);
+    opacity: 0;
   }
 }

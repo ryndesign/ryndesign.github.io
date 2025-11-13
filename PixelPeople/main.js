@@ -4,6 +4,16 @@ const normalize = s => (s||"").toString().trim().toLowerCase().normalize("NFD")
 const toNormCompare = s => normalize(s).replace(/\s+/g, "");
 const IS_TOUCH = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
 
+function vibratePhone(pattern) {
+  try {
+    if (navigator.vibrate) {
+      navigator.vibrate(pattern);
+    }
+  } catch (e) {
+    // ignore
+  }
+}
+
 // Local storage key base and season info
 const BASE_LS_KEY = "pp_state_scoring_bonuswords_1_13_0";
 
@@ -304,41 +314,49 @@ function getGlobalGameScore(){
 }
 
 // Simple confetti helpers
-function confettiBurst(count, sizeClass){
+function confettiBurst(count, sizeClass) {
   if (!confettiRoot) return;
-  const colors = ["#ff6b6b","#feca57","#48dbfb","#1dd1a1","#f368e0"];
 
-  // Fewer pieces on touch devices
-  const numPieces = IS_TOUCH ? Math.max(10, Math.floor(count * 0.4)) : count;
+  const colors = ["#ff6b6b", "#feca57", "#48dbfb", "#1dd1a1", "#f368e0"];
 
-  for (let i = 0; i < numPieces; i++){
+  // Very small number of pieces, scaled for mobile
+  const baseCount = count || 18;
+  const numPieces = IS_TOUCH
+    ? Math.max(8, Math.min(14, Math.floor(baseCount * 0.6)))
+    : baseCount;
+
+  for (let i = 0; i < numPieces; i++) {
     const piece = document.createElement("div");
     piece.className = "fx-confetti-piece " + (sizeClass || "");
-    const left = Math.random() * 100;
-    const xDrift = (Math.random() - 0.5) * 80;
-    const delay = Math.random() * 0.2;
+
+    // Spread across the top
+    const left = 10 + Math.random() * 80; // between 10% and 90%
+    const delay = Math.random() * 0.15;   // small stagger
 
     piece.style.left = left + "%";
-    piece.style.top = "-10px";
-    piece.style.setProperty("--confetti-x", xDrift + "px");
+    piece.style.top = "-10%";
     piece.style.backgroundColor = colors[i % colors.length];
     piece.style.animationDelay = delay + "s";
 
     confettiRoot.appendChild(piece);
 
-    // Match the 0.7s animation plus a bit of buffer
-    setTimeout(()=>{ piece.remove(); }, 900);
+    // Clean up after animation (~0.55s + buffer)
+    setTimeout(() => {
+      piece.remove();
+    }, 800);
   }
 }
 
-function confettiSeasonComplete(){
-  // Big burst count, auto-throttled on mobile
-  confettiBurst(40, "big");
+function confettiCorrect() {
+  // Light haptic + confetti for every correct answer
+  vibratePhone(70);
+  confettiBurst(18, "small");
 }
 
-function confettiCorrect(){
-  // Same look as season complete, just reusing the same settings
-  confettiBurst(40, "big");
+function confettiSeasonComplete() {
+  // Slightly stronger haptic + more confetti at season end
+  vibratePhone([120, 60, 160]);
+  confettiBurst(26, "big");
 }
 
 // Level modal
