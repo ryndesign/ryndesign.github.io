@@ -333,12 +333,12 @@ function confettiBurst(count, sizeClass){
 
 function confettiSeasonComplete(){
   // Big burst count, auto-throttled on mobile
-  confettiBurst(60, "big");
+  confettiBurst(40, "big");
 }
 
 function confettiCorrect(){
   // Same look as season complete, just reusing the same settings
-  confettiBurst(60, "big");
+  confettiBurst(40, "big");
 }
 
 // Level modal
