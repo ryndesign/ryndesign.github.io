@@ -5,31 +5,8 @@
 html,body{height:100%;margin:0;background:var(--bg);color:#e9edf4;font:16px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;}
 * { -webkit-tap-highlight-color: transparent; }
 
-.wrap{
-  max-width:520px;
-  margin:0 auto;
-}
-
+.wrap{max-width:520px;margin:0px auto;padding:0px;}
 header{display:none}
-
-.level-bar{
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-  background-color: var(--panel);
-  border-bottom: 1px solid #424242;
-  padding-top: 7px;
-  padding-bottom: 7px;
-
-  display:flex;
-  align-items:center;
-  gap:10px;
-  color:#8b93a7;
-  font-size:14px;
-  flex-wrap:wrap;
-  justify-content:center;
-  text-align:center;
-}
 
 button{
   appearance:none;border:1px solid #222838;border-radius:8px;
@@ -123,7 +100,7 @@ button#next.active{background:#123524;border-color:#1e4d32;color:#b7ffd1;}
 }
 
 .home.show{display:block;}
-.home-card{border-radius:8px;display:block;gap:15px;text-align:center; height: calc(100vh - 70px);background-color: #89C95B;}
+.home-card{border-radius:8px;display:block;gap:15px;text-align:center; height: calc(100vh - 100px);background-color: #89C95B;}
 
 .home-labelnum {
   font-size: 18px;
@@ -150,7 +127,7 @@ button#next.active{background:#123524;border-color:#1e4d32;color:#b7ffd1;}
 
 /* Limit artbox height on mobile screens */
 @media (max-height: 767px) {
-  .home-card{height:auto;padding-bottom: 30px;}
+  .home-card{height: auto;padding-bottom: 60px;}
 }
 
 /* TOP BAR */
