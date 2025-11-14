@@ -251,6 +251,7 @@ button#next.active{background:#123524;border-color:#1e4d32;color:#b7ffd1;}
   font-size:14px;
   font-weight: 600;
   cursor:pointer;
+  min-width: 26px;
 }
 .history-season-btn.active{
   background:#D2FE50;
