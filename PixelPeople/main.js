@@ -251,30 +251,52 @@ function correctProgressForLevel(level){
   return { correct, total };
 }
 
-function openLevelModal(level,final=false){
+function openLevelModal(level, final = false){
   const { correct, total } = correctProgressForLevel(level);
   if (mCorrect) mCorrect.textContent = `${correct}/${total}`;
-  mTotal.textContent = State.score;
 
-  if (final) {
-    modalTitle.textContent = "All Levels Complete";
+  // Season Score (this season)
+  if (mTotal) mTotal.textContent = State.score;
+
+  // Game Score (all seasons)
+  if (mGameTotal) mGameTotal.textContent = getGlobalGameScore();
+
+  const isSeasonDone = seasonIsComplete();
+
+  if (isSeasonDone) {
+    // Season complete view
+    modalTitle.textContent = `Season ${CURRENT_SEASON} Complete`;
+    unlockNote.style.display = "none";
+
+    if (HAS_NEXT_SEASON) {
+      modalNext.textContent = `Play Season ${CURRENT_SEASON + 1}`;
+      modalNext.disabled = false;
+      lastModalWasFinal = true;  // use this to jump to next season
+    } else {
+      modalNext.textContent = `Season ${CURRENT_SEASON + 1} Coming Soon`;
+      modalNext.disabled = true;
+      lastModalWasFinal = false;
+    }
   } else {
+    // Normal level view
     const globalOffset = window.PP_GLOBAL_OFFSET || 0;
     const currentGlobal = globalOffset + State.current + 1;
-    // Season X · Puzzle Y
     modalTitle.textContent = `Season ${CURRENT_SEASON} · Puzzle ${currentGlobal}`;
+
+    const complete = levelComplete(level);
+    unlockNote.style.display = complete ? "none" : "block";
+
+    modalNext.textContent = "Start Next Level";
+    modalNext.disabled = !complete;
+    lastModalWasFinal = false;
   }
-
-  const complete=levelComplete(level);
-  unlockNote.style.display=!complete?"block":"none";
-
-  modalNext.textContent=final?"Play Again":"Start Next Level";
-  modalNext.disabled=!final&&!complete;
 
   buildThumbGrid(level);
   levelLabel.setAttribute('aria-expanded','true');
   levelModal.classList.add('show');
-  setTimeout(()=>{(!modalNext.disabled?modalNext:modalCloseX).focus();},0);
+  setTimeout(() => {
+    (!modalNext.disabled ? modalNext : modalCloseX).focus();
+  }, 0);
 }
 
 // Global Game Score: sum of all seasons' scores using BASE_LS_KEY prefix
@@ -580,11 +602,14 @@ levelLabel.addEventListener("click", ()=>{
 });
 modalCloseX.addEventListener("click", () => { levelModal.classList.remove('show'); levelLabel.setAttribute('aria-expanded','false'); });
 modalNext.addEventListener("click", ()=>{
-  if(modalNext.disabled) return;
-  const lvl=getLevel(State.current);
+  if (modalNext.disabled) return;
+
+  const lvl = getLevel(State.current);
   levelModal.classList.remove('show');
   levelLabel.setAttribute('aria-expanded','false');
 
+  // If this modal represents a finished season and a next season exists,
+  // go to the next season URL instead of the next level.
   if (lastModalWasFinal) {
     if (HAS_NEXT_SEASON && NEXT_SEASON_URL) {
       window.location.href = NEXT_SEASON_URL;
@@ -592,10 +617,12 @@ modalNext.addEventListener("click", ()=>{
     return;
   }
 
+  // Otherwise behave as normal: move to the next level block
   const { end } = levelRange(lvl);
-  const nextIndex = Math.min(end+1, puzzles.length-1);
+  const nextIndex = Math.min(end + 1, puzzles.length - 1);
   fadeTransitionTo(nextIndex);
-  State.current = nextIndex; saveState();
+  State.current = nextIndex;
+  saveState();
 });
 
 function resetAllProgressAndGoToSeason1(){

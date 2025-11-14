@@ -36,7 +36,6 @@ window.LIVE_PUZZLES = [
 
   { image:"images/9.png",  name:"Deadpool", hint:"Fourth wall breaks, red suit",
     answers:["Dead Pool","Wade"], bonus:"Wade Wilson" },
-/*
 
  //LEVEL 2
 
@@ -66,7 +65,7 @@ window.LIVE_PUZZLES = [
 
   { image:"images/18.png", name:"Gizmo", hint:"Cute Mogwai, no water",
     answers:["Gremlins"], bonus:"Mogwai" },
-    
+ /*   
 // LEVEL 3
 
   { image:"images/19.png", name:"Flavor Flav", hint:"Giant clock necklace",
