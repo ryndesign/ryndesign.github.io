@@ -185,7 +185,7 @@ button#next.active{background:#123524;border-color:#1e4d32;color:#b7ffd1;}
 .modal-close{position:absolute;top:10px;right:10px;width:36px;height:36px;border-radius:8px;background:#171a21;border:1px solid #263048;color:#e9edf4;font-size:26px;line-height:17px;padding:8px;text-align:center;cursor:pointer;}
 .modal-reset{position:absolute;top:10px;right:56px;height:36px;padding:8px 10px;border-radius:8px;background:#171a21;border:1px solid #263048;color:#e9edf4;cursor:pointer;font-size:14px;line-height:20px;}
 .modal-reset:focus{outline:none;box-shadow:0 0 0 2px #86eefc;}
-.modal-title{font-size:22px;font-weight:700;margin:0 0 8px 0;padding-right:46px;}
+.modal-title{font-size:18px;font-weight:700;margin:0 0 8px 0;padding-right:46px;}
 .score-blurb{margin:-2px 0 10px;color:#cbd5e1;font-size:13px;line-height:1.35;}
 .modal-rows{display:grid;gap:8px;margin:12px 0 14px;}
 .modal-row{display:flex;justify-content:space-between;color:#cbd5e1;}
@@ -234,7 +234,7 @@ button#next.active{background:#123524;border-color:#1e4d32;color:#b7ffd1;}
   gap:8px;
 }
 .history-title{
-  font-size:16px;
+  font-size:18px;
   font-weight:600;
 }
 .history-season-buttons{
@@ -247,8 +247,9 @@ button#next.active{background:#123524;border-color:#1e4d32;color:#b7ffd1;}
   border:1px solid #263048;
   background:#1b2130;
   color:#e9edf4;
-  padding:4px 10px;
-  font-size:13px;
+  padding:4px 8px;
+  font-size:14px;
+  font-weight: 600;
   cursor:pointer;
 }
 .history-season-btn.active{

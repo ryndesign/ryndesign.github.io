@@ -12,7 +12,7 @@ window.LIVE_PUZZLES = [
 
   { image:"images/82.png", name:"Die Hard", hint:"Yippee ki yay",
     answers:["John McClane","McClane","Bruce Willis Die Hard"], bonus:"Name" },
-
+/*
   { image:"images/83.png", name:"Eric Cartman", hint:"Respect my authority",
     answers:["Cartman"], bonus:"Name" },
 
@@ -36,7 +36,7 @@ window.LIVE_PUZZLES = [
 
   { image:"images/90.png", name:"Justin Bieber", hint:"Baby, Peaches",
     answers:["Bieber","JB"], bonus:"Name" },
-
+ */
 ];
 
 window.PP_SEASON = 3;

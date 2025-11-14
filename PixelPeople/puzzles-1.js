@@ -12,7 +12,7 @@ window.LIVE_PUZZLES = [
 // LEVEL 1
   { image:"images/1.png",  name:"Michael Jackson", hint:"Beat It, Thriller, Billie Jean",
     answers:["MJ","Michael","Jackson"], bonus:"King of Pop" },
-    
+  /*   
   { image:"images/2.png",  name:"Hulk Hogan", hint:"Hulkamania, red and yellow",
     answers:["Hogan","The Hulkster","Hollywood Hogan"], bonus:"Terry Bollea" },
 
@@ -65,7 +65,7 @@ window.LIVE_PUZZLES = [
 
   { image:"images/18.png", name:"Gizmo", hint:"Cute Mogwai, no water",
     answers:["Gremlins"], bonus:"Mogwai" },
- /*   
+   
 // LEVEL 3
 
   { image:"images/19.png", name:"Flavor Flav", hint:"Giant clock necklace",

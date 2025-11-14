@@ -12,7 +12,7 @@ window.LIVE_PUZZLES = [
 
   { image:"images/91.png", name:"Pluto", hint:"Disney dog",
     answers:["Mickey’s dog","Mickeys dog"], bonus:"Name" },
-
+/*
   { image:"images/92.png", name:"Breaking Bad", hint:"Blue meth teacher",
     answers:["Walter White","Heisenberg"], bonus:"Name" },
 
@@ -36,7 +36,7 @@ window.LIVE_PUZZLES = [
 
   { image:"images/99.png", name:"Andre Agassi", hint:"Tennis rebel",
     answers:["Agassi","Andre Kirk Agassi"], bonus:"Name" },
-/*
+
 // LEVEL 1 - SEASEON 2
 
   { image:"images/100.png", name:"Cast Away", hint:"Lost on an Island",
