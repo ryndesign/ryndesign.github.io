@@ -42,6 +42,13 @@ const confirmModal=$('#confirmModal'), confirmCloseX=$('#confirmCloseX'), confir
 
 const howToModal=$('#howToModal'), howToCloseX=$('#howToCloseX'), howToOk=$('#howToOk');
 
+// History elements
+const historyScreen = $('#historyScreen'),
+      historyGrid = $('#historyGrid'),
+      historyBtn = $('#historyBtn');
+
+const historySeasonButtons = document.querySelectorAll('.history-season-btn');
+
 let resultTimer=null, resultHideTimer=null;
 let lastModalWasFinal = false;
 
@@ -50,7 +57,7 @@ window.PP_DOM_READY = window.PP_DOM_READY || false;
 window.PP_PUZZLES_READY = window.PP_PUZZLES_READY || false;
 
 // Prevent saving or dragging puzzle image on mobile
-['contextmenu','dragstart','gesturestart','selectstart'].forEach(evt=>{
+['contextmenu','dragstart','gesturestart'].forEach(evt=>{
   art.addEventListener(evt, e => e.preventDefault(), { passive:false });
 });
 art.addEventListener('touchstart', e => e.preventDefault(), { passive:false });
@@ -225,6 +232,80 @@ function buildThumbGrid(level){
   }
 }
 
+// History grid: all puzzles in current season
+function renderHistoryGrid(){
+  if (!historyGrid || !puzzles || !Array.isArray(puzzles)) return;
+  historyGrid.innerHTML = "";
+  for (let i = 0; i < State.total; i++){
+    const solved = !!State.solved[i];
+    const failed = !!State.givenUp[i];
+    const locked = !solved && !failed;
+
+    const th = document.createElement('div');
+    th.className = 'thumb' + (solved ? ' ok' : (failed ? ' bad' : '')) + (locked ? ' locked' : '');
+    const img = document.createElement('img');
+    img.src = puzzles[i].image;
+    img.alt = puzzles[i].name || `Puzzle ${i+1}`;
+    img.setAttribute('draggable','false');
+    img.setAttribute('oncontextmenu','return false;');
+    const cap = document.createElement('div');
+    cap.className = 'cap';
+    cap.textContent = locked ? "???" : puzzles[i].name;
+    th.appendChild(img);
+    th.appendChild(cap);
+    historyGrid.appendChild(th);
+  }
+}
+
+// Helpers for cross-season completion status (from localStorage)
+function loadSeasonState(season){
+  const key = BASE_LS_KEY + "_s" + season;
+  try{
+    const raw = localStorage.getItem(key);
+    if (!raw) return null;
+    return JSON.parse(raw);
+  }catch(e){
+    return null;
+  }
+}
+
+function seasonStateIsComplete(st){
+  if (!st || typeof st.total !== "number" || st.total <= 0) return false;
+  const solved = st.solved || {};
+  const givenUp = st.givenUp || {};
+  for (let i = 0; i < st.total; i++){
+    if (!solved[i] && !givenUp[i]) return false;
+  }
+  return true;
+}
+
+// Show/hide season chips in History: only show completed seasons
+function updateHistorySeasonButtonsVisibility(){
+  if (!historySeasonButtons || !historySeasonButtons.length) return;
+  let anyVisible = false;
+  historySeasonButtons.forEach(btn=>{
+    const s = Number(btn.dataset.season || "1");
+    const st = loadSeasonState(s);
+    const complete = seasonStateIsComplete(st);
+    btn.style.display = complete ? "" : "none";
+    if (complete) anyVisible = true;
+  });
+  const header = document.querySelector('.history-season-buttons');
+  if (header) header.style.display = anyVisible ? "flex" : "none";
+}
+
+function markActiveHistorySeasonButton(){
+  if (!historySeasonButtons || !historySeasonButtons.length) return;
+  historySeasonButtons.forEach(btn=>{
+    if (btn.style.display === "none") {
+      btn.classList.remove('active');
+      return;
+    }
+    const s = Number(btn.dataset.season || "1");
+    btn.classList.toggle('active', s === CURRENT_SEASON);
+  });
+}
+
 // Scoring helpers
 function normEq(a,b){ return toNormCompare(a) === toNormCompare(b); }
 function matchAny(cands, g){
@@ -356,11 +437,7 @@ function handleGuess(){
 
     // Fire confetti on correct guess, if the helper exists
     if (window.PPConfetti && typeof window.PPConfetti.fire === "function") {
-      window.PPConfetti.fire({
-        // optional overrides, or leave empty for defaults
-        // confettiesNumber: 160,
-        // confettiRadius: 5
-      });
+      window.PPConfetti.fire({});
     }
 
     hintBtn.disabled = true; 
@@ -417,13 +494,19 @@ function handleNext(){
   State.current = nextIndex; saveState();
 }
 
-// HOME AND SEASON SCREENS
+// HOME, HISTORY, AND SEASON SCREENS
 function showHome(){
   // If season splash is visible, hide it
   if (seasonSplash) {
     seasonSplash.classList.remove('show');
     seasonSplash.setAttribute('aria-hidden','true');
   }
+  // Hide history
+  if (historyScreen) {
+    historyScreen.classList.remove('show');
+    historyScreen.setAttribute('aria-hidden','true');
+  }
+  if (historyBtn) historyBtn.setAttribute('aria-expanded','false');
 
   homeScreen.classList.add('show');
   homeScreen.setAttribute('aria-hidden','false');
@@ -436,24 +519,38 @@ function showHome(){
     homeNum.textContent = String(globalPuzzleNum);
   }
 }
+
 function showGame(){
-  // Hide home screen, show game
+  // Hide home and history, show game
   if (seasonSplash) {
     seasonSplash.classList.remove('show');
     seasonSplash.setAttribute('aria-hidden','true');
   }
   homeScreen.classList.remove('show');
   homeScreen.setAttribute('aria-hidden','true');
-  stage.style.display = '';
   homeBtn.setAttribute('aria-expanded','false');
+
+  if (historyScreen) {
+    historyScreen.classList.remove('show');
+    historyScreen.setAttribute('aria-hidden','true');
+  }
+  if (historyBtn) historyBtn.setAttribute('aria-expanded','false');
+
+  stage.style.display = '';
 }
 
 function showSeasonSplash(){
-  // Hide game and home
+  // Hide game, home, history
   stage.style.display = 'none';
   homeScreen.classList.remove('show');
   homeScreen.setAttribute('aria-hidden', 'true');
   homeBtn.setAttribute('aria-expanded','false');
+
+  if (historyScreen) {
+    historyScreen.classList.remove('show');
+    historyScreen.setAttribute('aria-hidden','true');
+  }
+  if (historyBtn) historyBtn.setAttribute('aria-expanded','false');
 
   if (seasonSplash) {
     seasonSplash.classList.add('show');
@@ -466,7 +563,7 @@ function showSeasonSplash(){
     const globalOffset = window.PP_GLOBAL_OFFSET || 0;
     const firstGlobal = globalOffset + 1;
     const lastGlobal = globalOffset + State.total;
-    seasonSummary.textContent = `You've Finished Season ${CURRENT_SEASON}! Score: ${State.score.toFixed(0)}.`;
+    seasonSummary.textContent = `You have finished Season ${CURRENT_SEASON}. Score: ${State.score.toFixed(0)}.`;
   }
 
   // Coffee link
@@ -484,11 +581,60 @@ function showSeasonSplash(){
   }
 }
 
+function showHistory(){
+  if (!historyScreen) return;
+
+  // Hide home, game, season splash
+  if (seasonSplash) {
+    seasonSplash.classList.remove('show');
+    seasonSplash.setAttribute('aria-hidden','true');
+  }
+  homeScreen.classList.remove('show');
+  homeScreen.setAttribute('aria-hidden','true');
+  homeBtn.setAttribute('aria-expanded','false');
+
+  stage.style.display = 'none';
+
+  // Make sure season chips obey "only completed seasons" rule
+  updateHistorySeasonButtonsVisibility();
+  historyScreen.classList.add('show');
+  historyScreen.setAttribute('aria-hidden','false');
+  if (historyBtn) historyBtn.setAttribute('aria-expanded','true');
+
+  renderHistoryGrid();
+  markActiveHistorySeasonButton();
+}
+
 // Home button now always goes Home
 homeBtn.addEventListener('click', showHome);
 homeBtn.addEventListener('keydown', (e)=>{
   if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); showHome(); }
 });
+
+// History button
+if (historyBtn) {
+  historyBtn.addEventListener('click', showHistory);
+  historyBtn.addEventListener('keydown', (e)=>{
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); showHistory(); }
+  });
+}
+
+// History season buttons: load other seasons, stay on history view
+if (historySeasonButtons && historySeasonButtons.length){
+  historySeasonButtons.forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      if (btn.style.display === "none") return; // hidden seasons are not usable
+      const s = Number(btn.dataset.season || "1");
+      if (!s || s === CURRENT_SEASON) {
+        renderHistoryGrid();
+        markActiveHistorySeasonButton();
+        return;
+      }
+      // reload with view=history so we land back on the history screen
+      window.location.href = `index.html?s=${s}&view=history`;
+    });
+  });
+}
 
 // Play Now returns to game
 homePlay.addEventListener('click', showGame);
@@ -566,6 +712,13 @@ document.addEventListener("keydown",e=>{
     if (seasonSplash && seasonSplash.classList.contains('show')) {
       seasonSplash.classList.remove('show');
       seasonSplash.setAttribute('aria-hidden','true');
+      showHome();
+      return;
+    }
+    if (historyScreen && historyScreen.classList.contains('show')) {
+      historyScreen.classList.remove('show');
+      historyScreen.setAttribute('aria-hidden','true');
+      if (historyBtn) historyBtn.setAttribute('aria-expanded','false');
       showHome();
       return;
     }
@@ -687,6 +840,9 @@ function resetState(){try{localStorage.removeItem(LS_KEY);}catch(e){} Object.ass
 
 // Main init
 function init(){
+  const params = new URLSearchParams(window.location.search || "");
+  const viewParam = (params.get("view") || "").toLowerCase();
+
   CURRENT_SEASON = (typeof window !== "undefined" && window.PP_SEASON) ? window.PP_SEASON : 1;
   NEXT_SEASON_URL = (typeof window !== "undefined" && window.PP_NEXT_SEASON_URL) ? window.PP_NEXT_SEASON_URL : "";
   HAS_NEXT_SEASON = !!NEXT_SEASON_URL;
@@ -706,12 +862,18 @@ function init(){
   renderPuzzle();
   updateLevelLabels();
 
-  // always start on home screen
-  showHome();
+  // Apply "only completed seasons" rule to history buttons
+  updateHistorySeasonButtonsVisibility();
+  markActiveHistorySeasonButton();
 
-  // If this season is already complete when you arrive, show the season splash
-  if (seasonIsComplete() && puzzles.length > 0) {
-    showSeasonSplash();
+  // choose initial view
+  if (viewParam === "history") {
+    showHistory();
+  } else {
+    showHome();
+    if (seasonIsComplete() && puzzles.length > 0) {
+      showSeasonSplash();
+    }
   }
 }
 
