@@ -16,6 +16,8 @@ let LS_KEY = BASE_LS_KEY + "_s1";
 
 const COFFEE_URL = "https://buymeacoffee.com/pixelpeople"; // change to your real link
 
+const HISTORY_FLAG_KEY = "pp_startInHistory";
+
 const State={current:0,solved:{},givenUp:{},hintsUsed:{},guessAttempts:{},total:0,score:0};
 let puzzles=[];
 
@@ -132,7 +134,6 @@ function updateLevelLabels(){
   const globalOffset = window.PP_GLOBAL_OFFSET || 0;
   const globalPuzzleNum = State.current + 1 + globalOffset;
 
-  // Top bar: [SVG ICON] 1-27
   levelLabel.innerHTML = `
     <span class="season-icon" aria-hidden="true">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" width="20" height="20">
@@ -147,7 +148,6 @@ function updateLevelLabels(){
   hintBtn.disabled = finished;
   giveup.disabled = finished;
 
-  // Update home preview bits
   homeNum.textContent = String(globalPuzzleNum);
   if (puzzles[State.current]) homeArt.src = puzzles[State.current].image;
 }
@@ -189,7 +189,6 @@ function renderPuzzle(){
   hintBtn.disabled = finished; giveup.disabled = finished;
   lockNext(!finished); guess.blur(); art.style.opacity = 1;
 
-  // keep home preview in sync (global numbering)
   const globalOffset = window.PP_GLOBAL_OFFSET || 0;
   const globalPuzzleNum = State.current + 1 + globalOffset;
   homeArt.src = p.image;
@@ -279,7 +278,7 @@ function seasonStateIsComplete(st){
   return true;
 }
 
-// Show/hide season chips in History: only show completed seasons
+// Show or hide season chips in History: only show completed seasons
 function updateHistorySeasonButtonsVisibility(){
   if (!historySeasonButtons || !historySeasonButtons.length) return;
   let anyVisible = false;
@@ -314,7 +313,6 @@ function matchAny(cands, g){
   if (typeof cands === "string") return normEq(cands, g);
   return false;
 }
-/** Returns one of: 'bonus' | 'name' | 'answer' | null */
 function classifyGuess(p, guessStr){
   const g = guessStr || "";
   if (!g.trim()) return null;
@@ -336,30 +334,26 @@ function openLevelModal(level, final = false){
   const { correct, total } = correctProgressForLevel(level);
   if (mCorrect) mCorrect.textContent = `${correct}/${total}`;
 
-  // Season Score (this season)
   if (mTotal) mTotal.textContent = State.score;
 
-  // Game Score (all seasons)
   if (mGameTotal) mGameTotal.textContent = getGlobalGameScore();
 
   const isSeasonDone = seasonIsComplete();
 
   if (isSeasonDone) {
-    // Season complete view
     modalTitle.textContent = `Season ${CURRENT_SEASON} Complete`;
     unlockNote.style.display = "none";
 
     if (HAS_NEXT_SEASON) {
       modalNext.textContent = `Play Season ${CURRENT_SEASON + 1}`;
       modalNext.disabled = false;
-      lastModalWasFinal = true;  // use this to jump to next season
+      lastModalWasFinal = true;
     } else {
       modalNext.textContent = `Season ${CURRENT_SEASON + 1} Coming Soon`;
       modalNext.disabled = true;
       lastModalWasFinal = false;
     }
   } else {
-    // Normal level view
     const globalOffset = window.PP_GLOBAL_OFFSET || 0;
     const currentGlobal = globalOffset + State.current + 1;
     modalTitle.textContent = `Season ${CURRENT_SEASON} · Puzzle ${currentGlobal}`;
@@ -410,10 +404,9 @@ function handleGuess(){
   if(kind){
     State.solved[idx]=true;
 
-    // score rules
     let points = 0;
     if (State.hintsUsed[idx]) {
-      points = 4; // hint overrides all
+      points = 4;
     } else if (kind === "bonus") {
       points = 20;
     } else if (kind === "answer") {
@@ -424,7 +417,6 @@ function handleGuess(){
     State.score += points;
     saveState();
 
-    // feedback copy
     if (kind === "bonus" && !State.hintsUsed[idx]) {
       showResult(`Bonus found. ${p.name} (+${points})`,"good");
     } else if (kind === "answer" && !State.hintsUsed[idx]) {
@@ -435,13 +427,12 @@ function handleGuess(){
       showResult(`Correct with hint. ${p.name} (+${points})`,"good");
     }
 
-    // Fire confetti on correct guess, if the helper exists
     if (window.PPConfetti && typeof window.PPConfetti.fire === "function") {
       window.PPConfetti.fire({});
     }
 
-    hintBtn.disabled = true; 
-    giveup.disabled = true; 
+    hintBtn.disabled = true;
+    giveup.disabled = true;
     lockNext(false);
     updateLevelLabels();
     
@@ -479,7 +470,6 @@ function handleNext(){
     const lvl = getLevel(State.current);
     const final = State.current >= puzzles.length - 1;
 
-    // If this is the final puzzle in the season and all puzzles are solved or given up
     if (final && seasonIsComplete()) {
       showSeasonSplash();
       return;
@@ -496,12 +486,10 @@ function handleNext(){
 
 // HOME, HISTORY, AND SEASON SCREENS
 function showHome(){
-  // If season splash is visible, hide it
   if (seasonSplash) {
     seasonSplash.classList.remove('show');
     seasonSplash.setAttribute('aria-hidden','true');
   }
-  // Hide history
   if (historyScreen) {
     historyScreen.classList.remove('show');
     historyScreen.setAttribute('aria-hidden','true');
@@ -521,7 +509,6 @@ function showHome(){
 }
 
 function showGame(){
-  // Hide home and history, show game
   if (seasonSplash) {
     seasonSplash.classList.remove('show');
     seasonSplash.setAttribute('aria-hidden','true');
@@ -540,7 +527,6 @@ function showGame(){
 }
 
 function showSeasonSplash(){
-  // Hide game, home, history
   stage.style.display = 'none';
   homeScreen.classList.remove('show');
   homeScreen.setAttribute('aria-hidden', 'true');
@@ -557,19 +543,13 @@ function showSeasonSplash(){
     seasonSplash.setAttribute('aria-hidden', 'false');
   }
 
-  // Display season number and summary
   if (seasonNumber) seasonNumber.textContent = String(CURRENT_SEASON);
   if (seasonSummary) {
-    const globalOffset = window.PP_GLOBAL_OFFSET || 0;
-    const firstGlobal = globalOffset + 1;
-    const lastGlobal = globalOffset + State.total;
     seasonSummary.textContent = `You have finished Season ${CURRENT_SEASON}. Score: ${State.score.toFixed(0)}.`;
   }
 
-  // Coffee link
   if (seasonCoffee) seasonCoffee.setAttribute('href', COFFEE_URL);
 
-  // Button text and enabled state
   if (seasonPlayNext) {
     if (HAS_NEXT_SEASON) {
       seasonPlayNext.textContent = `Play Season ${CURRENT_SEASON + 1}`;
@@ -584,7 +564,6 @@ function showSeasonSplash(){
 function showHistory(){
   if (!historyScreen) return;
 
-  // Hide home, game, season splash
   if (seasonSplash) {
     seasonSplash.classList.remove('show');
     seasonSplash.setAttribute('aria-hidden','true');
@@ -595,7 +574,6 @@ function showHistory(){
 
   stage.style.display = 'none';
 
-  // Make sure season chips obey "only completed seasons" rule
   updateHistorySeasonButtonsVisibility();
   historyScreen.classList.add('show');
   historyScreen.setAttribute('aria-hidden','false');
@@ -605,10 +583,49 @@ function showHistory(){
   markActiveHistorySeasonButton();
 }
 
-// Home button now always goes Home
-homeBtn.addEventListener('click', showHome);
+// Find most recent season that has a save record
+function getHighestVisitedSeason(){
+  let maxSeason = 1;
+  try {
+    for (let i = 0; i < localStorage.length; i++){
+      const key = localStorage.key(i);
+      if (!key) continue;
+      const match = key.match(/^pp_state_scoring_bonuswords_1_13_0_s(\d+)$/);
+      if (match) {
+        const sn = parseInt(match[1], 10);
+        if (sn > maxSeason) maxSeason = sn;
+      }
+    }
+  } catch(e) {}
+  if (CURRENT_SEASON && CURRENT_SEASON > maxSeason) {
+    maxSeason = CURRENT_SEASON;
+  }
+  return maxSeason;
+}
+
+// Home should always jump to most recent season
+function goToMostRecentSeasonHome(){
+  const latest = getHighestVisitedSeason();
+
+  if (latest && latest !== CURRENT_SEASON) {
+    window.location.href = `index.html?s=${latest}`;
+    return;
+  }
+
+  if (seasonIsComplete() && puzzles.length > 0) {
+    showSeasonSplash();
+  } else {
+    showHome();
+  }
+}
+
+// Home button always uses goToMostRecentSeasonHome
+homeBtn.addEventListener('click', goToMostRecentSeasonHome);
 homeBtn.addEventListener('keydown', (e)=>{
-  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); showHome(); }
+  if (e.key === 'Enter' || e.key === ' ') {
+    e.preventDefault();
+    goToMostRecentSeasonHome();
+  }
 });
 
 // History button
@@ -619,19 +636,23 @@ if (historyBtn) {
   });
 }
 
-// History season buttons: load other seasons, stay on history view
+// History season buttons: load other seasons, then return to History once
 if (historySeasonButtons && historySeasonButtons.length){
   historySeasonButtons.forEach(btn=>{
     btn.addEventListener('click', ()=>{
-      if (btn.style.display === "none") return; // hidden seasons are not usable
+      if (btn.style.display === "none") return;
       const s = Number(btn.dataset.season || "1");
       if (!s || s === CURRENT_SEASON) {
         renderHistoryGrid();
         markActiveHistorySeasonButton();
         return;
       }
-      // reload with view=history so we land back on the history screen
-      window.location.href = `index.html?s=${s}&view=history`;
+      try {
+        if (window.sessionStorage) {
+          sessionStorage.setItem(HISTORY_FLAG_KEY, "1");
+        }
+      } catch(e) {}
+      window.location.href = `index.html?s=${s}`;
     });
   });
 }
@@ -761,8 +782,6 @@ modalNext.addEventListener("click", ()=>{
   levelModal.classList.remove('show');
   levelLabel.setAttribute('aria-expanded','false');
 
-  // If this modal represents a finished season and a next season exists,
-  // go to the next season URL instead of the next level.
   if (lastModalWasFinal) {
     if (HAS_NEXT_SEASON && NEXT_SEASON_URL) {
       window.location.href = NEXT_SEASON_URL;
@@ -770,7 +789,6 @@ modalNext.addEventListener("click", ()=>{
     return;
   }
 
-  // Otherwise behave as normal: move to the next level block
   const { end } = levelRange(lvl);
   const nextIndex = Math.min(end + 1, puzzles.length - 1);
   fadeTransitionTo(nextIndex);
@@ -779,7 +797,6 @@ modalNext.addEventListener("click", ()=>{
 });
 
 function resetAllProgressAndGoToSeason1(){
-  // remove all season save slots for this game
   try{
     const keys = [];
     for (let i = 0; i < localStorage.length; i++){
@@ -840,14 +857,10 @@ function resetState(){try{localStorage.removeItem(LS_KEY);}catch(e){} Object.ass
 
 // Main init
 function init(){
-  const params = new URLSearchParams(window.location.search || "");
-  const viewParam = (params.get("view") || "").toLowerCase();
-
   CURRENT_SEASON = (typeof window !== "undefined" && window.PP_SEASON) ? window.PP_SEASON : 1;
   NEXT_SEASON_URL = (typeof window !== "undefined" && window.PP_NEXT_SEASON_URL) ? window.PP_NEXT_SEASON_URL : "";
   HAS_NEXT_SEASON = !!NEXT_SEASON_URL;
 
-  // Lock LS key per season
   LS_KEY = BASE_LS_KEY + "_s" + CURRENT_SEASON;
 
   loadState();
@@ -862,17 +875,24 @@ function init(){
   renderPuzzle();
   updateLevelLabels();
 
-  // Apply "only completed seasons" rule to history buttons
   updateHistorySeasonButtonsVisibility();
   markActiveHistorySeasonButton();
 
-  // choose initial view
-  if (viewParam === "history") {
+  let startInHistory = false;
+  try {
+    if (window.sessionStorage && sessionStorage.getItem(HISTORY_FLAG_KEY) === "1") {
+      startInHistory = true;
+      sessionStorage.removeItem(HISTORY_FLAG_KEY);
+    }
+  } catch(e) {}
+
+  if (startInHistory) {
     showHistory();
   } else {
-    showHome();
     if (seasonIsComplete() && puzzles.length > 0) {
       showSeasonSplash();
+    } else {
+      showHome();
     }
   }
 }
