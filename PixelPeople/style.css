@@ -103,13 +103,18 @@ button#next.active{background:#123524;border-color:#1e4d32;color:#b7ffd1;}
 .logo-type{font-size:22px;font-weight:800;letter-spacing:.3px;}
 .home-current{display:grid;gap:8px;justify-items:center; color: var(--font); padding-top: 15px;} 
 .home-number{font-size:28px;font-weight:800;color: var(--font);}
-.home-art{aspect-ratio:1/1;position:relative;overflow:hidden;width:100%;max-width:150px;margin-top: -95px; margin-bottom: 15px;}
+.home-art{aspect-ratio:1/1;position:relative;overflow:hidden;width:100%;max-width:150px;margin-top: -105px; margin-bottom: 5px;}
 .home-art img{position:absolute;inset:0;width:90%;height:90%;padding:5%;object-fit:contain;margin:auto;}
 .home-actions{display:grid;gap:10px;justify-items:center;}
 .home-actions button{width: 230px;border-radius:4px; background-color: #1A1A1A;font-weight: 500; border: 1px solid #414141;box-shadow: 0px 2px 0px 0px rgba(169,232,122,1);-webkit-box-shadow: 0px 2px 0px 0px rgba(169,232,122,1);-moz-box-shadow: 0px 2px 0px 0px rgba(169,232,122,1); }
 .home-actions button:hover{background-color: #272728;}
 .btn-link{display:inline-block;text-align:center;padding:8px 14px;border-radius:4px;background:#D2FE50;font-weight: 500;color:var(--panel);text-decoration:none;border:0;font-weight: 600;width: 200px;border: 1px solid #D2FE50;box-shadow: 0px 2px 0px 0px rgba(122,181,80,1);-webkit-box-shadow: 0px 2px 0px 0px rgba(122,181,80,1);-moz-box-shadow: 0px 2px 0px 0px rgba(122,181,80,1); }
 .btn-link:hover{background-color: #DBFE71;}
+
+/* Limit artbox height on mobile screens */
+@media (max-height: 767px) {
+  .home-card{height: auto;padding-bottom: 60px;}
+}
 
 /* TOP BAR */
 #levelLabel {
