@@ -8,6 +8,8 @@ html,body{height:100%;margin:0;background:var(--bg);color:#e9edf4;font:16px/1.4 
 .wrap{max-width:520px;margin:0px auto;padding:0px;}
 header{display:none}
 
+.bmc-btn {font-size: 21px!important;}
+
 button{
   appearance:none;border:1px solid #222838;border-radius:8px;
   padding:10px 14px;background:#171a21;color:#e9edf4;font-size:16px;
@@ -262,6 +264,9 @@ button#next.active{background:#123524;border-color:#1e4d32;color:#b7ffd1;}
   /* no own scrollbar, use page scroll */
   margin-top:4px;
   padding-right:0;
+}
+.history-blurb{
+  margin-bottom: 15px;
 }
 .history-grid{
   margin-bottom:4px;

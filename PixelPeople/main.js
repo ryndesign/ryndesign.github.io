@@ -14,7 +14,7 @@ let HAS_NEXT_SEASON = false;
 // LS key will be updated in init()
 let LS_KEY = BASE_LS_KEY + "_s1";
 
-const COFFEE_URL = "https://buymeacoffee.com/pixelpeople"; // change to your real link
+const COFFEE_URL = "https://buymeacoffee.com/ryndesign"; // change to your real link
 
 const HISTORY_FLAG_KEY = "pp_startInHistory";
 
