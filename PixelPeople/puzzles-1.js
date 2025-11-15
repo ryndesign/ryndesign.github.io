@@ -12,7 +12,7 @@ window.LIVE_PUZZLES = [
 // LEVEL 1
   { image:"images/1.png",  name:"Michael Jackson", hint:"Beat It, Thriller, Billie Jean",
     answers:["MJ","Michael","Jackson"], bonus:"King of Pop" },
-  /*   
+   
   { image:"images/2.png",  name:"Hulk Hogan", hint:"Hulkamania, red and yellow",
     answers:["Hogan","The Hulkster","Hollywood Hogan"], bonus:"Terry Bollea" },
 
@@ -329,7 +329,7 @@ window.LIVE_PUZZLES = [
 
   { image:"images/100.png", name:"Cast Away", hint:"Wilson volleyball",
     answers:["Castaway","Tom Hanks Cast Away","Chuck Noland"], bonus:"Name" },
-    */
+  
 ];
 
 /* Load Season 2 
@@ -341,4 +341,4 @@ Steps to adding a new season.
 
 window.PP_SEASON = 1;
 window.PP_GLOBAL_OFFSET = 0;
-window.PP_NEXT_SEASON_URL = "index.html?s=2";
+//window.PP_NEXT_SEASON_URL = "index.html?s=2";
