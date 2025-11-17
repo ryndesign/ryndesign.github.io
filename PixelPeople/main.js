@@ -663,9 +663,7 @@ homePlay.addEventListener('click', showGame);
 // How To Play modal from Home
 homeHowTo.addEventListener('click', ()=>{
   howToModal.classList.add('show');
-  setTimeout(()=>{ howToOk.focus(); },0);
 });
-howToOk.addEventListener('click', ()=> howToModal.classList.remove('show'));
 howToCloseX.addEventListener('click', ()=> howToModal.classList.remove('show'));
 
 // Share from Home
