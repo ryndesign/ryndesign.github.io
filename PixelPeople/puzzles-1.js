@@ -31,10 +31,10 @@ window.LIVE_PUZZLES = [
   { image:"images/7.png",  name:"Scream", hint:"1996 American slasher film",
     answers:["Killer"], bonus:"Ghostface" },
 
-  { image:"images/8.png",  name:"Buzz Lightyear", hint:"To infinity and beyond",
-    answers:["Buzz","Lightyear"], bonus:"Toy Story" },
+  { image:"images/8.png",  name:"Buzz Lightyear", hint:"Disney–Pixar",
+    answers:["Buzz","Lightyear"], bonus:"To infinity and beyond" },
 
-  { image:"images/9.png",  name:"Deadpool", hint:"Fourth wall breaks, red suit",
+  { image:"images/9.png",  name:"Deadpool", hint:"Superhuman healing",
     answers:["Dead Pool","Wade"], bonus:"Wade Wilson" },
 
  //LEVEL 2
@@ -42,11 +42,11 @@ window.LIVE_PUZZLES = [
   { image:"images/10.png", name:"Borat", hint:"Kazakhstan journalist",
     answers:["Sagdiyev"], bonus:"Very Nice" },
 
-  { image:"images/11.png", name:"Beyonce", hint:"Single Ladies, Formation",
+  { image:"images/11.png", name:"Beyonce", hint:"All the Single Ladies",
     answers:["Bey"], bonus:"Queen Bey" },
 
   { image:"images/12.png", name:"WALL-E", hint:"Trash compacting robot in space",
-    answers:["WALL E","WALLE","Wall E","Wall-E"], bonus:"2805" },
+    answers:["WALL E","WALLE","Wall E","Wall-E"], bonus:"Axiom" },
 
   { image:"images/13.png", name:"Michael Jordan", hint:"Air 23, Chicago Bulls",
     answers:["MJ","Air Jordan","Jordan","Mike Jordan"], bonus:"The Goat" },
@@ -55,7 +55,7 @@ window.LIVE_PUZZLES = [
     answers:["Fett"], bonus:"Mandalorian" },
 
   { image:"images/15.png", name:"Vanilla Ice", hint:"Ice Ice Baby",
-    answers:["Ice","Vanilla"], bonus:"Robert Van Winkle" },
+    answers:["Ice","Vanilla"], bonus:"Rob Van Winkle" },
 
   { image:"images/16.png", name:"Steve Jobs", hint:"Black turtleneck, Apple",
     answers:["Jobs","Steven Jobs"], bonus:"Macintosh" },
@@ -63,272 +63,240 @@ window.LIVE_PUZZLES = [
   { image:"images/17.png", name:"Mr. T", hint:"I pity the fool",
     answers:["Mister T","Mr T"], bonus:"BA Baracus" },
 
-  { image:"images/18.png", name:"Gizmo", hint:"Cute Mogwai, no water",
+  { image:"images/18.png", name:"Gizmo", hint:"No water, No eating after midnight",
     answers:["Gremlins"], bonus:"Mogwai" },
    
 // LEVEL 3
 
-  { image:"images/19.png", name:"Flavor Flav", hint:"Giant clock necklace",
-    answers:["Flav","Flavor Flave"], bonus:"Public Enemy" },
+  { image:"images/19.png", name:"Flavor Flav", hint:"Public Enemy",
+    answers:["Flav","Flavor Flave"], bonus:"Yeah, boyeeeeee!" },
 
   { image:"images/20.png", name:"Forrest Gump", hint:"Box of chocolates",
     answers:["Forest Gump","Forrest", "Gump"], bonus:"Jenny" },
 
   { image:"images/21.png", name:"Charizard", hint:"Final form of Charmander",
-    answers:["Charzard","Lizardon"], bonus:"Name" },
+    answers:["Charzard", "Pokemon"], bonus:"Lizardon" },
 
   { image:"images/22.png", name:"Mister Rogers", hint:"Cardigan and sneakers",
-    answers:["Mr Rogers","Fred Rogers","Mr. Rogers","Mister Rogers"], bonus:"Name" },
+    answers:["Mr Rogers","Fred Rogers","Mr. Rogers","Mister Rogers"], bonus:"Won't you be my neighbor" },
 
   { image:"images/23.png", name:"The Goonies", hint:"Never say die",
-    answers:["Goonies"], bonus:"Name" },
+    answers:["Goonies", "Chunk"], bonus:"Sloth" },
 
-  { image:"images/24.png", name:"Jake The Snake Roberts", hint:"Damien python",
-    answers:["Jake Roberts","The Snake","Jack The Snake"], bonus:"Name" },
+  { image:"images/24.png", name:"Jake The Snake Roberts", hint:"90s Wrestler",
+    answers:["Jake Roberts","The Snake","Jack The Snake"], bonus:"DDT" },
 
   { image:"images/25.png", name:"Marty McFly", hint:"88 mph DeLorean",
-    answers:["Marty","McFly"], bonus:"Name" },
+    answers:["Marty","McFly"], bonus:"Back to the Future" },
 
-  { image:"images/26.png", name:"Prince", hint:"Purple Rain, The Artist",
-    answers:["The Artist","TAFKAP","Prince Rogers Nelson","Symbol"], bonus:"Name" },
+  { image:"images/26.png", name:"Prince", hint:"Purple Rain",
+    answers:["The Artist"], bonus:"Symbol" },
 
   { image:"images/27.png", name:"Vladimir Guerrero Jr.", hint:"Blue Jays slugger",    
     answers:["Vladdy Jr","Vlad Jr","Guerrero Jr","Vladdy"], bonus:"Daaa Yankess Lose" },
 
 // LEVEL 4
 
-  { image:"images/28.png", name:"Ewok", hint:"Forest moon of Endor",
-    answers:["Ewoks","Wicket"], bonus:"Name" },
+  { image:"images/28.png", name:"Ewoks", hint:"Return of the Jedi",
+    answers:["Ewok", "Star Wars"], bonus:"Wicket" },
 
   { image:"images/29.png", name:"The Terminator", hint:"I’ll be back",
-    answers:["Terminator","T 800","T800","T-800","Arnold Terminator"], bonus:"Name" },
+    answers:["Terminator"], bonus:"Schwarzenegger" },
 
   { image:"images/30.png", name:"Donnie Darko", hint:"Frank the rabbit",
-    answers:["Donny Darko","Donnie"], bonus:"Name" },
+    answers:["Donny Darko","Donnie"], bonus:"Sleepwalking" },
 
-  { image:"images/31.png", name:"Macho Man", hint:"Oooh yeah",
-    answers:["Randy Savage","Macho Man Randy Savage","Randy Poffo"], bonus:"Name" },
+  { image:"images/31.png", name:"Macho Man", hint:"Snap into a slim jim",
+    answers:["Randy Savage","Randy Poffo"], bonus:"Miss Elizabeth" },
 
-  { image:"images/32.png", name:"Joker", hint:"Clown prince of crime",
-    answers:["The Joker"], bonus:"Name" },
+  { image:"images/32.png", name:"Joker", hint:"Why so serious?",
+    answers:["The Joker"], bonus:"Heath Ledger" },
 
   { image:"images/33.png", name:"Wayne’s World", hint:"Party time, excellent",
-    answers:["Waynes World","Wayne Campbell","Garth Algar","Wayne and Garth"], bonus:"Name" },
+    answers:["Waynes World","Wayne and Garth"], bonus:"Shwing" },
 
-  { image:"images/34.png", name:"Eleven", hint:"Stranger Things telekinesis",
-    answers:["El","Jane Hopper","Jane Ives","Stranger Things Eleven","11"], bonus:"Name" },
+  { image:"images/34.png", name:"Eleven", hint:"Telekinesis, Netflix",
+    answers:["El","Stranger Things"], bonus:"Millie Bobby Brown" },
 
-  { image:"images/35.png", name:"Louis C.K.", hint:"Stand-up comic, FX series",
-    answers:["Louis CK","Louis CKay","Louis Székely","Louis Szekely"], bonus:"Name" },
+  { image:"images/35.png", name:"Louis CK", hint:"Stand-up comic",
+    answers:["Louis"], bonus:"Emmy Award" },
 
   { image:"images/36.png", name:"Ghostbusters", hint:"Who you gonna call",
-    answers:["Ray Stantz","Peter Venkman","Egon Spengler","Winston Zeddemore"], bonus:"Name" },
+    answers:["Ray","Peter","Egon","Winston"], bonus:"Slimer" },
 
 // LEVEL 5
 
   { image:"images/37.png", name:"The Rock", hint:"If you smell",
-    answers:["Dwayne Johnson","Rock"], bonus:"Name" },
+    answers:["Dwayne Johnson","Rock"], bonus:"Jumanji" },
 
-  { image:"images/38.png", name:"Jon Snow", hint:"Knows nothing",
-    answers:["John Snow","Aegon Targaryen","Lord Snow"], bonus:"Name" },
+  { image:"images/38.png", name:"Jon Snow", hint:"Winter is coming",
+    answers:["John Snow","Lord Snow"], bonus:"White Walkers" },
 
-  { image:"images/39.png", name:"Free Guy", hint:"NPC becomes hero",
-    answers:["Guy","Ryan Reynolds Free Guy"], bonus:"Name" },
+  { image:"images/39.png", name:"Free Guy", hint:"Open world video game",
+    answers:["Guy","Ryan Reynolds"], bonus:"NPC" },
 
   { image:"images/40.png", name:"Wreck-It Ralph", hint:"Fix-It Felix",
-    answers:["Wreck it Ralph","Wreckit Ralph","Ralph"], bonus:"Name" },
+    answers:["Wreck it Ralph","Wreckit Ralph","Ralph"], bonus:"Hero's Duty" },
 
   { image:"images/41.png", name:"Big Bird", hint:"Sesame Street",
-    answers:["BigBird"], bonus:"Name" },
+    answers:["BigBird"], bonus:"Snuffleupagus" },
 
-  { image:"images/42.png", name:"John Wick", hint:"Baba Yaga, the boogeyman",
-    answers:["Wick","Keanu Wick"], bonus:"Name" },
+  { image:"images/42.png", name:"John Wick", hint:"A legendary hitman",
+    answers:["Wick","Keanu"], bonus:"The Boogeyman" },
 
-  { image:"images/43.png", name:"Jimi Hendrix", hint:"Purple Haze",
-    answers:["Hendrix","James Marshall Hendrix"], bonus:"Name" },
+  { image:"images/43.png", name:"Jimi Hendrix", hint:"Greatest guitarists of all time",
+    answers:["Hendrix", "Jim Hendriz"], bonus:"All along the watchtower" },
 
-  { image:"images/44.png", name:"Teen Wolf", hint:"High school werewolf",
-    answers:["Scott Howard","Michael J Fox Teen Wolf"], bonus:"Name" },
+  { image:"images/44.png", name:"Teen Wolf", hint:"High school basketball team",
+    answers:["Michael J Fox"], bonus:"Werewolf" },
 
-  { image:"images/45.png", name:"Venom", hint:"Symbiote",
-    answers:["Eddie Brock","Lethal Protector"], bonus:"Name" },
+  { image:"images/45.png", name:"Venom", hint:"2018 Superhero film",
+    answers:["Vennom"], bonus:"Lethal Protector" },
 
 // LEVEL 6
 
-  { image:"images/46.png", name:"Vegeta", hint:"Prince of all Saiyans",
-    answers:["Prince Vegeta","Saiyan Prince"], bonus:"Name" },
+  { image:"images/46.png", name:"Vegeta", hint:"Dragon Ball Z",
+    answers:["Prince Vegeta","Saiyan"], bonus:"Galick Gun" },
 
   { image:"images/47.png", name:"Scorpion", hint:"Get over here",
-    answers:["Hanzo Hasashi","Mortal Kombat Scorpion"], bonus:"Name" },
+    answers:["Mortal Kombat"], bonus:"Hanzo Hasashi" },
 
-  { image:"images/48.png", name:"Keyser Söze", hint:"Unreliable narrator",
-    answers:["Keyser Soze","The Usual Suspects","Soze"], bonus:"Name" },
+  { image:"images/48.png", name:"Verbal", hint:"Kevin Spacey",
+    answers:["The Usual Suspects","Soze"], bonus:"Keyser Soze" },
 
-  { image:"images/49.png", name:"Top Gun", hint:"Naval aviators",
-    answers:["Maverick","Pete Mitchell","Tom Cruise Maverick"], bonus:"Name" },
+  { image:"images/49.png", name:"Top Gun", hint:"Mvie was released on May 16, 1986",
+    answers:["Maverick"], bonus:"Goose" },
 
   { image:"images/50.png", name:"Stripe", hint:"Gremlins villain",
-    answers:["Gremlins Stripe"], bonus:"Name" },
+    answers:["Gremlins"], bonus:"The Spider Gremlin" },
 
-  { image:"images/51.png", name:"Wolverine", hint:"Adamantium claws",
-    answers:["Logan","James Howlett","X-Men Wolverine","Xmen"], bonus:"Name" },
+  { image:"images/51.png", name:"Wolverine", hint:"Claws",
+    answers:["Logan","X-Men","Xmen"], bonus:"Sabretooth" },
 
-  { image:"images/52.png", name:"Alvin", hint:"High pitched singer",
-    answers:["Alvin and the Chipmunks","Chipmunks","Alvin Seville"], bonus:"Name" },
+  { image:"images/52.png", name:"Alvin", hint:"Simon, Theodore",
+    answers:["Alvin and the Chipmunks","Chipmunks"], bonus:"Dave Seville" },
 
   { image:"images/53.png", name:"Fresh Prince", hint:"West Philadelphia born and raised",
-    answers:["The Fresh Prince","Will Smith","Fresh Prince of Bel Air","Bel-Air"], bonus:"Name" },
+    answers:["The Fresh Prince", "Fresh Prince of Bel Air","Bel-Air"], bonus:"Carlton" },
 
-  { image:"images/54.png", name:"Mike Tyson", hint:"Heavyweight champ, Punch-Out",
-    answers:["Michael Tyson","Iron Mike","Kid Dynamite"], bonus:"Name" },
+  { image:"images/54.png", name:"Mike Tyson", hint:"Heavyweight champ",
+    answers:["Tyson","Iron Mike"], bonus:"Punch-Out" },
 
 // LEVEL 7
 
-  { image:"images/55.png", name:"Peppa Pig", hint:"British preschool icon",
-    answers:["Peppa"], bonus:"Name" },
+  { image:"images/55.png", name:"Peppa Pig", hint:"Children's TV Show",
+    answers:["Peppa"], bonus:"Neville Astley" },
 
   { image:"images/56.png", name:"He-Man", hint:"By the power of Grayskull",
-    answers:["He Man","Prince Adam"], bonus:"Name" },
+    answers:["He Man"], bonus:"Prince Adam" },
 
   { image:"images/57.png", name:"Freddie Mercury", hint:"Bohemian Rhapsody",
-    answers:["Freddy Mercury","Farrokh Bulsara","Queen"], bonus:"Name" },
+    answers:["Freddy Mercury"], bonus:"Queen" },
 
   { image:"images/58.png", name:"Fat Albert", hint:"Hey hey hey",
-    answers:["FatAlbert"], bonus:"Name" },
+    answers:["FatAlbert"], bonus:"Bill Cosby" },
 
-  { image:"images/59.png", name:"Eminem", hint:"Slim Shady",
-    answers:["Marshall Mathers","Slim Shady","M and M"], bonus:"Name" },
+  { image:"images/59.png", name:"Eminem", hint:"My Name Is",
+    answers:["Slim Shady", "MM"], bonus:"Marshall Mathers" },
 
-  { image:"images/60.png", name:"Elton John", hint:"Rocket Man",
-    answers:["Sir Elton John","Reginald Dwight","Reggie Dwight"], bonus:"Name" },
+  { image:"images/60.png", name:"Elton John", hint:"British singer, songwriter and pianist",
+    answers:["Sir Elton John"], bonus:"Rocket Man" },
 
-  { image:"images/61.png", name:"Bruce Lee", hint:"Jeet Kune Do",
-    answers:["Lee Jun Fan"], bonus:"Name" },
+  { image:"images/61.png", name:"Bruce Lee", hint:"Hong Kong-American martial artist",
+    answers:["Bruce", "Lee"], bonus:"Lee Jun Fan" },
 
   { image:"images/62.png", name:"Bugs Bunny", hint:"What’s up, Doc",
-    answers:["Bugs","Looney Tunes Bugs"], bonus:"Name" },
+    answers:["Bugs"], bonus:"Yosemite Sam" },
 
-  { image:"images/63.png", name:"Home Alone", hint:"Wet Bandits",
-    answers:["Kevin McCallister","Kevin"], bonus:"Name" },
+  { image:"images/63.png", name:"Home Alone", hint:"I made my family disappear",
+    answers:["Kevin McCallister","Kevin"], bonus:"Wet Bandits" },
 
 // LEVEL 8
 
-  { image:"images/64.png", name:"Jason Voorhees", hint:"Hockey mask",
-    answers:["Jason","Voorhees"], bonus:"Name" },
+  { image:"images/64.png", name:"Jason", hint:"Hockey mask",
+    answers:["Halloween"], bonus:"Voorhees" },
 
-  { image:"images/65.png", name:"Avatar", hint:"Blue Na’vi on Pandora",
-    answers:["James Cameron Avatar","Na’vi","Navi"], bonus:"Name" },
+  { image:"images/65.png", name:"Avatar", hint:"James Cameron Movie",
+    answers:["Navi"], bonus:"Pandora" },
 
-  { image:"images/66.png", name:"Jean Grey", hint:"Phoenix Force",
-    answers:["Marvel Girl","Phoenix","Dark Phoenix","Jean Gray"], bonus:"Name" },
+  { image:"images/66.png", name:"Jean Grey", hint:"Marvel",
+    answers:["X-men","Phoenix","Jean Gray"], bonus:"Dark Phoenix" },
 
   { image:"images/67.png", name:"Lion-O", hint:"Thundercats leader",
-    answers:["Liono","Thundercats Lion-O"], bonus:"Name" },
+    answers:["Liono"], bonus:"Lord of the ThunderCats" },
 
-  { image:"images/68.png", name:"Indiana Jones", hint:"It belongs in a museum",
-    answers:["Indy","Dr. Jones","Henry Jones Jr","Indiana"], bonus:"Name" },
+  { image:"images/68.png", name:"Indiana Jones", hint:"Temple of Doom",
+    answers:["Indy","Dr. Jones"], bonus:"George Lucas" },
 
   { image:"images/69.png", name:"Barney", hint:"Purple dinosaur",
-    answers:["Barney the Dinosaur"], bonus:"Name" },
+    answers:["Barney and Friends"], bonus:"PBS" },
 
-  { image:"images/70.png", name:"Carrot Top", hint:"Prop comic, red hair",
-    answers:["Scott Thompson","Prop Comedian"], bonus:"Name" },
+  { image:"images/70.png", name:"Carrot Top", hint:"Prop Comic",
+    answers:["Scott Thompson"], bonus:"Red Head" },
 
   { image:"images/71.png", name:"Predator", hint:"Thermal vision hunter",
-    answers:["Yautja","The Predator"], bonus:"Name" },
+    answers:["The Predator"], bonus:"Dutch" },
 
   { image:"images/72.png", name:"Batman", hint:"Dark Knight",
-    answers:["Bruce Wayne","The Batman"], bonus:"Name" },
+    answers:["The Batman"], bonus:"Bruce Wayne" },
 
 // LEVEL 9
 
   { image:"images/73.png", name:"Clint Eastwood", hint:"Make my day",
-    answers:["Eastwood"], bonus:"Name" },
+    answers:["Eastwood"], bonus:"Dirty Harry" },
 
-  { image:"images/74.png", name:"Kermit the Frog", hint:"Rainbow Connection",
-    answers:["Kermit","Muppets Kermit"], bonus:"Name" },
+  { image:"images/74.png", name:"Kermit the Frog", hint:"It's not easy being green",
+    answers:["Kermit","Muppets"], bonus:"Jim Henson" },
 
   { image:"images/75.png", name:"She-Ra", hint:"Princess of Power",
-    answers:["She Ra","Adora"], bonus:"Name" },
+    answers:["She Ra"], bonus:"Adora" },
 
-  { image:"images/76.png", name:"Captain Picard", hint:"Make it so",
-    answers:["Jean Luc Picard","Jean-Luc Picard","Picard","Captain Jean Luc Picard"], bonus:"Name" },
+  { image:"images/76.png", name:"Captain Picard", hint:"Officer of the USS Enterprise",
+    answers:["Picard","Jean-Luc", "Captain"], bonus:"Patrick Stewart" },
 
-  { image:"images/77.png", name:"Oprah", hint:"Daytime talk icon",
-    answers:["Oprah Winfrey","Winfrey"], bonus:"Name" },
+  { image:"images/77.png", name:"Oprah", hint:"Daytime talk show icon",
+    answers:["Oprah Winfrey","Winfrey"], bonus:"You Get a Car" },
 
-  { image:"images/78.png", name:"Say Anything", hint:"Boombox serenade",
-    answers:["Lloyd Dobler","John Cusack Boombox"], bonus:"Name" },
+  { image:"images/78.png", name:"MrBeast", hint:"Famous YouTuber",
+    answers:["Mr Beast","Mr. Beast"], bonus:"Jimmy" },
 
-  { image:"images/79.png", name:"Rambo", hint:"Green beret, bandana",
-    answers:["John Rambo","First Blood"], bonus:"Name" },
+  { image:"images/79.png", name:"Rambo", hint:"Series of action movies",
+    answers:["First Blood"], bonus:"Sylvester Stallone" },
 
   { image:"images/80.png", name:"Homer Simpson", hint:"D’oh",
-    answers:["Homer","Simpson","Homer J Simpson"], bonus:"Name" },
+    answers:["Homer","Simpson","Homer J Simpson"], bonus:"Springfield" },
 
   { image:"images/81.png", name:"Optimus Prime", hint:"Autobots roll out",
-    answers:["Prime","Transformers Optimus"], bonus:"Name" },
+    answers:["Prime","Transformers"], bonus:"Decepticons" },
 
 // LEVEL 10
 
-  { image:"images/82.png", name:"Die Hard", hint:"Yippee ki yay",
-    answers:["John McClane","McClane","Bruce Willis Die Hard"], bonus:"Name" },
+  { image:"images/82.png", name:"Die Hard", hint:"Yippee Ki Yay",
+    answers:["John McClane","McClane"], bonus:"Christmas Movie" },
 
-  { image:"images/83.png", name:"Eric Cartman", hint:"Respect my authority",
-    answers:["Cartman"], bonus:"Name" },
+  { image:"images/83.png", name:"Cartman", hint:"I'm not fat, I'm big-boned!",
+    answers:["Eric Cartman", "South Park"], bonus:"Kyle Broflovski" },
 
   { image:"images/84.png", name:"Madonna", hint:"Material Girl",
-    answers:["Madonna Ciccone","Queen of Pop"], bonus:"Name" },
+    answers:["Queen of Pop"], bonus:"Vogue" },
 
-  { image:"images/85.png", name:"Yoda", hint:"Do or do not",
-    answers:["Master Yoda"], bonus:"Name" },
+  { image:"images/85.png", name:"Yoda", hint:"Do or do not. There is no try",
+    answers:["Star Wars"], bonus:"Jedi Master" },
 
   { image:"images/86.png", name:"Tiger Woods", hint:"Green jacket",
-    answers:["Eldrick Woods","Eldrick T Woods"], bonus:"Name" },
+    answers:["Tiger"], bonus:"Eldrick Woods" },
 
   { image:"images/87.png", name:"Elon Musk", hint:"SpaceX and Tesla",
-    answers:["Musk"], bonus:"Name" },
+    answers:["Musk", "Elon"], bonus:"X" },
 
   { image:"images/88.png", name:"Iron Man", hint:"Genius billionaire",
-    answers:["Tony Stark","Anthony Stark","Mk 3","Mark 3"], bonus:"Name" },
+    answers:["Avengers"], bonus:"Tony Stark" },
 
-  { image:"images/89.png", name:"Billie Eilish", hint:"Bad Guy",
-    answers:["Eilish","Billie"], bonus:"Name" },
+  { image:"images/89.png", name:"Billie Eilish", hint:"American singer-songwriter",
+    answers:["Eilish","Billie"], bonus:"Finneas" },
 
-  { image:"images/90.png", name:"Justin Bieber", hint:"Baby, Peaches",
-    answers:["Bieber","JB"], bonus:"Name" },
-
-// LEVEL 1 - SEASEON 2
-
-  { image:"images/91.png", name:"Pluto", hint:"Disney dog",
-    answers:["Mickey’s dog","Mickeys dog"], bonus:"Name" },
-
-  { image:"images/92.png", name:"Breaking Bad", hint:"Blue meth teacher",
-    answers:["Walter White","Heisenberg"], bonus:"Name" },
-
-  { image:"images/93.png", name:"Baymax", hint:"Healthcare companion",
-    answers:["Big Hero 6 Baymax"], bonus:"Name" },
-
-  { image:"images/94.png", name:"Up", hint:"House with balloons",
-    answers:["Carl Fredricksen","Carl"], bonus:"Name" },
-
-  { image:"images/95.png", name:"Mike Wazowski", hint:"One-eyed monster",
-    answers:["Wazowski","Monsters Inc Mike"], bonus:"Name" },
-
-  { image:"images/96.png", name:"Knight Rider", hint:"Talking car",
-    answers:["KITT","Michael Knight","David Hasselhoff"], bonus:"Name" },
-
-  { image:"images/97.png", name:"Happy Gilmore", hint:"Hockey slapshot golf",
-    answers:["Happy Gilmour","Adam Sandler Happy"], bonus:"Name" },
-
-  { image:"images/98.png", name:"Howard Stern", hint:"Radio shock jock",
-    answers:["Stern","Howard Allan Stern"], bonus:"Name" },
-
-  { image:"images/99.png", name:"Andre Agassi", hint:"Tennis rebel",
-    answers:["Agassi","Andre Kirk Agassi"], bonus:"Name" },
-
-  { image:"images/100.png", name:"Cast Away", hint:"Wilson volleyball",
-    answers:["Castaway","Tom Hanks Cast Away","Chuck Noland"], bonus:"Name" },
+  { image:"images/90.png", name:"Justin Bieber", hint:"Canadian singer",
+    answers:["Bieber","JB"], bonus:"Drew" },
   
 ];
 

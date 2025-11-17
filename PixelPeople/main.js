@@ -418,7 +418,7 @@ function handleGuess(){
     saveState();
 
     if (kind === "bonus" && !State.hintsUsed[idx]) {
-      showResult(`Bonus found. ${p.name} (+${points})`,"good");
+      showResult(`Bonus Found! ${p.name} (+${points})`,"good");
     } else if (kind === "answer" && !State.hintsUsed[idx]) {
       showResult(`Accepted. ${p.name} (+${points})`,"good");
     } else if (kind === "name" && !State.hintsUsed[idx]) {
