@@ -6,6 +6,17 @@ const toNormCompare = s => normalize(s).replace(/\s+/g, "");
 // Local storage key base and season info
 const BASE_LS_KEY = "pp_state_scoring_bonuswords_1_13_0";
 
+/**
+ * Google Analytics event helper.
+ * Safe to call even if GA is not loaded.
+ */
+function trackEvent(name, params = {}) {
+  if (typeof window !== "undefined" && typeof window.gtag === "function") {
+    window.gtag("event", name, params);
+  }
+}
+
+
 // these get filled once the puzzle file has run
 let CURRENT_SEASON = 1;
 let NEXT_SEASON_URL = "";
@@ -417,8 +428,18 @@ function handleGuess(){
     State.score += points;
     saveState();
 
+    trackEvent("puzzle_solved", {
+      season: CURRENT_SEASON,
+      puzzle_index: idx + 1,
+      global_puzzle: (window.PP_GLOBAL_OFFSET || 0) + idx + 1,
+      kind,
+      used_hint: !!State.hintsUsed[idx],
+      points_awarded: points,
+      score_after: State.score
+    });
+
     if (kind === "bonus" && !State.hintsUsed[idx]) {
-      showResult(`Bonus Found! ${p.name} (+${points})`,"good");
+      showResult(`Bonus found. ${p.name} (+${points})`,"good");
     } else if (kind === "answer" && !State.hintsUsed[idx]) {
       showResult(`Accepted. ${p.name} (+${points})`,"good");
     } else if (kind === "name" && !State.hintsUsed[idx]) {
@@ -439,8 +460,22 @@ function handleGuess(){
   }else{
     State.guessAttempts[idx] = (State.guessAttempts[idx] || 0) + 1;
     saveState();
+
+    trackEvent("guess_incorrect", {
+      season: CURRENT_SEASON,
+      puzzle_index: idx + 1,
+      attempt: State.guessAttempts[idx]
+    });
+
     if (State.guessAttempts[idx] >= 3) {
       State.givenUp[idx] = true;
+
+      trackEvent("puzzle_auto_revealed", {
+        season: CURRENT_SEASON,
+        puzzle_index: idx + 1,
+        attempts: State.guessAttempts[idx]
+      });
+
       delete State.solved[idx];
       showResult(`Answer: ${puzzles[idx].name}`,"revealed");
       hintBtn.disabled = true; giveup.disabled = true; lockNext(false);
@@ -453,11 +488,23 @@ function handleGuess(){
 }
 
 function handleGiveUp(){
-  const idx=State.current;
-  if(State.solved[idx]||State.givenUp[idx]) return;
-  State.givenUp[idx]=true; saveState();
+  const idx = State.current;
+  if (State.solved[idx] || State.givenUp[idx]) return;
+
+  State.givenUp[idx] = true;
+  saveState();
+
+  trackEvent("puzzle_skipped", {
+    season: CURRENT_SEASON,
+    puzzle_index: idx + 1,
+    global_puzzle: (window.PP_GLOBAL_OFFSET || 0) + idx + 1,
+    attempts: State.guessAttempts[idx] || 0
+  });
+
   showResult(`Answer: ${puzzles[idx].name}`,"revealed");
-  hintBtn.disabled = true; giveup.disabled = true; lockNext(false);
+  hintBtn.disabled = true;
+  giveup.disabled = true;
+  lockNext(false);
   updateLevelLabels();
 }
 
@@ -506,6 +553,13 @@ function showHome(){
     homeArt.src = puzzles[State.current].image;
     homeNum.textContent = String(globalPuzzleNum);
   }
+
+  const globalOffset = window.PP_GLOBAL_OFFSET || 0;
+  trackEvent("view_home", {
+    season: CURRENT_SEASON,
+    puzzle_index: State.current + 1,
+    global_puzzle: globalOffset + State.current + 1
+  });
 }
 
 function showGame(){
@@ -537,6 +591,23 @@ function showSeasonSplash(){
     historyScreen.setAttribute('aria-hidden','true');
   }
   if (historyBtn) historyBtn.setAttribute('aria-expanded','false');
+
+  // Track season completion when splash is shown
+  let solvedCount = 0;
+  let givenUpCount = 0;
+  for (let i = 0; i < State.total; i++) {
+    if (State.solved[i]) solvedCount++;
+    else if (State.givenUp[i]) givenUpCount++;
+  }
+
+  trackEvent("season_complete", {
+    season: CURRENT_SEASON,
+    season_score: State.score,
+    puzzles_total: State.total,
+    puzzles_solved: solvedCount,
+    puzzles_given_up: givenUpCount,
+    global_score: getGlobalGameScore()
+  });
 
   if (seasonSplash) {
     seasonSplash.classList.add('show');
@@ -581,6 +652,10 @@ function showHistory(){
 
   renderHistoryGrid();
   markActiveHistorySeasonButton();
+
+  trackEvent("view_history", {
+    season: CURRENT_SEASON
+  });
 }
 
 // Find most recent season that has a save record
@@ -677,16 +752,37 @@ homeShare.addEventListener('click', async ()=>{
         url
       });
       showResult("Shared successfully.","good");
+
+      trackEvent("share_success", {
+        method: "navigator.share",
+        season: CURRENT_SEASON
+      });
+
     } else if (navigator.clipboard && window.isSecureContext) {
       await navigator.clipboard.writeText(url);
       showResult("Link copied to clipboard.","good");
+
+      trackEvent("share_copied", {
+        method: "clipboard",
+        season: CURRENT_SEASON
+      });
+
     } else {
       const tmp=document.createElement('input');
       tmp.value=url; document.body.appendChild(tmp); tmp.select(); document.execCommand('copy'); document.body.removeChild(tmp);
       showResult("Link copied to clipboard.","good");
+
+      trackEvent("share_copied", {
+        method: "execCommand",
+        season: CURRENT_SEASON
+      });
     }
   }catch{
     showResult("Share canceled.","bad");
+
+    trackEvent("share_canceled", {
+      season: CURRENT_SEASON
+    });
   }
 });
 
@@ -706,7 +802,6 @@ if (seasonHome) {
 if (seasonHowTo) {
   seasonHowTo.addEventListener('click', ()=>{
     howToModal.classList.add('show');
-    setTimeout(()=>{ howToOk.focus(); },0);
   });
 }
 if (seasonShare) {
@@ -762,10 +857,19 @@ confirmYes.addEventListener("click", ()=>{ confirmModal.classList.remove('show')
 
 nextBtn.addEventListener("click",handleNext);
 hintBtn.addEventListener("click", ()=>{
-  const idx=State.current, p=puzzles[idx]; if(!p) return;
-  if(State.solved[idx]||State.givenUp[idx]) return;
-  State.hintsUsed[idx]=true; saveState();
-  const text=p.hint&&p.hint.trim()?p.hint:`Starts with "${(p.name||"").trim().charAt(0)}"`;
+  const idx = State.current, p = puzzles[idx]; if (!p) return;
+  if (State.solved[idx] || State.givenUp[idx]) return;
+
+  State.hintsUsed[idx] = true;
+  saveState();
+
+  trackEvent("hint_used", {
+    season: CURRENT_SEASON,
+    puzzle_index: idx + 1,
+    global_puzzle: (window.PP_GLOBAL_OFFSET || 0) + idx + 1
+  });
+
+  const text = p.hint && p.hint.trim() ? p.hint : `Starts with "${(p.name||"").trim().charAt(0)}"`;
   showResult(`Hint: ${text}`,"revealed");
 });
 
@@ -808,6 +912,11 @@ function resetAllProgressAndGoToSeason1(){
 
 modalReset.addEventListener("click", ()=>{
   if (!confirm('Reset all progress and return to Season 1?')) return;
+
+  trackEvent("reset_all_progress", {
+    season: CURRENT_SEASON
+  });
+
   resetAllProgressAndGoToSeason1();
 });
 
