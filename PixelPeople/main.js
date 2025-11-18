@@ -747,8 +747,8 @@ homeShare.addEventListener('click', async ()=>{
   try{
     if (navigator.share) {
       await navigator.share({
-        title: "Pixel People - Character Guessing Game",
-        text: "Play Now and see how many you can name.",
+        title: "Pixel People - Guess Who?",
+        text: "Play Now! See how many you can name.",
         url
       });
       showResult("Shared successfully.","good");
