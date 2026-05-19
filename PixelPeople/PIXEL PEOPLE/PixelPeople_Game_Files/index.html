@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Pixel People - Guess The Character [MASTER]</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <meta name="build" content="master-1.12.7" />
+  <script src="puzzles.js" defer></script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="wrap">
+    <div class="level-bar">
+      <span class="pill" id="levelLabel" role="button" tabindex="0" aria-controls="levelModal" aria-expanded="false">Level 1</span>
+      <div id="levelCells" class="level-cells"></div>
+      <span class="pill">Score: <strong id="scoreLabel">0</strong></span>
+    </div>
+    <section id="stage" class="stage">
+      <div class="artbox" id="artbox">
+        <img id="art" alt="Character puzzle" src="" />
+        <div class="result-overlay"><div id="result" class="result"></div></div>
+        <button id="hint" class="fab left">Hint</button>
+        <button id="giveup" class="fab right">Skip</button>
+      </div>
+      <div class="col">
+        <div class="guess-row">
+          <input id="guess" type="text" placeholder="Type your guess..." autocomplete="off" inputmode="none" />
+          <button id="next" disabled>Next</button>
+        </div>
+        <div id="kb">
+          <div class="kb-row" id="kb-r1"></div>
+          <div class="kb-row" id="kb-r2"></div>
+          <div class="kb-row" id="kb-r3"></div>
+          <div class="kb-row" id="kb-r4"></div>
+        </div>
+      </div>
+      <div id="levelModal" class="modal" role="dialog" aria-labelledby="modalTitle">
+        <div class="modal-card">
+          <button id="modalReset" class="modal-reset">Reset</button>
+          <button id="modalCloseX" class="modal-close">×</button>
+          <h2 class="modal-title" id="modalTitle">Level 1</h2>
+          <div class="modal-rows">
+            <div class="modal-row"><span>Correct Puzzles</span><strong id="mCorrect">0/10</strong></div>
+            <div class="modal-row"><span>Game Score</span><strong id="mTotal">0</strong></div>
+          </div>
+          <div id="thumbGrid" class="thumb-grid"></div>
+          <div class="modal-actions">
+            <div class="note" id="unlockNote" style="display:none;">Complete all 10 puzzles in this level to unlock next level.</div>
+            <button id="modalNext">Start Next Level</button>
+          </div>
+        </div>
+      </div>
+      <div id="confirmModal" class="modal" role="dialog" aria-labelledby="confirmTitle">
+        <div class="modal-card">
+          <button id="confirmCloseX" class="modal-close">×</button>
+          <h2 class="modal-title" id="confirmTitle">Give Up?</h2>
+          <div class="confirm-text">Are You Sure</div>
+          <div class="modal-actions"><button id="confirmYes">Yes, I Give Up</button></div>
+        </div>
+      </div>
+    </section>
+  </div>
+  <div id="fx-confetti" class="fx-confetti"></div>
+  <script src="main.js"></script>
+</body>
+</html>

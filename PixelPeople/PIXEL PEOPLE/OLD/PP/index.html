@@ -1,0 +1,676 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Pixel People - Guess The Character</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root { --bg:#0f1115; --panel:#171a21; --muted:#8b93a7; --text:#e9edf4; }
+    html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font:16px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;}
+    .wrap{max-width:720px;margin:32px auto;padding:0 16px;}
+    header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px;flex-wrap:wrap}
+    .title{font-weight:700;font-size:22px;letter-spacing:.2px;}
+    button,input[type=text]{appearance:none;border:1px solid #222838;border-radius:10px;padding:10px 14px;background:#171a21;color:#e9edf4;font-size:16px;cursor:pointer}
+    button:disabled{opacity:.6;cursor:not-allowed}
+    button#next.active{background:#123524;border-color:#1e4d32;color:#b7ffd1;}
+
+    /* Stage */
+    .stage{
+      margin-top:18px;
+      background:#171a21;
+      border:1px solid #23293a;
+      border-radius:16px;
+      padding:18px;
+      display:grid;
+      gap:14px;
+    }
+    .artbox{
+      width:100%;
+      max-width:500px;
+      aspect-ratio:1/1;
+      margin:0 auto;
+      background:#ffffff url('pp_bgnd.jpg') center/cover no-repeat;
+      border:1px solid #202636;
+      border-radius:12px;
+      overflow:hidden;
+      position:relative;
+    }
+    .artbox img{
+      position:absolute; inset:0; width:100%; height:100%; object-fit:contain; transition:transform .2s ease;
+    }
+    .col{display:grid;gap:14px;align-content:start}
+    .guess-row{display:grid;grid-template-columns:1fr auto;gap:8px}
+    .result{font-weight:600;padding:10px 12px;border-radius:10px;display:none}
+    .result.show{display:block}
+    .result.good{background:#0f291a;border:1px solid #1e4d32;color:#b7ffd1}
+    .result.bad{background:#2a1416;border:1px solid #5a1e23;color:#ffc3c6}
+    .result.revealed{background:#2a2310;border:1px solid #5a4720;color:#ffe8a1}
+    .progress{height:8px;width:100%;background:#121621;border:1px solid #1d2435;border-radius:999px;overflow:hidden}
+    .progress>div{height:100%;width:0%;background:linear-gradient(90deg,#5ee6a8,#86eefc);transition:width .2s ease}
+
+    /* Level bar */
+    .level-bar{display:flex;align-items:center;gap:12px;color:#8b93a7;font-size:14px;flex-wrap:wrap;justify-content:center;text-align:center}
+    .pill{background:#1b2130;border:1px solid #263048;padding:6px 10px;border-radius:999px}
+    .level-cells{display:flex;gap:4px;align-items:center}
+    .cell{
+      width:10px; height:22px; border-radius:3px;
+      background:#23293a; border:1px solid #2a3246;
+      box-sizing:border-box;
+    }
+    .cell.ok{ background:#0e3a23; border-color:#1e4d32; }
+    .cell.bad{ background:#3a1b1d; border-color:#5a1e23; }
+    .cell.active{ box-shadow:0 0 0 2px #86eefc inset; }
+
+    /* On-screen keyboard */
+    .kb-row{
+      display:flex; justify-content:center; flex-wrap:nowrap;
+      gap:8px; margin-bottom:10px; max-width:500px; margin-left:auto; margin-right:auto;
+    }
+    .kb-key{
+      flex:1; max-width:48px; padding:10px 0;
+      border:1px solid #263048; background:#171a21; border-radius:10px;
+      color:#e9edf4; cursor:pointer; text-align:center; user-select:none; font-size:16px; transition:background .2s;
+    }
+    .kb-key.wide{ flex:1.5; max-width:none; }
+    .kb-key:hover{ background:#1f2637; }
+
+    /* Confetti */
+    .fx-confetti{ position:fixed; inset:0; pointer-events:none; overflow:hidden; z-index:999; }
+    .fx-confetti .piece{
+      position:absolute; top:-10px; left:0; width:var(--w,8px); height:var(--h,14px);
+      background:hsl(var(--hue,0) 90% 60%); border-radius:2px; opacity:.95; transform:translateX(var(--x,0));
+      animation: confetti-fall var(--dur,1800ms) ease-out forwards;
+    }
+    @keyframes confetti-fall{ to{ transform: translate(calc(var(--x,0) + var(--dx,0)), 110vh) rotate(var(--rot,360deg)); } }
+
+    /* Level modal */
+    .modal{ position:fixed; inset:0; display:none; place-items:center; z-index:1000; background:rgba(0,0,0,.5); }
+    .modal.show{ display:grid; }
+    .modal-card{ width:min(600px, 92vw); background:#0f1115; border:1px solid #23293a; border-radius:16px; padding:20px; }
+    .modal-title{ font-size:22px; font-weight:700; margin:0 0 8px 0; }
+    .modal-sub{ color:#8b93a7; margin-bottom:14px; }
+    .modal-rows{ display:grid; gap:8px; margin:12px 0 18px; }
+    .modal-row{ display:flex; justify-content:space-between; color:#cbd5e1; }
+    .modal-actions{ display:flex; gap:10px; justify-content:flex-end; align-items:center; }
+    .note{font-size:12px;color:#8b93a7;margin-right:auto}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="title">Pixel People - Guess The Character</div>
+      <button id="reset">Reset Progress</button>
+    </header>
+
+    <div class="level-bar">
+      <span class="pill" id="levelLabel">Level 1</span>
+      <div id="levelCells" class="level-cells" aria-label="Level progress"></div>
+      <span class="pill">Score: <strong id="scoreLabel">0</strong></span>
+    </div>
+
+    <section class="stage" aria-live="polite" aria-atomic="true">
+      <div class="artbox">
+        <img id="art" alt="Character puzzle" src="" />
+      </div>
+
+      <div class="col">
+        <div class="guess-row">
+          <input id="guess" type="text" placeholder="Type your guess..." autocomplete="off" />
+          <button id="submit">Enter</button>
+        </div>
+
+        <div id="result" class="result"></div>
+
+        <div class="flex" style="text-align:center; display:flex; justify-content:center; gap:10px;">
+          <button id="hint">Hint</button>
+          <button id="giveup">Give Up</button>
+          <button id="levelStats">Level Stats</button>
+          <button id="next" disabled>Next Puzzle</button>
+        </div>
+
+        <div class="progress" title="Progress"><div id="bar"></div></div>
+
+        <div id="kb">
+          <div class="kb-row" id="kb-r1"></div>
+          <div class="kb-row" id="kb-r2"></div>
+          <div class="kb-row" id="kb-r3"></div>
+          <div class="kb-row" id="kb-r4"></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div id="fx-confetti" class="fx-confetti" aria-hidden="true"></div>
+
+  <!-- Level Stats / Complete Modal -->
+  <div id="levelModal" class="modal">
+    <div class="modal-card">
+      <h2 class="modal-title" id="modalTitle">Level Stats</h2>
+      <div class="modal-sub" id="modalSub">Live results</div>
+      <div class="modal-rows">
+        <div class="modal-row"><span>Level</span><strong id="mLevel">1</strong></div>
+        <div class="modal-row"><span>Puzzles solved</span><strong id="mSolved">0</strong></div>
+        <div class="modal-row"><span>Puzzles revealed</span><strong id="mRevealed">0</strong></div>
+        <div class="modal-row"><span>Hints used</span><strong id="mHints">0</strong></div>
+        <div class="modal-row"><span>Level score (10 each, 5 if hinted)</span><strong id="mScore">0</strong></div>
+        <div class="modal-row"><span>Total score</span><strong id="mTotal">0</strong></div>
+      </div>
+      <div class="modal-actions">
+        <div class="note" id="unlockNote" style="display:none;">Complete all 10 puzzles in this level to unlock next level.</div>
+        <button id="modalClose">Close</button>
+        <button id="modalNext">Start Next Level</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const $ = (s)=>document.querySelector(s);
+    const normalize = s => (s||"").toString().trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9\s'-]/g, "").replace(/\s+/g, " ");
+
+    const LS_KEY="pp_state_scoring_multianswers_v1";
+
+    const State={current:0,solved:{},givenUp:{},hintsUsed:{},guessAttempts:{},total:0,score:0};
+    let puzzles=[];
+
+    const art=$('#art'), guess=$('#guess'), submit=$('#submit'), giveup=$('#giveup'),
+          nextBtn=$('#next'), result=$('#result'), levelLabel=$('#levelLabel'),
+          bar=$('#bar'), reset=$('#reset'), scoreLabel=$('#scoreLabel'),
+          cellsWrap=$('#levelCells');
+
+    const levelModal=$('#levelModal'), modalTitle=$('#modalTitle'), modalSub=$('#modalSub'),
+          mLevel=$('#mLevel'), mSolved=$('#mSolved'), mRevealed=$('#mRevealed'),
+          mHints=$('#mHints'), mScore=$('#mScore'), mTotal=$('#mTotal'),
+          modalNext=$('#modalNext'), unlockNote=$('#unlockNote'), modalClose=$('#modalClose');
+
+    // Confetti
+    function launchConfetti(pieces=80){
+      const root=document.getElementById('fx-confetti'); if(!root)return;
+      root.innerHTML='';
+      for(let i=0;i<pieces;i++){
+        const el=document.createElement('div');
+        el.className='piece';
+        const x=Math.random()*100, dx=(Math.random()*40-20),
+              w=6+Math.random()*6, h=10+Math.random()*10,
+              hue=Math.floor(Math.random()*360),
+              rot=(Math.random()*720-360), dur=1200+Math.random()*1200;
+        el.style.setProperty('--x',x+'vw');
+        el.style.setProperty('--dx',dx+'vw');
+        el.style.setProperty('--w',w+'px');
+        el.style.setProperty('--h',h+'px');
+        el.style.setProperty('--hue',hue);
+        el.style.setProperty('--rot',rot+'deg');
+        el.style.setProperty('--dur',dur+'ms');
+        root.appendChild(el);
+      }
+      setTimeout(()=>{root.innerHTML='';},2600);
+    }
+
+    // Persistence
+    function loadState(){try{const raw=localStorage.getItem(LS_KEY);if(!raw)return;Object.assign(State,JSON.parse(raw));}catch{}}
+    function saveState(){localStorage.setItem(LS_KEY,JSON.stringify(State));}
+    function resetState(){localStorage.removeItem(LS_KEY);State.current=0;State.solved={};State.givenUp={};State.hintsUsed={};State.guessAttempts={};State.score=0;saveState();}
+
+    // Levels
+    function getLevel(i){return Math.floor(i/10)+1;}
+    function levelRange(level){const s=(level-1)*10;return{start:s,end:Math.min(level*10-1,State.total-1)};}
+    function levelComplete(level){const {start,end}=levelRange(level);for(let i=start;i<=end;i++){if(!State.solved[i]&&!State.givenUp[i])return false;}return true;}
+    function levelStats(level){const {start,end}=levelRange(level);let solved=0,revealed=0,hinted=0,score=0;for(let i=start;i<=end;i++){if(State.solved[i]){solved++;if(State.hintsUsed[i]){hinted++;score+=5;}else{score+=10;}}else if(State.givenUp[i])revealed++;}return{solved,revealed,hinted,score};}
+
+    // Level cells (10 vertical rectangles)
+    function renderLevelCells(){
+      const lvl=getLevel(State.current);
+      const {start,end}=levelRange(lvl);
+      const activeIndex=State.current-start;
+      cellsWrap.innerHTML="";
+      for(let i=0;i<10;i++){
+        const idx=start+i;
+        const div=document.createElement('div');
+        div.className='cell';
+        if(idx<State.total){
+          if(State.solved[idx]) div.classList.add('ok');
+          else if(State.givenUp[idx]) div.classList.add('bad');
+        }else{
+          div.style.opacity=.3;
+        }
+        if(i===activeIndex) div.classList.add('active');
+        cellsWrap.appendChild(div);
+      }
+    }
+
+    // Progress resets each level
+    function updateProgress(){
+      const lvl = getLevel(State.current);
+      const { start, end } = levelRange(lvl);
+      const levelTotal = Math.max(1, end - start + 1);
+      let done = 0;
+      for (let i = start; i <= end; i++){
+        if (State.solved[i] || State.givenUp[i]) done++;
+      }
+      const pct = Math.round((done / levelTotal) * 100);
+      bar.style.width = pct + "%";
+    }
+
+    function updateLevelLabels(){
+      const cur=getLevel(State.current);
+      levelLabel.textContent=`Level ${cur}`;
+      scoreLabel.textContent=State.score.toFixed(0);
+      renderLevelCells();
+    }
+    function showResult(t,c){result.textContent=t;result.className="result show "+(c||"");}
+    function clearResult(){result.textContent="";result.className="result";}
+    function lockNext(x){
+      nextBtn.disabled=x;
+      if(!x){ nextBtn.classList.add("active"); } else { nextBtn.classList.remove("active"); }
+    }
+
+    // Render a puzzle
+    function renderPuzzle(){
+      if(State.current>=puzzles.length){
+        showResult("All levels complete!","good");
+        guess.disabled=true; submit.disabled=true; giveup.disabled=true;
+        updateLevelLabels();
+        return;
+      }
+      const p=puzzles[State.current];
+      art.src=p.image; guess.value=""; clearResult();
+      lockNext(!(State.solved[State.current]||State.givenUp[State.current]));
+      updateProgress(); updateLevelLabels(); guess.focus();
+    }
+
+    // Multi-answer matcher
+    function isCorrect(answerOrPuzzle, guessStr){
+      const toNorm = s => normalize(s).replace(/[^a-z0-9 ]/g,"");
+      const g = toNorm(guessStr);
+      if (!g) return false;
+
+      let candidates = [];
+      if (typeof answerOrPuzzle === "string") {
+        candidates = [answerOrPuzzle];
+      } else if (answerOrPuzzle) {
+        const primary = answerOrPuzzle.name || "";
+        const extras = Array.isArray(answerOrPuzzle.answers) ? answerOrPuzzle.answers : [];
+        candidates = [primary, ...extras];
+      }
+      return candidates.some(c => {
+        const a = toNorm(c);
+        return a && a === g;
+      });
+    }
+
+    // Modal open
+    function openLevelModal(level,final=false){
+      const {solved,revealed,hinted,score}=levelStats(level);
+      mLevel.textContent=level;
+      mSolved.textContent=solved;
+      mRevealed.textContent=revealed;
+      mHints.textContent=hinted;
+      mScore.textContent=score;
+      mTotal.textContent=State.score;
+
+      const complete=levelComplete(level);
+      modalTitle.textContent=final?"All Levels Complete":complete?"Level Complete":"Level Stats";
+      modalSub.textContent=final?"You finished every puzzle":complete?"Great job":"Live results";
+      unlockNote.style.display=!final&&!complete?"block":"none";
+      modalNext.textContent=final?"Play Again":"Start Next Level";
+      modalNext.disabled=!final&&!complete;
+
+      levelModal.classList.add('show');
+      setTimeout(()=>{(!modalNext.disabled?modalNext:modalClose).focus();},0);
+    }
+
+    // Guess handling
+    function handleGuess(){
+      const idx=State.current, p=puzzles[idx], val=guess.value;
+      if(!val.trim()) return;
+      if(State.solved[idx]||State.givenUp[idx]) return;
+
+      if(isCorrect(p, val)){
+        State.solved[idx]=true;
+        State.score += State.hintsUsed[idx] ? 5 : 10;
+        saveState();
+        showResult("Correct. Nice job.","good");
+        lockNext(false);
+        updateLevelLabels();
+        updateProgress();
+        launchConfetti();
+      }else{
+        State.guessAttempts[idx]=(State.guessAttempts[idx]||0)+1;
+        saveState();
+        if(State.guessAttempts[idx]>=3){
+          State.givenUp[idx]=true;
+          delete State.solved[idx];
+          showResult(`Revealed: ${p.name}`,"revealed");
+          lockNext(false);
+          saveState();
+          updateLevelLabels();
+          updateProgress();
+        }else{
+          showResult(`Not quite. Try again (${State.guessAttempts[idx]}/3).`,"bad");
+        }
+      }
+    }
+
+    function handleGiveUp(){
+      const idx=State.current;
+      if(State.solved[idx]||State.givenUp[idx]) return;
+      State.givenUp[idx]=true;
+      saveState();
+      showResult(`Revealed: ${puzzles[idx].name}`,"revealed");
+      lockNext(false);
+      updateLevelLabels();
+      updateProgress();
+    }
+
+    function atEndOfLevel(i){const lvl=getLevel(i),{end}=levelRange(lvl);return i===end;}
+    function handleNext(){
+      if(nextBtn.disabled) return;
+      if(atEndOfLevel(State.current)){
+        const lvl=getLevel(State.current);
+        const final=State.current>=puzzles.length-1;
+        openLevelModal(lvl,final);
+        return;
+      }
+      State.current=Math.min(State.current+1,puzzles.length);
+      saveState(); renderPuzzle();
+    }
+
+    function handleHint(){
+      const idx=State.current, p=puzzles[idx];
+      if(!p) return;
+      State.hintsUsed[idx]=true;
+      saveState();
+      const text=p.hint&&p.hint.trim()?p.hint:`Starts with "${(p.name||"").trim().charAt(0)}"`;
+      showResult(`Hint: ${text}`,"revealed");
+    }
+
+    // Events
+    document.addEventListener("keydown",e=>{
+      if(e.key==="Enter"&&document.activeElement===guess){e.preventDefault();handleGuess();}
+      else if(e.key==="Escape"){guess.focus();}
+      else if((e.key==="n"||e.key==="N")&&!nextBtn.disabled){handleNext();}
+    });
+    submit.addEventListener("click",handleGuess);
+    giveup.addEventListener("click",handleGiveUp);
+    nextBtn.addEventListener("click",handleNext);
+    $("#hint").addEventListener("click", handleHint);
+    $("#levelStats").addEventListener("click", ()=> openLevelModal(getLevel(State.current), State.current>=puzzles.length-1 && levelComplete(getLevel(State.current))));
+    modalClose.addEventListener("click", ()=> levelModal.classList.remove('show'));
+    modalNext.addEventListener("click", ()=>{
+      if(modalNext.disabled) return;
+      const lvl=parseInt(mLevel.textContent,10);
+      const final=modalTitle.textContent.includes("All Levels Complete");
+      levelModal.classList.remove('show');
+      if(final){
+        // Restart run.
+        State.current=0;
+        State.solved={}; State.givenUp={}; State.hintsUsed={}; State.guessAttempts={};
+        State.score=0;
+      }else{
+        const { end } = levelRange(lvl);
+        State.current=Math.min(end+1,puzzles.length);
+      }
+      saveState(); renderPuzzle();
+    });
+    reset.addEventListener("click",()=>{if(confirm("Clear your progress?")){resetState();renderPuzzle();}});
+
+    // Puzzles with improved hints and broader accepted answers
+    const LIVE_PUZZLES = [
+      { image:"images/1.png",  name:"Michael Jackson", hint:"Beat It, Thriller, Billie Jean",
+        answers:["MJ","Michael","Jackson","King of Pop","Michael J Jackson"] },
+      { image:"images/2.png",  name:"Hulk Hogan", hint:"Hulkamania, red and yellow",
+        answers:["Hogan","The Hulkster","Terry Bollea","Bollea","Hollywood Hogan"] },
+      { image:"images/3.png",  name:"Groot", hint:"Guardians of the Galaxy",
+        answers:["I am Groot","Baby Groot","Teen Groot"] },
+      { image:"images/4.png",  name:"Lady Gaga", hint:"Poker Face, Bad Romance",
+        answers:["Gaga","Stefani Germanotta","Stefani"] },
+      { image:"images/5.png",  name:"Donald Trump", hint:"The Apprentice catchphrase",
+        answers:["Trump","President Trump","Donald J Trump","DJT","Donald John Trump"] },
+      { image:"images/6.png",  name:"Wonder Woman", hint:"Lasso of Truth, Amazon warrior",
+        answers:["Diana Prince","Diana"] },
+      { image:"images/7.png",  name:"Ghostface", hint:"Scream mask and voice",
+        answers:["Scream","Ghost Face"] },
+      { image:"images/8.png",  name:"Buzz Lightyear", hint:"To infinity and beyond",
+        answers:["Buzz","Lightyear","Toy Story Buzz"] },
+      { image:"images/9.png",  name:"Deadpool", hint:"Fourth wall breaks, red suit",
+        answers:["Wade Wilson","Dead Pool","Wade"] },
+      { image:"images/10.png", name:"Borat", hint:"Kazakhstan journalist, very nice",
+        answers:["Borat Sagdiyev","Sagdiyev"] },
+
+      { image:"images/11.png", name:"Beyoncé", hint:"Single Ladies, Formation",
+        answers:["Beyonce","Queen Bey","Bey"] },
+      { image:"images/12.png", name:"WALL-E", hint:"Trash compacting robot in space",
+        answers:["WALL E","WALLE","Wall E","Wall-E"] },
+      { image:"images/13.png", name:"Michael Jordan", hint:"Air 23, Chicago Bulls",
+        answers:["MJ","Air Jordan","Jordan","Mike Jordan"] },
+      { image:"images/14.png", name:"Boba Fett", hint:"Mandalorian bounty hunter",
+        answers:["Fett"] },
+      { image:"images/15.png", name:"Vanilla Ice", hint:"Ice Ice Baby",
+        answers:["Robert Van Winkle","Van Winkle"] },
+      { image:"images/16.png", name:"Steve Jobs", hint:"Black turtleneck, Apple keynotes",
+        answers:["Jobs","Steven Jobs"] },
+      { image:"images/17.png", name:"Mr. T", hint:"I pity the fool",
+        answers:["Mister T","Mr T","Clubber Lang","BA Baracus","B. A. Baracus"] },
+      { image:"images/18.png", name:"Gizmo", hint:"Cute Mogwai, no water",
+        answers:["Gremlins Gizmo","Mogwai"] },
+      { image:"images/19.png", name:"Flavor Flav", hint:"Giant clock necklace",
+        answers:["Flav","Flavor Flave","William Drayton"] },
+      { image:"images/20.png", name:"Forrest Gump", hint:"Box of chocolates",
+        answers:["Forest Gump","Forrest"] },
+
+      { image:"images/21.png", name:"Charizard", hint:"Final form of Charmander",
+        answers:["Charzard","Lizardon"] },
+      { image:"images/22.png", name:"Mister Rogers", hint:"Cardigan and sneakers",
+        answers:["Mr Rogers","Fred Rogers","Mr. Rogers","Mister Rogers"] },
+      { image:"images/23.png", name:"The Goonies", hint:"Never say die",
+        answers:["Goonies"] },
+      { image:"images/24.png", name:"Jake The Snake Roberts", hint:"Damien python",
+        answers:["Jake Roberts","The Snake","Jack The Snake"] },
+      { image:"images/25.png", name:"Marty McFly", hint:"88 mph DeLorean",
+        answers:["Marty","McFly"] },
+      { image:"images/26.png", name:"Prince", hint:"Purple Rain, The Artist",
+        answers:["The Artist","TAFKAP","Prince Rogers Nelson","Symbol"] },
+      { image:"images/27.png", name:"Vladimir Guerrero Jr.", hint:"Blue Jays slugger",
+        answers:["Vladdy Jr","Vlad Jr","Guerrero Jr","Vladimir Guerrero Junior","Vladimir Guerrero"] },
+      { image:"images/28.png", name:"Ewok", hint:"Forest moon of Endor",
+        answers:["Ewoks","Wicket"] },
+      { image:"images/29.png", name:"The Terminator", hint:"I’ll be back",
+        answers:["Terminator","T 800","T800","T-800","Arnold Terminator"] },
+      { image:"images/30.png", name:"Donnie Darko", hint:"Frank the rabbit",
+        answers:["Donny Darko","Donnie"] },
+
+      { image:"images/31.png", name:"Macho Man", hint:"Oooh yeah",
+        answers:["Randy Savage","Macho Man Randy Savage","Randy Poffo"] },
+      { image:"images/32.png", name:"Joker", hint:"Clown prince of crime",
+        answers:["The Joker"] },
+      { image:"images/33.png", name:"Wayne’s World", hint:"Party time, excellent",
+        answers:["Waynes World","Wayne Campbell","Garth Algar","Wayne and Garth"] },
+      { image:"images/34.png", name:"Eleven", hint:"Stranger Things telekinesis",
+        answers:["El","Jane Hopper","Jane Ives","Stranger Things Eleven","11"] },
+      { image:"images/35.png", name:"Louis C.K.", hint:"Stand-up comic, FX series",
+        answers:["Louis CK","Louis CKay","Louis Székely","Louis Szekely"] },
+      { image:"images/36.png", name:"Ghostbusters", hint:"Who you gonna call",
+        answers:["Ray Stantz","Peter Venkman","Egon Spengler","Winston Zeddemore"] },
+      { image:"images/37.png", name:"The Rock", hint:"If you smell",
+        answers:["Dwayne Johnson","Rock"] },
+      { image:"images/38.png", name:"Jon Snow", hint:"Knows nothing",
+        answers:["John Snow","Aegon Targaryen","Lord Snow"] },
+      { image:"images/39.png", name:"Free Guy", hint:"NPC becomes hero",
+        answers:["Guy","Ryan Reynolds Free Guy"] },
+      { image:"images/40.png", name:"Wreck-It Ralph", hint:"Fix-It Felix",
+        answers:["Wreck it Ralph","Wreckit Ralph","Ralph"] },
+
+      { image:"images/41.png", name:"Big Bird", hint:"Sesame Street",
+        answers:["BigBird"] },
+      { image:"images/42.png", name:"John Wick", hint:"Baba Yaga, the boogeyman",
+        answers:["Wick","Keanu Wick"] },
+      { image:"images/43.png", name:"Jimi Hendrix", hint:"Purple Haze",
+        answers:["Hendrix","James Marshall Hendrix"] },
+      { image:"images/44.png", name:"Teen Wolf", hint:"High school werewolf",
+        answers:["Scott Howard","Michael J Fox Teen Wolf"] },
+      { image:"images/45.png", name:"Venom", hint:"Symbiote",
+        answers:["Eddie Brock","Lethal Protector"] },
+      { image:"images/46.png", name:"Vegeta", hint:"Prince of all Saiyans",
+        answers:["Prince Vegeta","Saiyan Prince"] },
+      { image:"images/47.png", name:"Scorpion", hint:"Get over here",
+        answers:["Hanzo Hasashi","Mortal Kombat Scorpion"] },
+      { image:"images/48.png", name:"Keyser Söze", hint:"Unreliable narrator",
+        answers:["Keyser Soze","The Usual Suspects","Soze"] },
+      { image:"images/49.png", name:"Top Gun", hint:"Naval aviators",
+        answers:["Maverick","Pete Mitchell","Tom Cruise Maverick"] },
+      { image:"images/50.png", name:"Stripe", hint:"Gremlins villain",
+        answers:["Gremlins Stripe"] },
+
+      { image:"images/51.png", name:"Wolverine", hint:"Adamantium claws",
+        answers:["Logan","James Howlett","X-Men Wolverine","Xmen"] },
+      { image:"images/52.png", name:"Alvin", hint:"High pitched singer",
+        answers:["Alvin and the Chipmunks","Chipmunks","Alvin Seville"] },
+      { image:"images/53.png", name:"Fresh Prince", hint:"West Philadelphia born and raised",
+        answers:["The Fresh Prince","Will Smith","Fresh Prince of Bel Air","Bel-Air"] },
+      { image:"images/54.png", name:"Mike Tyson", hint:"Heavyweight champ, Punch-Out",
+        answers:["Michael Tyson","Iron Mike","Kid Dynamite"] },
+      { image:"images/55.png", name:"Peppa Pig", hint:"British preschool icon",
+        answers:["Peppa"] },
+      { image:"images/56.png", name:"He-Man", hint:"By the power of Grayskull",
+        answers:["He Man","Prince Adam"] },
+      { image:"images/57.png", name:"Freddie Mercury", hint:"Bohemian Rhapsody",
+        answers:["Freddy Mercury","Farrokh Bulsara","Queen"] },
+      { image:"images/58.png", name:"Fat Albert", hint:"Hey hey hey",
+        answers:["FatAlbert"] },
+      { image:"images/59.png", name:"Eminem", hint:"Slim Shady",
+        answers:["Marshall Mathers","Slim Shady","M and M"] },
+      { image:"images/60.png", name:"Elton John", hint:"Rocket Man",
+        answers:["Sir Elton John","Reginald Dwight","Reggie Dwight"] },
+
+      { image:"images/61.png", name:"Bruce Lee", hint:"Jeet Kune Do",
+        answers:["Lee Jun Fan"] },
+      { image:"images/62.png", name:"Bugs Bunny", hint:"What’s up, Doc",
+        answers:["Bugs","Looney Tunes Bugs"] },
+      { image:"images/63.png", name:"Home Alone", hint:"Wet Bandits",
+        answers:["Kevin McCallister","Kevin"] },
+      { image:"images/64.png", name:"Jason Voorhees", hint:"Hockey mask",
+        answers:["Jason","Voorhees"] },
+      { image:"images/65.png", name:"Avatar", hint:"Blue Na’vi on Pandora",
+        answers:["James Cameron Avatar","Na’vi","Navi"] },
+      { image:"images/66.png", name:"Jean Grey", hint:"Phoenix Force",
+        answers:["Marvel Girl","Phoenix","Dark Phoenix","Jean Gray"] },
+      { image:"images/67.png", name:"Lion-O", hint:"Thundercats leader",
+        answers:["Liono","Thundercats Lion-O"] },
+      { image:"images/68.png", name:"Indiana Jones", hint:"It belongs in a museum",
+        answers:["Indy","Dr. Jones","Henry Jones Jr","Indiana"] },
+      { image:"images/69.png", name:"Barney", hint:"Purple dinosaur",
+        answers:["Barney the Dinosaur"] },
+      { image:"images/70.png", name:"Carrot Top", hint:"Prop comic, red hair",
+        answers:["Scott Thompson","Prop Comedian"] },
+
+      { image:"images/71.png", name:"Predator", hint:"Thermal vision hunter",
+        answers:["Yautja","The Predator"] },
+      { image:"images/72.png", name:"Batman", hint:"Dark Knight",
+        answers:["Bruce Wayne","The Batman"] },
+      { image:"images/73.png", name:"Clint Eastwood", hint:"Make my day",
+        answers:["Eastwood"] },
+      { image:"images/74.png", name:"Kermit the Frog", hint:"Rainbow Connection",
+        answers:["Kermit","Muppets Kermit"] },
+      { image:"images/75.png", name:"She-Ra", hint:"Princess of Power",
+        answers:["She Ra","Adora"] },
+      { image:"images/76.png", name:"Captain Picard", hint:"Make it so",
+        answers:["Jean Luc Picard","Jean-Luc Picard","Picard","Captain Jean Luc Picard"] },
+      { image:"images/77.png", name:"Oprah", hint:"Daytime talk icon",
+        answers:["Oprah Winfrey","Winfrey"] },
+      { image:"images/78.png", name:"Say Anything", hint:"Boombox serenade",
+        answers:["Lloyd Dobler","John Cusack Boombox"] },
+      { image:"images/79.png", name:"Rambo", hint:"Green beret, bandana",
+        answers:["John Rambo","First Blood"] },
+      { image:"images/80.png", name:"Homer Simpson", hint:"D’oh",
+        answers:["Homer","Simpson","Homer J Simpson"] },
+
+      { image:"images/81.png", name:"Optimus Prime", hint:"Autobots roll out",
+        answers:["Prime","Transformers Optimus"] },
+      { image:"images/82.png", name:"Die Hard", hint:"Yippee ki yay",
+        answers:["John McClane","McClane","Bruce Willis Die Hard"] },
+      { image:"images/83.png", name:"Eric Cartman", hint:"Respect my authority",
+        answers:["Cartman"] },
+      { image:"images/84.png", name:"Madonna", hint:"Material Girl",
+        answers:["Madonna Ciccone","Queen of Pop"] },
+      { image:"images/85.png", name:"Yoda", hint:"Do or do not",
+        answers:["Master Yoda"] },
+      { image:"images/86.png", name:"Tiger Woods", hint:"Green jacket",
+        answers:["Eldrick Woods","Eldrick T Woods"] },
+      { image:"images/87.png", name:"Elon Musk", hint:"SpaceX and Tesla",
+        answers:["Musk"] },
+      { image:"images/88.png", name:"Iron Man", hint:"Genius billionaire",
+        answers:["Tony Stark","Anthony Stark","Mk 3","Mark 3"] },
+      { image:"images/89.png", name:"Billie Eilish", hint:"Bad Guy",
+        answers:["Eilish","Billie"] },
+      { image:"images/90.png", name:"Justin Bieber", hint:"Baby, Peaches",
+        answers:["Bieber","JB"] },
+
+      { image:"images/91.png", name:"Pluto", hint:"Disney dog",
+        answers:["Mickey’s dog","Mickeys dog"] },
+      { image:"images/92.png", name:"Breaking Bad", hint:"Blue meth teacher",
+        answers:["Walter White","Heisenberg"] },
+      { image:"images/93.png", name:"Baymax", hint:"Healthcare companion",
+        answers:["Big Hero 6 Baymax"] },
+      { image:"images/94.png", name:"Up", hint:"House with balloons",
+        answers:["Carl Fredricksen","Carl"] },
+      { image:"images/95.png", name:"Mike Wazowski", hint:"One-eyed monster",
+        answers:["Wazowski","Monsters Inc Mike"] },
+      { image:"images/96.png", name:"Knight Rider", hint:"Talking car",
+        answers:["KITT","Michael Knight","David Hasselhoff"] },
+      { image:"images/97.png", name:"Happy Gilmore", hint:"Hockey slapshot golf",
+        answers:["Happy Gilmour","Adam Sandler Happy"] },
+      { image:"images/98.png", name:"Howard Stern", hint:"Radio shock jock",
+        answers:["Stern","Howard Allan Stern"] },
+      { image:"images/99.png", name:"Andre Agassi", hint:"Tennis rebel",
+        answers:["Agassi","Andre Kirk Agassi"] },
+      { image:"images/100.png", name:"Cast Away", hint:"Wilson volleyball",
+        answers:["Castaway","Tom Hanks Cast Away","Chuck Noland"] },
+    ];
+
+    /* Keyboard layout */
+    const KB_ROWS = [
+      ["Q","W","E","R","T","Y","U","I","O","P"],
+      ["A","S","D","F","G","H","J","K","L"],
+      ["-","Z","X","C","V","B","N","M",".","'"],
+      ["Enter","Space","Delete"],
+    ];
+
+    function addKey(rowEl,label,wide=false){
+      const b=document.createElement("button");
+      b.className="kb-key"+(wide?" wide":"");
+      b.textContent=label;
+      b.addEventListener("click",()=>pressKey(label));
+      rowEl.appendChild(b);
+    }
+
+    function pressKey(label){
+      if(!puzzles.length) return;
+      switch(label){
+        case "Delete": guess.value = guess.value.slice(0, -1); break;
+        case "Enter":  handleGuess(); break;
+        case "Space":  guess.value += " "; break;
+        case "'":      guess.value += "'"; break;
+        case "-":      guess.value += "-"; break;
+        case ".":      guess.value += "."; break;
+        default:       guess.value += label.toLowerCase();
+      }
+      guess.focus();
+    }
+
+    (function buildKeyboard(){
+      const r1=$("#kb-r1"), r2=$("#kb-r2"), r3=$("#kb-r3"), r4=$("#kb-r4");
+      KB_ROWS[0].forEach(k=>addKey(r1,k));
+      KB_ROWS[1].forEach(k=>addKey(r2,k));
+      KB_ROWS[2].forEach(k=>addKey(r3,k));
+      KB_ROWS[3].forEach(k=>addKey(r4,k,true));
+    })();
+
+    (function init(){
+      loadState();
+      puzzles = LIVE_PUZZLES;
+      State.total = puzzles.length;
+      if(State.current >= puzzles.length) State.current = 0;
+      renderPuzzle();
+    })();
+  </script>
+</body>
+</html>
